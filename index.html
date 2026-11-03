@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Qummar Waheed Chartered Accountants provides audit, tax, SECP and corporate advisory services in Faisalabad, Pakistan.">
+  <meta name="description"
+    content="Qummar Waheed Chartered Accountants provides audit, tax, SECP and corporate advisory services in Faisalabad, Pakistan.">
   <title>QWCA | Chartered Accountants, Faisalabad</title>
-  
+
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
@@ -18,36 +22,36 @@
       --navy-900: #0b172a;
       --navy-800: #13243e;
       --navy-700: #1b3358;
-      
+
       --primary: #1e60d5;
       --primary-hover: #144cb3;
       --primary-light: #eef4ff;
       --primary-subtle: rgba(30, 96, 213, 0.08);
       --primary-border: rgba(30, 96, 213, 0.2);
-      
+
       --accent-gold: #d97706;
       --accent-gold-light: #fef3c7;
       --accent-teal: #0d9488;
       --accent-teal-light: #ccfbf1;
-      
+
       --text-dark: #0f172a;
       --text-body: #334155;
       --text-muted: #64748b;
       --text-light: #94a3b8;
-      
+
       --bg-white: #ffffff;
       --bg-subtle: #f8fafc;
       --bg-alt: #f1f5f9;
-      
+
       --line: #e2e8f0;
       --line-hover: #cbd5e1;
-      
+
       --radius-sm: 6px;
       --radius-md: 10px;
       --radius-lg: 14px;
       --radius-xl: 20px;
       --radius-full: 9999px;
-      
+
       --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
       --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
       --shadow-md: 0 10px 20px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
@@ -55,8 +59,14 @@
       --shadow-hover: 0 16px 36px -8px rgba(30, 96, 213, 0.15), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       color: var(--text-body);
@@ -88,12 +98,14 @@
       font-size: 13px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
+
     .topbar .container {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
     }
+
     .topbar-link {
       display: inline-flex;
       align-items: center;
@@ -101,15 +113,18 @@
       color: #f1f5f9;
       font-weight: 500;
     }
+
     .topbar-link:hover {
       color: #60a5fa;
     }
+
     .topbar-info {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       color: #94a3b8;
     }
+
     .topbar-badge {
       display: inline-flex;
       align-items: center;
@@ -135,6 +150,7 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
       transition: all 0.2s ease;
     }
+
     .nav {
       min-height: 76px;
       display: flex;
@@ -153,6 +169,7 @@
       font-size: 21px;
       letter-spacing: -0.02em;
     }
+
     .brand-mark {
       width: 44px;
       height: 44px;
@@ -168,19 +185,23 @@
       flex-shrink: 0;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
     .brand:hover .brand-mark {
       transform: scale(1.04);
       box-shadow: 0 6px 16px rgba(30, 96, 213, 0.3);
     }
+
     .brand-mark-svg {
       width: 24px;
       height: 24px;
     }
+
     .brand-text {
       display: flex;
       flex-direction: column;
       line-height: 1.15;
     }
+
     .brand-text small {
       display: block;
       color: var(--primary);
@@ -199,11 +220,13 @@
       font-size: 14.5px;
       font-weight: 500;
     }
+
     .links a {
       color: var(--text-body);
       position: relative;
       padding: 6px 0;
     }
+
     .links a::after {
       content: "";
       position: absolute;
@@ -215,9 +238,11 @@
       border-radius: 2px;
       transition: width 0.2s ease;
     }
+
     .links a:hover {
       color: var(--primary);
     }
+
     .links a:hover::after {
       width: 100%;
     }
@@ -241,11 +266,13 @@
       box-shadow: 0 4px 14px rgba(30, 96, 213, 0.3);
       transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
+
     .button:hover {
       background: linear-gradient(135deg, var(--primary-hover) 0%, #0d3b94 100%);
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(30, 96, 213, 0.4);
     }
+
     .button:active {
       transform: translateY(0);
     }
@@ -266,6 +293,7 @@
       letter-spacing: 0.08em;
       margin-bottom: 12px;
     }
+
     .eyebrow::before {
       content: "";
       display: inline-block;
@@ -276,22 +304,27 @@
     }
 
     /* Typography */
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       color: var(--navy-900);
       line-height: 1.2;
       font-weight: 700;
       letter-spacing: -0.025em;
     }
+
     h1 {
       margin: 12px 0 16px;
       font-size: clamp(34px, 4.4vw, 50px);
       font-weight: 800;
       line-height: 1.15;
     }
+
     h2 {
       margin: 0 0 12px;
       font-size: clamp(26px, 3.2vw, 34px);
     }
+
     h3 {
       margin: 0 0 8px;
       font-size: 19px;
@@ -302,20 +335,23 @@
       position: relative;
       padding: 80px 0 90px;
       background: radial-gradient(1100px circle at 85% 15%, rgba(30, 96, 213, 0.07) 0%, transparent 60%),
-                  radial-gradient(700px circle at 10% 85%, rgba(2, 132, 199, 0.05) 0%, transparent 50%),
-                  var(--bg-subtle);
+        radial-gradient(700px circle at 10% 85%, rgba(2, 132, 199, 0.05) 0%, transparent 50%),
+        var(--bg-subtle);
       border-bottom: 1px solid var(--line);
       overflow: hidden;
     }
+
     .hero-layout {
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
       align-items: center;
       gap: 56px;
     }
+
     .hero-content {
       max-width: 650px;
     }
+
     .hero p {
       max-width: 580px;
       color: var(--text-muted);
@@ -323,6 +359,7 @@
       line-height: 1.65;
       margin: 0 0 24px;
     }
+
     .hero .button {
       margin-top: 4px;
     }
@@ -332,6 +369,7 @@
       position: relative;
       width: 100%;
     }
+
     .hero-photo-wrap::before {
       content: "";
       position: absolute;
@@ -341,6 +379,7 @@
       z-index: 0;
       filter: blur(12px);
     }
+
     .hero-photo {
       position: relative;
       z-index: 1;
@@ -354,6 +393,7 @@
       box-shadow: var(--shadow-lg);
       display: block;
     }
+
     .hero-photo-badge {
       position: absolute;
       bottom: -14px;
@@ -368,6 +408,7 @@
       align-items: center;
       gap: 10px;
     }
+
     .hero-photo-badge-icon {
       width: 32px;
       height: 32px;
@@ -379,15 +420,18 @@
       font-weight: 800;
       font-size: 13px;
     }
+
     .hero-photo-badge-text {
       display: flex;
       flex-direction: column;
       line-height: 1.2;
     }
+
     .hero-photo-badge-text strong {
       font-size: 13px;
       color: var(--navy-900);
     }
+
     .hero-photo-badge-text span {
       font-size: 11px;
       color: var(--text-muted);
@@ -397,10 +441,12 @@
     .section {
       padding: 84px 0;
     }
+
     .section-heading {
       max-width: 680px;
       margin-bottom: 36px;
     }
+
     .section-heading p {
       color: var(--text-muted);
       font-size: 16.5px;
@@ -413,6 +459,7 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 22px;
     }
+
     .card {
       padding: 30px;
       border: 1px solid var(--line);
@@ -422,11 +469,13 @@
       transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
       position: relative;
     }
+
     .card:hover {
       transform: translateY(-5px);
       border-color: rgba(30, 96, 213, 0.35);
       box-shadow: var(--shadow-hover);
     }
+
     .card-icon {
       width: 44px;
       height: 44px;
@@ -437,16 +486,19 @@
       place-items: center;
       margin-bottom: 18px;
     }
+
     .card h3 {
       font-size: 20px;
       margin-bottom: 10px;
     }
+
     .card p {
       color: var(--text-muted);
       font-size: 14.5px;
       line-height: 1.6;
       margin-bottom: 16px;
     }
+
     .card ul {
       list-style: none;
       padding-left: 0;
@@ -455,6 +507,7 @@
       flex-direction: column;
       gap: 9px;
     }
+
     .card li {
       position: relative;
       padding-left: 24px;
@@ -462,6 +515,7 @@
       font-size: 14px;
       line-height: 1.5;
     }
+
     .card li::before {
       content: "";
       position: absolute;
@@ -480,6 +534,7 @@
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
     }
+
     .table-wrap {
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
@@ -487,16 +542,20 @@
       box-shadow: var(--shadow-sm);
       overflow: hidden;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
     }
-    th, td {
+
+    th,
+    td {
       padding: 16px 20px;
       border-bottom: 1px solid var(--line);
       font-size: 14.5px;
     }
+
     th {
       color: #ffffff;
       background: var(--navy-900);
@@ -506,19 +565,24 @@
       letter-spacing: 0.07em;
       border-bottom: none;
     }
+
     tbody tr:last-child td {
       border-bottom: none;
     }
+
     tbody tr {
       transition: background 0.15s ease;
     }
+
     tbody tr:hover {
       background: #f1f7fe;
     }
+
     .filing-title {
       font-weight: 600;
       color: var(--navy-900);
     }
+
     .badge {
       display: inline-block;
       padding: 3px 9px;
@@ -527,16 +591,19 @@
       font-weight: 700;
       letter-spacing: 0.03em;
     }
+
     .badge-fbr {
       background: #eef4ff;
       color: #1e40af;
       border: 1px solid #bfdbfe;
     }
+
     .badge-secp {
       background: #ecfdf5;
       color: #047857;
       border: 1px solid #a7f3d0;
     }
+
     .pill-freq {
       display: inline-flex;
       align-items: center;
@@ -548,6 +615,7 @@
       background: #f1f5f9;
       color: #475569;
     }
+
     .pill-freq::before {
       content: "";
       width: 5px;
@@ -560,14 +628,16 @@
     .team-intro {
       margin-bottom: 34px;
     }
+
     .team-intro p {
       max-width: 700px;
       color: var(--text-muted);
       font-size: 16.5px;
       margin: 0;
     }
+
     .team-head {
-      margin-bottom: 24px;
+      margin-bottom: 28px;
       padding: 32px;
       border: 1px solid var(--line);
       border-left: 5px solid var(--primary);
@@ -575,25 +645,33 @@
       background: linear-gradient(135deg, #ffffff 0%, var(--bg-subtle) 100%);
       box-shadow: var(--shadow-sm);
     }
+
     .team-manager {
+      margin-top: 28px;
+      margin-bottom: 0;
       border-left-color: #0284c7;
     }
+
     .team-manager .partner-tag {
       background: #e0f2fe;
       color: #0369a1;
     }
+
     .team-manager .partner-role {
       color: #0284c7;
     }
+
     .partner {
       display: grid;
       grid-template-columns: 140px 1fr;
       gap: 30px;
       align-items: center;
     }
+
     .partner-photo-wrap {
       position: relative;
     }
+
     .partner-photo {
       width: 140px;
       height: 160px;
@@ -604,6 +682,7 @@
       border: 2px solid var(--bg-white);
       box-shadow: var(--shadow-md);
     }
+
     .partner-tag {
       display: inline-flex;
       align-items: center;
@@ -616,10 +695,12 @@
       font-weight: 700;
       margin-bottom: 6px;
     }
+
     .partner h3 {
       font-size: 22px;
       margin: 4px 0 6px;
     }
+
     .partner-role {
       color: var(--primary);
       font-weight: 700;
@@ -628,6 +709,7 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+
     .partner p {
       color: var(--text-body);
       font-size: 15px;
@@ -637,54 +719,113 @@
 
     .team-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      padding-top: 36px;
     }
+
     .team-card {
-      padding: 28px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 22px;
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
       background: var(--bg-white);
       box-shadow: var(--shadow-xs);
       transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
     }
+
     .team-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px);
       border-color: rgba(30, 96, 213, 0.35);
       box-shadow: var(--shadow-hover);
     }
-    .team-initial {
-      width: 48px;
-      height: 48px;
+
+    .team-card-media {
+      flex: 0 0 30%;
+      max-width: 30%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .team-card-media .team-member-thumb {
+      width: 100%;
+      max-width: 125px;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      object-position: center 20%;
+      display: block;
+      border: 2px solid var(--line);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      cursor: zoom-in;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .team-card-media .team-member-thumb:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 16px rgba(30, 96, 213, 0.2);
+    }
+
+    .team-card-media .team-initial {
+      width: 100%;
+      max-width: 85px;
+      aspect-ratio: 1 / 1;
       display: grid;
       place-items: center;
-      margin-bottom: 18px;
+      margin: 0;
       border-radius: var(--radius-md);
       color: white;
-      font-size: 18px;
+      font-size: 26px;
       font-weight: 800;
-      box-shadow: var(--shadow-xs);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
     }
+
     .initial-tax {
       background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
     }
+
     .initial-audit {
       background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%);
     }
+
     .initial-corp {
       background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     }
+
     .initial-it {
       background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     }
-    .team-card h3 {
-      font-size: 18px;
-      margin-bottom: 8px;
+
+    .team-card-body {
+      flex: 1;
+      min-width: 0;
     }
-    .team-card p {
+
+    .team-card-body h3 {
+      font-size: 17.5px;
+      margin: 0 0 4px;
+      color: var(--navy-900);
+      line-height: 1.35;
+    }
+
+    .team-card-body .team-card-role {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 11.5px;
+      margin: 0 0 8px !important;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+
+    .team-card-body p {
       margin-bottom: 0;
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 13.5px;
       line-height: 1.6;
     }
 
@@ -693,30 +834,36 @@
       background: var(--bg-subtle);
       border-top: 1px solid var(--line);
     }
+
     .contact-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 48px;
       align-items: start;
     }
+
     .contact-details p {
       margin: 14px 0;
       font-size: 15px;
       line-height: 1.6;
     }
+
     .contact-details a {
       color: var(--primary);
       font-weight: 600;
     }
+
     .contact-details a:hover {
       text-decoration: underline;
     }
+
     .contact-list {
       margin-top: 24px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
+
     .contact-item {
       display: flex;
       align-items: flex-start;
@@ -727,6 +874,7 @@
       background: var(--bg-white);
       box-shadow: var(--shadow-xs);
     }
+
     .contact-icon {
       width: 38px;
       height: 38px;
@@ -737,9 +885,11 @@
       place-items: center;
       flex-shrink: 0;
     }
+
     .contact-item-text {
       font-size: 14.5px;
     }
+
     .contact-item-text strong {
       display: block;
       color: var(--navy-900);
@@ -757,9 +907,11 @@
       background: var(--bg-white);
       box-shadow: var(--shadow-md);
     }
+
     .form-group {
       margin-bottom: 18px;
     }
+
     label {
       display: block;
       margin: 0 0 6px;
@@ -767,7 +919,10 @@
       font-size: 13.5px;
       font-weight: 700;
     }
-    input, select, textarea {
+
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 12px 14px;
       border: 1.5px solid #cbd5e1;
@@ -778,15 +933,20 @@
       font-size: 14.5px;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    input:focus, select:focus, textarea:focus {
+
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(30, 96, 213, 0.12);
     }
+
     textarea {
       min-height: 110px;
       resize: vertical;
     }
+
     form .button {
       width: 100%;
       padding: 14px 20px;
@@ -794,40 +954,206 @@
       margin-top: 6px;
     }
 
+    /* Contact Social Channels */
+    .contact-social-channels {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .social-channels-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .social-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .social-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .social-pill svg {
+      flex-shrink: 0;
+    }
+
+    .social-pill.whatsapp {
+      background: #E8F8EE;
+      color: #0E7756;
+      border-color: rgba(37, 211, 102, 0.35);
+    }
+
+    .social-pill.whatsapp:hover {
+      background: #25D366;
+      color: #ffffff;
+      border-color: #25D366;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
+    }
+
+    .social-pill.linkedin {
+      background: #EDF3F8;
+      color: #0A66C2;
+      border-color: rgba(10, 102, 194, 0.35);
+    }
+
+    .social-pill.linkedin:hover {
+      background: #0A66C2;
+      color: #ffffff;
+      border-color: #0A66C2;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(10, 102, 194, 0.35);
+    }
+
+    .social-pill.facebook {
+      background: #EEF3FA;
+      color: #1877F2;
+      border-color: rgba(24, 119, 242, 0.35);
+    }
+
+    .social-pill.facebook:hover {
+      background: #1877F2;
+      color: #ffffff;
+      border-color: #1877F2;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(24, 119, 242, 0.35);
+    }
+
     /* Footer */
     footer {
-      padding: 32px 0;
+      padding: 34px 0;
       color: #94a3b8;
       background: var(--navy-950);
       font-size: 13.5px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    footer .container {
+
+    .footer-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 18px;
     }
-    footer span:first-child {
+
+    .footer-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .footer-meta span:first-child {
       color: #e2e8f0;
       font-weight: 500;
     }
 
+    .footer-note {
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+
+    .footer-social-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-social-icon {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.07);
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: all 0.22s ease;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .footer-social-icon:hover {
+      transform: translateY(-3px);
+    }
+
+    .footer-social-icon.whatsapp:hover {
+      background: #25D366;
+      color: #ffffff;
+      border-color: #25D366;
+      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.45);
+    }
+
+    .footer-social-icon.linkedin:hover {
+      background: #0A66C2;
+      color: #ffffff;
+      border-color: #0A66C2;
+      box-shadow: 0 6px 16px rgba(10, 102, 194, 0.45);
+    }
+
+    .footer-social-icon.facebook:hover {
+      background: #1877F2;
+      color: #ffffff;
+      border-color: #1877F2;
+      box-shadow: 0 6px 16px rgba(24, 119, 242, 0.45);
+    }
+
     /* Responsive */
-    @media (max-width: 900px) {
+    @media (max-width: 960px) {
       .hero-layout {
         grid-template-columns: 1fr;
         gap: 36px;
       }
+
       .hero-photo {
         max-height: 360px;
       }
+
       .services {
         grid-template-columns: 1fr;
       }
+
       .team-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        padding-top: 30px;
       }
+
+      .team-card {
+        padding: 20px 16px;
+        gap: 16px;
+      }
+
+      .team-card-media {
+        flex: 0 0 30%;
+        max-width: 30%;
+      }
+
+      .team-card-media .team-member-thumb {
+        max-width: 105px;
+      }
+
+      .team-card-media .team-initial {
+        max-width: 75px;
+        font-size: 24px;
+      }
+
       .contact-grid {
         grid-template-columns: 1fr;
         gap: 32px;
@@ -835,66 +1161,369 @@
     }
 
     @media (max-width: 700px) {
+      .container {
+        width: min(100% - 32px, 1140px);
+      }
+
+      .topbar {
+        padding: 8px 0;
+      }
+
       .topbar .container {
         flex-direction: column;
         align-items: flex-start;
-        gap: 4px;
+        gap: 5px;
+        font-size: 12px;
       }
+
+      .topbar-info {
+        font-size: 11.5px;
+        line-height: 1.4;
+      }
+
       .nav {
+        min-height: auto;
+        padding: 14px 0;
+        gap: 12px;
         align-items: flex-start;
         flex-direction: column;
-        padding: 16px 0;
-        gap: 14px;
       }
+
+      .brand {
+        font-size: 19px;
+      }
+
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+      }
+
       .links {
+        width: 100%;
+        display: flex;
         flex-wrap: wrap;
-        gap: 12px 20px;
+        gap: 8px;
       }
+
+      .links a {
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        background: var(--bg-alt);
+        color: var(--navy-900);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .links a::after {
+        display: none;
+      }
+
       .hero {
-        padding: 56px 0;
+        padding: 44px 0 52px;
       }
-      .section {
-        padding: 56px 0;
-      }
-      .partner {
+
+      .hero-layout {
         grid-template-columns: 1fr;
-        text-align: left;
+        gap: 28px;
       }
-      .partner-photo {
-        width: 120px;
-        height: 140px;
+
+      h1 {
+        font-size: clamp(28px, 7vw, 36px);
+        margin: 10px 0 14px;
       }
+
+      .hero p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .hero-photo-wrap {
+        max-width: 440px;
+        margin: 0 auto;
+      }
+
+      .hero-photo {
+        max-height: 280px;
+        aspect-ratio: 16 / 10;
+      }
+
+      .hero-photo-badge {
+        bottom: -8px;
+        right: 12px;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+
+      .hero-photo-badge-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+
+      .hero-photo-badge-text strong {
+        font-size: 12px;
+      }
+
+      .hero-photo-badge-text span {
+        font-size: 10.5px;
+      }
+
+      .section {
+        padding: 52px 0;
+      }
+
+      .section-heading {
+        margin-bottom: 28px;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      .services {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        padding: 24px 20px;
+      }
+
       .table-wrap {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
+
       table {
-        min-width: 580px;
+        min-width: 520px;
       }
-      footer .container {
+
+      th,
+      td {
+        padding: 12px 14px;
+        font-size: 13.5px;
+      }
+
+      .partner {
+        grid-template-columns: 1fr;
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: 16px;
+      }
+
+      .partner-photo {
+        width: 105px;
+        height: 120px;
+      }
+
+      .team-head {
+        padding: 24px 20px;
+      }
+
+      .team-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding-top: 24px;
+      }
+
+      .team-card {
+        padding: 18px 16px;
+        gap: 14px;
+      }
+
+      .team-card-media {
+        flex: 0 0 28%;
+        max-width: 95px;
+      }
+
+      .team-card-media .team-member-thumb {
+        max-width: 95px;
+      }
+
+      .team-card-media .team-initial {
+        max-width: 70px;
+        font-size: 22px;
+      }
+
+      .team-card-body h3 {
+        font-size: 16.5px;
+      }
+
+      .team-card-body p {
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      form {
+        padding: 22px 18px;
+      }
+
+      input,
+      select,
+      textarea {
+        font-size: 16px;
+        /* Prevents iOS Safari zoom */
+      }
+    }
+
+    @media (max-width: 440px) {
+      .team-card {
+        padding: 14px 12px;
+        gap: 12px;
+      }
+
+      .team-card-media {
+        flex: 0 0 72px;
+        max-width: 72px;
+      }
+
+      .team-card-media .team-member-thumb {
+        max-width: 72px;
+      }
+
+      .team-card-media .team-initial {
+        max-width: 60px;
+        font-size: 20px;
+      }
+
+      .team-card-body h3 {
+        font-size: 15.5px;
+      }
+
+      .social-pills-row {
+        flex-direction: column;
+      }
+
+      .social-pill {
+        width: 100%;
+        justify-content: center;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
+
+      *,
+      *::before,
+      *::after {
         scroll-behavior: auto !important;
         transition-duration: .01ms !important;
       }
     }
+
+    /* Fullscreen Image Preview Lightbox */
+    img {
+      cursor: zoom-in;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(7, 14, 27, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
+    }
+
+    .image-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .image-modal-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      z-index: 2;
+    }
+
+    .image-modal-close:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.08);
+    }
+
+    .image-modal-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 90vw;
+      max-height: 90vh;
+      transform: scale(0.92);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .image-modal.active .image-modal-content {
+      transform: scale(1);
+    }
+
+    .image-modal-img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: var(--radius-md);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+      object-fit: contain;
+      cursor: default;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .image-modal-caption {
+      margin: 14px 0 0;
+      color: #f1f5f9;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
   </style>
 </head>
+
 <body>
   <!-- Topbar -->
   <div class="topbar">
     <div class="container">
       <a href="tel:+92415392192" class="topbar-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
         <span>Call us: +92-41-5392192</span>
       </a>
       <span class="topbar-info">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
         <span>Main Boulevard, Wapda City, Faisalabad · ICAP Approved Training Organization</span>
       </span>
     </div>
@@ -906,10 +1535,12 @@
       <a class="brand" href="#home">
         <span class="brand-mark" aria-hidden="true">
           <svg class="brand-mark-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="transparent"/>
-            <path d="M9 10C9 7.79 10.79 6 13 6H19C21.21 6 23 7.79 23 10V16C23 18.21 21.21 20 19 20H15.5L12 23.5V20H13C10.79 20 9 18.21 9 16V10Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" opacity="0.9"/>
-            <path d="M12 13H20M12 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="23" cy="8" r="2.5" fill="#38BDF8"/>
+            <rect width="32" height="32" rx="8" fill="transparent" />
+            <path
+              d="M9 10C9 7.79 10.79 6 13 6H19C21.21 6 23 7.79 23 10V16C23 18.21 21.21 20 19 20H15.5L12 23.5V20H13C10.79 20 9 18.21 9 16V10Z"
+              stroke="white" stroke-width="1.8" stroke-linejoin="round" opacity="0.9" />
+            <path d="M12 13H20M12 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" />
+            <circle cx="23" cy="8" r="2.5" fill="#38BDF8" />
           </svg>
         </span>
         <span class="brand-text">
@@ -933,14 +1564,19 @@
         <div class="hero-content">
           <span class="eyebrow">Qummar Waheed Chartered Accountants</span>
           <h1>Clear advice for better business decisions.</h1>
-          <p>Reliable accounting, audit, tax and corporate services for businesses and individuals in Faisalabad and across Pakistan.</p>
+          <p>Reliable accounting, audit, tax and corporate services for businesses and individuals in Faisalabad and
+            across Pakistan.</p>
           <a class="button" href="#contact">
             <span>Schedule a consultation</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
           </a>
         </div>
         <div class="hero-photo-wrap">
-          <img class="hero-photo" src="1617259615181.jpg" alt="Qummar Waheed, Managing Partner of QWCA">
+          <img class="hero-photo" src="Qummar Waheed.jpg" alt="Qummar Waheed, Managing Partner of QWCA">
           <div class="hero-photo-badge" aria-hidden="true">
             <div class="hero-photo-badge-icon">FCA</div>
             <div class="hero-photo-badge-text">
@@ -963,7 +1599,13 @@
         <div class="services">
           <article class="card">
             <div class="card-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
             </div>
             <h3>Taxation &amp; Advisory</h3>
             <p>Tax preparation, planning and support with FBR, PRA and other tax authorities.</p>
@@ -976,7 +1618,11 @@
 
           <article class="card">
             <div class="card-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <polyline points="9 12 11 14 15 10" />
+              </svg>
             </div>
             <h3>Audit &amp; Assurance</h3>
             <p>Independent audits and reviews that support accurate reporting and stronger controls.</p>
@@ -989,7 +1635,11 @@
 
           <article class="card">
             <div class="card-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
             </div>
             <h3>SECP &amp; Corporate Services</h3>
             <p>Help with company formation, statutory filings and corporate secretarial work.</p>
@@ -1002,7 +1652,12 @@
 
           <article class="card">
             <div class="card-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
             </div>
             <h3>SEZ Advisory</h3>
             <p>Guidance for businesses and developers working with Special Economic Zones.</p>
@@ -1022,7 +1677,8 @@
         <div class="section-heading">
           <span class="eyebrow">Important dates</span>
           <h2>Tax &amp; Compliance Calendar</h2>
-          <p>Common filing deadlines. Actual dates may vary by taxpayer and can be extended by the relevant authority.</p>
+          <p>Common filing deadlines. Actual dates may vary by taxpayer and can be extended by the relevant authority.
+          </p>
         </div>
         <div class="table-wrap">
           <table>
@@ -1071,56 +1727,89 @@
         <div class="team-intro">
           <span class="eyebrow">Our leadership</span>
           <h2>Meet the QWCA Team</h2>
-          <p>Our team works across accounting, tax, audit and corporate services to provide practical support to businesses and individuals.</p>
+          <p>Our team works across accounting, tax, audit and corporate services to provide practical support to
+            businesses and individuals.</p>
         </div>
+        <!-- Firm Head across the top -->
         <div class="team-head">
           <div class="partner">
             <div class="partner-photo-wrap">
-              <img class="partner-photo" src="1617259615181.jpg" alt="Qummar Waheed, FCA, Managing Partner">
+              <img class="partner-photo" src="Qummar Waheed.jpg" alt="Qummar Waheed, FCA, Managing Partner">
             </div>
             <div>
               <span class="partner-tag">Firm head</span>
               <h3>Qummar Waheed, FCA</h3>
               <p class="partner-role"><strong>Managing Partner</strong></p>
-              <p>Qummar leads the firm’s client work and provides guidance on audit, taxation, SECP compliance and corporate advisory. He is committed to professional integrity, clear communication and dependable client service.</p>
+              <p>Qummar leads the firm’s client work and provides guidance on audit, taxation, SECP compliance and
+                corporate advisory. He is committed to professional integrity, clear communication and dependable client
+                service.</p>
             </div>
           </div>
         </div>
+
+
+        <!-- Team Lead & Manager (at the back of other four team members, alike head or ceo) -->
         <div class="team-head team-manager">
           <div class="partner">
             <div class="partner-photo-wrap">
-              <img class="partner-photo" src="1617259615181.jpg" alt="Manager, Team Lead">
+              <img class="partner-photo" src="manager.jpg" alt="Accounting & Finance Manager, Team Lead">
             </div>
             <div>
-              <span class="partner-tag">Manager</span>
-              <h3>Manager</h3>
-              <p class="partner-role"><strong>Team Lead</strong></p>
-              <p>Directs engagement workflow and client coordination across audit, tax compliance, and corporate filings to ensure accuracy, compliance, and dependable turnaround.</p>
+              <span class="partner-tag">Team Lead</span>
+              <h3>Accounting &amp; Finance Manager</h3>
+              <p class="partner-role"><strong>Team Lead · Accounting &amp; Finance</strong></p>
+              <p>Directs accounting operations, financial reporting, and client workflow coordination across audit, tax
+                compliance, and corporate filings to ensure accuracy, compliance, and dependable turnaround.</p>
             </div>
           </div>
         </div>
+
+        <!-- The Four Team Members -->
         <div class="team-grid">
           <article class="team-card">
-            <div class="team-initial initial-tax" aria-hidden="true">T</div>
-            <h3>Tax Department</h3>
-            <p>Supports clients with tax returns, withholding compliance, tax planning and correspondence with tax authorities.</p>
+            <div class="team-card-media">
+              <img class="team-member-thumb" src="Nafees Akram.jpg" alt="Nafees Akram">
+            </div>
+            <div class="team-card-body">
+              <h3>Nafees Akram</h3>
+              <p class="team-card-role">Internal Audit Associate &middot; Taxation &amp; Advisory</p>
+              <p>Specializes in internal audit engagements, tax planning, statutory compliance, and financial advisory&mdash;helping clients strengthen controls and ensure regulatory compliance.</p>
+            </div>
           </article>
           <article class="team-card">
-            <div class="team-initial initial-audit" aria-hidden="true">A</div>
-            <h3>Audit &amp; Assurance</h3>
-            <p>Works on audit engagements, financial reporting and reviews of internal controls.</p>
+            <div class="team-card-media">
+              <img class="team-member-thumb" src="Rana Hammad.jpeg" alt="Muhammad Hammad Akram">
+            </div>
+            <div class="team-card-body">
+              <h3>M. Hammad Akram</h3>
+              <p class="team-card-role">Internal Audit Associate &middot; Taxation &amp; Advisory</p>
+              <p>Specializes in internal audit engagements, tax planning, compliance, and financial advisory&mdash;helping
+                clients strengthen internal controls and ensure regulatory compliance with FBR &amp; SECP.</p>
+            </div>
           </article>
           <article class="team-card">
-            <div class="team-initial initial-corp" aria-hidden="true">C</div>
-            <h3>Corporate Services</h3>
-            <p>Helps with company formation, SECP filings, corporate records and secretarial support.</p>
+            <div class="team-card-media">
+              <img class="team-member-thumb" src="Muhammad Hashaam.jpeg" alt="Muhammad Hasham">
+            </div>
+            <div class="team-card-body">
+              <h3>Muhammad Hasham</h3>
+              <p class="team-card-role">Internal Audit Associate &middot; Taxation &amp; Advisory</p>
+              <p>Specializes in internal audit engagements, direct &amp; indirect taxation, risk reviews, and FBR compliance&mdash;providing dependable advisory for business operations.</p>
+            </div>
           </article>
           <article class="team-card">
-            <div class="team-initial initial-it" aria-hidden="true">IT</div>
-            <h3>IT Guy</h3>
-            <p>Oversees digital accounting software, client data security, tax portal integrations, and technical IT support.</p>
+            <div class="team-card-media">
+              <img class="team-member-thumb" src="it-guy.jpg" alt="Talha Rehman">
+            </div>
+            <div class="team-card-body">
+              <h3>Talha Rehman</h3>
+              <p class="team-card-role">IT &amp; Systems Infrastructure</p>
+              <p>Architects internal accounting platforms, automated tax filing integrations, cybersecurity, and cloud
+                client portals.</p>
+            </div>
           </article>
         </div>
+
       </div>
     </section>
 
@@ -1131,11 +1820,15 @@
           <span class="eyebrow">Get in touch</span>
           <h2>Contact QWCA</h2>
           <p>Have a question or need professional support? Get in touch with our Faisalabad office.</p>
-          
+
           <div class="contact-list">
             <div class="contact-item">
               <div class="contact-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
               </div>
               <div class="contact-item-text">
                 <strong>Phone</strong>
@@ -1145,7 +1838,11 @@
 
             <div class="contact-item">
               <div class="contact-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
               </div>
               <div class="contact-item-text">
                 <strong>Email</strong>
@@ -1155,22 +1852,60 @@
 
             <div class="contact-item">
               <div class="contact-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
               </div>
               <div class="contact-item-text">
                 <strong>Address</strong>
-                <span>Business 3-G Commercial, Jamal Plaza, 1st Floor, Main Boulevard, Wapda City, Faisalabad, Pakistan</span>
+                <span>Business 3-G Commercial, Jamal Plaza, 1st Floor, Main Boulevard, Wapda City, Faisalabad,
+                  Pakistan</span>
               </div>
             </div>
 
             <div class="contact-item">
               <div class="contact-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
               </div>
               <div class="contact-item-text">
                 <strong>Office hours</strong>
                 <span>Monday–Friday, 9:00 AM–5:00 PM</span>
               </div>
+            </div>
+          </div>
+
+          <div class="contact-social-channels">
+            <span class="social-channels-label">Connect with us directly:</span>
+            <div class="social-pills-row">
+              <a href="https://wa.me/92415392192?text=Hello%20QWCA,%20I%20would%20like%20to%20inquire%20about%20your%20services."
+                target="_blank" rel="noopener noreferrer" class="social-pill whatsapp" aria-label="Chat with QWCA on WhatsApp">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                </svg>
+                <span>WhatsApp</span>
+              </a>
+
+              <a href="https://www.linkedin.com/company/qummar-waheed-ca"
+                target="_blank" rel="noopener noreferrer" class="social-pill linkedin" aria-label="Follow QWCA on LinkedIn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.46 1.46 0 0 0-2.91 0c0 .8.65 1.45 1.46 1.45m1.37 9.74v-8.37H5.09v8.37z"/>
+                </svg>
+                <span>LinkedIn</span>
+              </a>
+
+              <a href="https://www.facebook.com/qwca.pk"
+                target="_blank" rel="noopener noreferrer" class="social-pill facebook" aria-label="Visit QWCA on Facebook">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span>Facebook</span>
+              </a>
             </div>
           </div>
         </div>
@@ -1196,11 +1931,16 @@
           </div>
           <div class="form-group">
             <label for="message">Message</label>
-            <textarea id="message" name="Message" placeholder="How can our practice assist your business?" required></textarea>
+            <textarea id="message" name="Message" placeholder="How can our practice assist your business?"
+              required></textarea>
           </div>
           <button class="button" type="submit">
             <span>Send message</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
           </button>
         </form>
       </div>
@@ -1209,14 +1949,97 @@
 
   <!-- Footer -->
   <footer>
-    <div class="container">
-      <span>© <span id="year">2026</span> Qummar Waheed Chartered Accountants</span>
-      <span>Website information is general guidance and is not professional advice.</span>
+    <div class="container footer-content">
+      <div class="footer-meta">
+        <span>&copy; <span id="year">2026</span> Qummar Waheed Chartered Accountants</span>
+        <span class="footer-note">Website information is general guidance and is not professional advice.</span>
+      </div>
+      <div class="footer-social-links" aria-label="Official Social Channels">
+        <a href="https://wa.me/92415392192?text=Hello%20QWCA,%20I%20would%20like%20to%20inquire%20about%20your%20services."
+          target="_blank" rel="noopener noreferrer" class="footer-social-icon whatsapp" title="Chat on WhatsApp" aria-label="WhatsApp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/qummar-waheed-ca"
+          target="_blank" rel="noopener noreferrer" class="footer-social-icon linkedin" title="Follow on LinkedIn" aria-label="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.46 1.46 0 0 0-2.91 0c0 .8.65 1.45 1.46 1.45m1.37 9.74v-8.37H5.09v8.37z"/>
+          </svg>
+        </a>
+        <a href="https://www.facebook.com/qwca.pk"
+          target="_blank" rel="noopener noreferrer" class="footer-social-icon facebook" title="Visit Facebook Page" aria-label="Facebook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </footer>
 
+  <!-- Fullscreen Image Preview Lightbox -->
+  <div id="imageModal" class="image-modal" aria-hidden="true" role="dialog" aria-label="Image Preview">
+    <button class="image-modal-close" aria-label="Close preview">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="image-modal-content">
+      <img id="modalImg" class="image-modal-img" src="" alt="">
+      <p id="modalCaption" class="image-modal-caption"></p>
+    </div>
+  </div>
+
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Fullscreen Image Lightbox Preview
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalCaption = document.getElementById('modalCaption');
+    const closeBtn = document.querySelector('.image-modal-close');
+
+    function openModal(img) {
+      modalImg.src = img.src;
+      modalImg.alt = img.alt || 'Full screen preview';
+      modalCaption.textContent = img.alt || '';
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        if (!modal.classList.contains('active')) {
+          modalImg.src = '';
+        }
+      }, 250);
+    }
+
+    // Attach click listener to all page images (excluding modal image itself)
+    document.querySelectorAll('img:not(.image-modal-img)').forEach((img) => {
+      img.addEventListener('click', () => openModal(img));
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || e.target.classList.contains('image-modal-content')) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
   </script>
 </body>
+
 </html>
