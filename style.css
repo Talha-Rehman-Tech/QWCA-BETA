@@ -421,6 +421,63 @@
       margin: 0;
     }
 
+    /* FAQ Section */
+    .faq {
+      background: var(--bg-subtle);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .faq-list {
+      max-width: 860px;
+      border-top: 1px solid var(--line);
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .faq-item summary {
+      position: relative;
+      padding: 20px 44px 20px 4px;
+      color: var(--navy-900);
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary::after {
+      content: "+";
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      color: var(--primary);
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1;
+      transform: translateY(-50%);
+    }
+
+    .faq-item[open] summary::after {
+      content: "\2212";
+    }
+
+    .faq-item summary:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+    }
+
+    .faq-item p {
+      max-width: 760px;
+      margin: -4px 44px 20px 4px;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
     /* Services Section */
     .services {
       display: grid;
@@ -669,6 +726,38 @@
       margin: 4px 0 6px;
     }
 
+    .partner-heading {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .partner-linkedin {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid rgba(10, 102, 194, 0.3);
+      border-radius: var(--radius-full);
+      background: #edf3f8;
+      color: #0a66c2;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .partner-linkedin:hover {
+      background: #0a66c2;
+      color: #ffffff;
+    }
+
+    .partner-linkedin:focus-visible {
+      outline: 2px solid #0a66c2;
+      outline-offset: 3px;
+    }
+
     .partner-role {
       color: var(--primary);
       font-weight: 700;
@@ -731,6 +820,10 @@
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       cursor: zoom-in;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .team-card-media .team-member-thumb-top {
+      object-position: center top;
     }
 
     .team-card-media .team-member-thumb:hover {
