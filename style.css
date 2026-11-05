@@ -686,6 +686,21 @@
       color: #0284c7;
     }
 
+    .team-senior {
+      margin-top: 28px;
+      margin-bottom: 0;
+      border-left-color: #6366f1;
+    }
+
+    .team-senior .partner-tag {
+      background: #eef2ff;
+      color: #4338ca;
+    }
+
+    .team-senior .partner-role {
+      color: #4f46e5;
+    }
+
     .partner {
       display: grid;
       grid-template-columns: 140px 1fr;
