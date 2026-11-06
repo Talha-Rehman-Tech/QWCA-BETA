@@ -83,7 +83,7 @@
           </a>
         </div>
         <div class="hero-photo-wrap">
-          <img class="hero-photo" src="assets/Qummar Waheed.webp" alt="Qummar Waheed, Managing Partner of QWCA">
+          <img class="hero-photo" src="assets/Qummar Waheed.webp" alt="Qummar Waheed, Managing Partner of QWCA" width="928" height="1152" loading="eager" decoding="async">
           <div class="hero-photo-badge">
             <div class="hero-photo-badge-icon">FCA</div>
             <div class="hero-photo-badge-text">
@@ -187,22 +187,27 @@
         <div class="section-heading">
           <span class="eyebrow">Interactive Estimator</span>
           <h2>Calculate Your Income Tax Instantly</h2>
-          <p>Choose your taxpayer category and enter your monthly income to estimate your annual taxable income, monthly tax deduction, and net take-home pay based on official FBR tax slabs.</p>
+          <p>Choose your taxpayer category and enter your monthly income to estimate your annual taxable income, monthly
+            tax deduction, and net take-home pay based on official FBR tax slabs.</p>
         </div>
 
         <!-- Tax Category Switcher (Salaried vs Business) -->
         <div class="tax-category-switch-wrap">
           <div class="tax-category-switch" role="tablist" aria-label="Taxpayer Category Selection">
-            <button type="button" class="category-tab active" data-category="salaried" role="tab" aria-selected="true" id="tabSalaried">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <button type="button" class="category-tab active" data-category="salaried" role="tab" aria-selected="true"
+              id="tabSalaried">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
               <span>Salaried Individual</span>
               <span class="cat-pill active-pill">Active</span>
             </button>
-            <button type="button" class="category-tab" data-category="business" role="tab" aria-selected="false" id="tabBusiness">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <button type="button" class="category-tab" data-category="business" role="tab" aria-selected="false"
+              id="tabBusiness">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
@@ -215,222 +220,236 @@
         <!-- Salaried Calculator View -->
         <div id="salariedCalcView">
           <div class="tax-calc-grid">
-          <!-- Input Card -->
-          <div class="calc-card calc-input-card">
-            <div class="calc-card-header">
-              <div class="calc-card-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="2" width="16" height="20" rx="2" />
-                  <line x1="8" y1="6" x2="16" y2="6" />
-                  <line x1="16" y1="14" x2="16" y2="18" />
-                  <path d="M16 10h.01" />
-                  <path d="M12 10h.01" />
-                  <path d="M8 10h.01" />
-                  <path d="M12 14h.01" />
-                  <path d="M8 14h.01" />
-                  <path d="M12 18h.01" />
-                  <path d="M8 18h.01" />
-                </svg>
+            <!-- Input Card -->
+            <div class="calc-card calc-input-card">
+              <div class="calc-card-header">
+                <div class="calc-card-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" />
+                    <line x1="8" y1="6" x2="16" y2="6" />
+                    <line x1="16" y1="14" x2="16" y2="18" />
+                    <path d="M16 10h.01" />
+                    <path d="M12 10h.01" />
+                    <path d="M8 10h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M8 14h.01" />
+                    <path d="M12 18h.01" />
+                    <path d="M8 18h.01" />
+                  </svg>
+                </div>
+                <div>
+                  <h3>Calculate Your Tax</h3>
+                  <p>Enter your details and let us do the math for you</p>
+                </div>
               </div>
-              <div>
-                <h3>Calculate Your Tax</h3>
-                <p>Enter your details and let us do the math for you</p>
+
+              <form id="taxCalculatorForm" class="calc-form" onsubmit="event.preventDefault();">
+                <!-- Tax Year Field on Top -->
+                <div class="form-group">
+                  <label for="taxYear">Tax Year</label>
+                  <select id="taxYear" name="taxYear">
+                    <option value="2026-2027" selected>Tax Year 2026–2027</option>
+                    <option value="2025-2026">Tax Year 2025–2026</option>
+                    <option value="2024-2025">Tax Year 2024–2025</option>
+                    <option value="2023-2024">Tax Year 2023–2024</option>
+                  </select>
+                </div>
+
+                <!-- Salary Input with Monthly / Annually Option -->
+                <div class="form-group">
+                  <div class="salary-input-header">
+                    <label for="monthlySalary" id="salaryInputLabel">Monthly Salary (PKR)</label>
+                    <select id="salaryPeriod" name="salaryPeriod" class="salary-period-select" aria-label="Salary calculation period">
+                      <option value="monthly" selected>Monthly</option>
+                      <option value="annually">Annually</option>
+                    </select>
+                  </div>
+                  <div class="currency-input-wrap">
+                    <span class="currency-prefix">Rs</span>
+                    <input type="text" id="monthlySalary" name="monthlySalary" inputmode="numeric"
+                      placeholder="e.g. 100,000" value="100,000" autocomplete="off" required>
+                  </div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="salary-presets" id="salaryPresetsWrap" aria-label="Quick salary presets">
+                  <span class="presets-label">Quick select:</span>
+                  <div class="presets-row" id="presetsRow">
+                    <button type="button" class="preset-pill" data-amount="50000">50k</button>
+                    <button type="button" class="preset-pill active" data-amount="100000">100k</button>
+                    <button type="button" class="preset-pill" data-amount="150000">150k</button>
+                    <button type="button" class="preset-pill" data-amount="250000">250k</button>
+                    <button type="button" class="preset-pill" data-amount="500000">500k</button>
+                  </div>
+                </div>
+
+                <button type="button" id="btnCalculateTax" class="button calc-btn">
+                  <span>Calculate Tax</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </form>
+
+              <div class="calc-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Calculated under Section 149 of Income Tax Ordinance, 2001 for salaried individuals.</span>
               </div>
             </div>
 
-            <form id="taxCalculatorForm" class="calc-form" onsubmit="event.preventDefault();">
-              <div class="form-group">
-                <label for="monthlySalary">Monthly Salary (PKR)</label>
-                <div class="currency-input-wrap">
-                  <span class="currency-prefix">Rs</span>
-                  <input type="text" id="monthlySalary" name="monthlySalary" inputmode="numeric"
-                    placeholder="e.g. 100,000" value="100,000" autocomplete="off" required>
+            <!-- Result Card -->
+            <div class="calc-card calc-result-card" id="calcResults">
+              <div class="result-header">
+                <span class="result-badge" id="resYearBadge">Tax Year 2026–2027</span>
+                <h3>Calculation Summary</h3>
+              </div>
+
+              <div class="result-highlight-box">
+                <div class="res-item primary-res">
+                  <span class="res-label">Monthly Take-Home</span>
+                  <span class="res-value take-home" id="resMonthlyTakeHome">Rs 99,500</span>
+                  <span class="res-sub">Net salary after tax</span>
+                </div>
+                <div class="res-item highlight-tax">
+                  <span class="res-label">Monthly Tax Deduction</span>
+                  <span class="res-value tax-amt" id="resMonthlyTax">Rs 500</span>
+                  <span class="res-sub">Deducted at source (WHT)</span>
                 </div>
               </div>
 
-              <!-- Quick Presets -->
-              <div class="salary-presets" aria-label="Quick salary presets">
-                <span class="presets-label">Quick select:</span>
-                <div class="presets-row">
-                  <button type="button" class="preset-pill" data-amount="50000">50k</button>
-                  <button type="button" class="preset-pill active" data-amount="100000">100k</button>
-                  <button type="button" class="preset-pill" data-amount="150000">150k</button>
-                  <button type="button" class="preset-pill" data-amount="250000">250k</button>
-                  <button type="button" class="preset-pill" data-amount="500000">500k</button>
+              <div class="result-metrics-grid">
+                <div class="metric-box">
+                  <span class="metric-label">Annual Salary</span>
+                  <span class="metric-value" id="resAnnualSalary">Rs 1,200,000</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">Total Annual Tax</span>
+                  <span class="metric-value" id="resAnnualTax">Rs 6,000</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">Annual Take-Home</span>
+                  <span class="metric-value" id="resAnnualTakeHome">Rs 1,194,000</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">Effective Tax Rate</span>
+                  <span class="metric-value" id="resEffectiveRate">0.50%</span>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="taxYear">Tax Year</label>
-                <select id="taxYear" name="taxYear">
-                  <option value="2026-2027" selected>Tax Year 2026–2027 (Latest Rates)</option>
-                  <option value="2025-2026">Tax Year 2025–2026 (Current Tax Year)</option>
-                  <option value="2024-2025">Tax Year 2024–2025 (FY 2024–25)</option>
-                  <option value="2023-2024">Tax Year 2023–2024 (Tax Year 2023–24)</option>
-                </select>
+              <div class="active-slab-banner" id="activeSlabBanner">
+                <div class="slab-banner-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <div class="slab-banner-text">
+                  <strong id="slabBannerTitle">Active Slab: Rs 600,001 – Rs 1,200,000 (1%)</strong>
+                  <span id="slabBannerDesc">1% of amount above Rs 600,000</span>
+                </div>
               </div>
 
-              <button type="button" id="btnCalculateTax" class="button calc-btn">
-                <span>Calculate Tax</span>
+              <div class="calc-action-row">
+                <a href="#contact" class="calc-consult-link">Need tax planning or filing advice? Consult QWCA &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Official Tax Slabs Table -->
+          <div class="tax-slabs-container">
+            <div class="slabs-table-header">
+              <div>
+                <h3 id="slabsTableTitle">Income Tax Slabs 2026–2027</h3>
+                <p id="slabsTableDesc">Tax year 2026-27 keeps the Rs 600,000 exemption but re-bands the middle and upper
+                  rates.</p>
+              </div>
+              <div class="slabs-tabs" role="tablist" aria-label="Tax Slabs Year Selection">
+                <button type="button" class="tab-btn active" data-year="2026-2027" role="tab" aria-selected="true">Tax Year 2026–2027</button>
+                <button type="button" class="tab-btn" data-year="2025-2026" role="tab" aria-selected="false">Tax Year 2025–2026</button>
+                <button type="button" class="tab-btn" data-year="2024-2025" role="tab" aria-selected="false">Tax Year 2024–2025</button>
+                <button type="button" class="tab-btn" data-year="2023-2024" role="tab" aria-selected="false">Tax Year 2023–2024</button>
+              </div>
+            </div>
+
+            <div class="table-wrap slabs-table-wrap">
+              <table class="slabs-table" id="slabsTable">
+                <thead>
+                  <tr>
+                    <th>Annual Taxable Income</th>
+                    <th>Rate</th>
+                    <th>Tax Payable</th>
+                  </tr>
+                </thead>
+                <tbody id="slabsTableBody">
+                  <!-- Dynamically populated and highlighted via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- /#salariedCalcView -->
+
+        <!-- Business / AOP Notice View (Displayed when Business tab is clicked) -->
+        <div class="business-placeholder-card" id="businessCalcView" hidden>
+          <div class="business-placeholder-inner">
+            <div class="business-status-pill">
+              <span class="status-dot"></span> Under Configuration (Coming Soon)
+            </div>
+            <div class="business-icon-wrap" aria-hidden="true">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <h3>Business Individual &amp; AOP Tax Computation</h3>
+            <p>Tax slabs, turnover limits, and calculation models for <strong>Sole Proprietors, Partnership Firms
+                (AOPs), and Non-Salaried Individuals</strong> under Section 113 &amp; Division I, Part I of the First
+              Schedule are currently being configured.</p>
+            <div class="business-features-list">
+              <div class="biz-feat-item">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
+                  <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
+                <span>Non-salaried progressive tax bands (up to 45%)</span>
+              </div>
+              <div class="biz-feat-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Turnover tax &amp; Minimum Tax (Section 113) adjustments</span>
+              </div>
+              <div class="biz-feat-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Partnership profit-sharing apportionment</span>
+              </div>
+            </div>
+            <div class="business-actions">
+              <button type="button" class="button" id="btnBackToSalaried">
+                &larr; Switch to Salaried Calculator
               </button>
-            </form>
-
-            <div class="calc-note">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <span>Calculated under Section 149 of Income Tax Ordinance, 2001 for salaried individuals.</span>
+              <a href="#contact" class="button button-outline">
+                Consult QWCA for Business Tax &rarr;
+              </a>
             </div>
-          </div>
-
-          <!-- Result Card -->
-          <div class="calc-card calc-result-card" id="calcResults">
-            <div class="result-header">
-              <span class="result-badge" id="resYearBadge">Tax Year 2026–2027</span>
-              <h3>Calculation Summary</h3>
-            </div>
-
-            <div class="result-highlight-box">
-              <div class="res-item primary-res">
-                <span class="res-label">Monthly Take-Home</span>
-                <span class="res-value take-home" id="resMonthlyTakeHome">Rs 99,500</span>
-                <span class="res-sub">Net salary after tax</span>
-              </div>
-              <div class="res-item highlight-tax">
-                <span class="res-label">Monthly Tax Deduction</span>
-                <span class="res-value tax-amt" id="resMonthlyTax">Rs 500</span>
-                <span class="res-sub">Deducted at source (WHT)</span>
-              </div>
-            </div>
-
-            <div class="result-metrics-grid">
-              <div class="metric-box">
-                <span class="metric-label">Annual Salary</span>
-                <span class="metric-value" id="resAnnualSalary">Rs 1,200,000</span>
-              </div>
-              <div class="metric-box">
-                <span class="metric-label">Total Annual Tax</span>
-                <span class="metric-value" id="resAnnualTax">Rs 6,000</span>
-              </div>
-              <div class="metric-box">
-                <span class="metric-label">Annual Take-Home</span>
-                <span class="metric-value" id="resAnnualTakeHome">Rs 1,194,000</span>
-              </div>
-              <div class="metric-box">
-                <span class="metric-label">Effective Tax Rate</span>
-                <span class="metric-value" id="resEffectiveRate">0.50%</span>
-              </div>
-            </div>
-
-            <div class="active-slab-banner" id="activeSlabBanner">
-              <div class="slab-banner-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-              </div>
-              <div class="slab-banner-text">
-                <strong id="slabBannerTitle">Active Slab: Rs 600,001 – Rs 1,200,000 (1%)</strong>
-                <span id="slabBannerDesc">1% of amount above Rs 600,000</span>
-              </div>
-            </div>
-
-            <div class="calc-action-row">
-              <a href="#contact" class="calc-consult-link">Need tax planning or filing advice? Consult QWCA &rarr;</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Official Tax Slabs Table -->
-        <div class="tax-slabs-container">
-          <div class="slabs-table-header">
-            <div>
-              <h3 id="slabsTableTitle">Income Tax Slabs 2026–27</h3>
-              <p id="slabsTableDesc">Tax year 2026-27 keeps the Rs 600,000 exemption but re-bands the middle and upper
-                rates.</p>
-            </div>
-            <div class="slabs-tabs" role="tablist" aria-label="Tax Slabs Year Selection">
-              <button type="button" class="tab-btn active" data-year="2026-2027" role="tab" aria-selected="true">Tax Year 2026–27</button>
-              <button type="button" class="tab-btn" data-year="2025-2026" role="tab" aria-selected="false">Tax Year 2025–26</button>
-              <button type="button" class="tab-btn" data-year="2024-2025" role="tab" aria-selected="false">Tax Year 2024–25</button>
-              <button type="button" class="tab-btn" data-year="2023-2024" role="tab" aria-selected="false">Tax Year 2023–24</button>
-            </div>
-          </div>
-
-          <div class="table-wrap slabs-table-wrap">
-            <table class="slabs-table" id="slabsTable">
-              <thead>
-                <tr>
-                  <th>Annual Taxable Income</th>
-                  <th>Rate</th>
-                  <th>Tax Payable</th>
-                </tr>
-              </thead>
-              <tbody id="slabsTableBody">
-                <!-- Dynamically populated and highlighted via JS -->
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
-      <!-- /#salariedCalcView -->
-
-      <!-- Business / AOP Notice View (Displayed when Business tab is clicked) -->
-      <div class="business-placeholder-card" id="businessCalcView" hidden>
-        <div class="business-placeholder-inner">
-          <div class="business-status-pill">
-            <span class="status-dot"></span> Under Configuration (Coming Soon)
-          </div>
-          <div class="business-icon-wrap" aria-hidden="true">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-            </svg>
-          </div>
-          <h3>Business Individual &amp; AOP Tax Computation</h3>
-          <p>Tax slabs, turnover limits, and calculation models for <strong>Sole Proprietors, Partnership Firms (AOPs), and Non-Salaried Individuals</strong> under Section 113 &amp; Division I, Part I of the First Schedule are currently being configured.</p>
-          <div class="business-features-list">
-            <div class="biz-feat-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span>Non-salaried progressive tax bands (up to 45%)</span>
-            </div>
-            <div class="biz-feat-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span>Turnover tax &amp; Minimum Tax (Section 113) adjustments</span>
-            </div>
-            <div class="biz-feat-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span>Partnership profit-sharing apportionment</span>
-            </div>
-          </div>
-          <div class="business-actions">
-            <button type="button" class="button" id="btnBackToSalaried">
-              &larr; Switch to Salaried Calculator
-            </button>
-            <a href="#contact" class="button button-outline">
-              Consult QWCA for Business Tax &rarr;
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
     <!-- Tax Calendar Section -->
     <section class="section calendar" id="calendar">
@@ -448,7 +467,6 @@
                 <th>Filing</th>
                 <th>Authority</th>
                 <th>Frequency</th>
-                <th>Typical due date</th>
               </tr>
             </thead>
             <tbody>
@@ -456,25 +474,21 @@
                 <td><strong class="filing-title">Sales Tax Return</strong></td>
                 <td><span class="badge badge-fbr">FBR</span></td>
                 <td><span class="pill-freq">Monthly</span></td>
-                <td>Usually 18th of following month</td>
               </tr>
               <tr>
                 <td><strong class="filing-title">Withholding Tax Statement</strong></td>
                 <td><span class="badge badge-fbr">FBR</span></td>
                 <td><span class="pill-freq">Quarterly</span></td>
-                <td>Usually 21st after quarter end</td>
               </tr>
               <tr>
                 <td><strong class="filing-title">Annual Income Tax Return</strong></td>
                 <td><span class="badge badge-fbr">FBR</span></td>
                 <td><span class="pill-freq">Annual</span></td>
-                <td>Varies by taxpayer</td>
               </tr>
               <tr>
                 <td><strong class="filing-title">Annual Company Return</strong></td>
                 <td><span class="badge badge-secp">SECP</span></td>
                 <td><span class="pill-freq">Annual</span></td>
-                <td>As required for your company</td>
               </tr>
             </tbody>
           </table>
@@ -528,7 +542,7 @@
                 alt="Abdul Rehman, Accounting & Finance Manager, Team Lead">
             </div>
             <div>
-              <span class="partner-tag">Team Lead</span>
+              <span class="partner-tag">Manager</span>
               <h3>Abdul Rehman</h3>
               <p class="partner-role"><strong>Accounting &amp; Finance Manager</strong></p>
               <p>Directs accounting operations, financial reporting, and client workflow coordination across audit, tax
@@ -544,9 +558,9 @@
               <img class="partner-photo" src="assets/Muhammad Umer.webp" alt="Muhammad Umer, Senior Software Engineer">
             </div>
             <div>
-              <span class="partner-tag">Senior Role</span>
+              <span class="partner-tag">IT Head</span>
               <h3>Muhammad Umer</h3>
-              <p class="partner-role"><strong>Senior Software Engineer</strong></p>
+              <p class="partner-role"><strong>Software Engineer</strong></p>
               <p><strong>Experience:</strong> 4+ years of industry experience &middot; <strong>Education:</strong> MS in
                 Computer Science</p>
               <p>Specializes in software engineering, system architecture, and digital infrastructure&mdash;driving
@@ -598,14 +612,13 @@
           </article>
           <article class="team-card">
             <div class="team-card-media">
-              <img class="team-member-thumb" src="assets/Talha Rehman.webp" alt="Talha Rehman">
+              <img class="team-member-thumb" src="assets/Talha Rehman.webp" alt="Talha Rehman, Full Stack Engineer">
             </div>
             <div class="team-card-body">
               <h3>Talha Rehman</h3>
-              <p class="team-card-role">Junior Full Stack Intern</p>
-              <p><strong>Department:</strong> IT &amp; Systems Infrastructure</p>
-              <p>Architects internal accounting platforms, automated tax filing integrations, cybersecurity, and cloud
-                client portals.</p>
+              <p class="team-card-role">Full Stack Engineer</p>
+              <p><strong>Experience:</strong> 1+ years of industry experience &middot; <strong>Education:</strong> BS in Computer Science</p>
+              <p>Specializes in end-to-end full-stack web engineering, automated tax calculation portals, responsive interfaces, secure APIs, and cloud accounting systems.</p>
             </div>
           </article>
         </div>
@@ -698,7 +711,7 @@
               </div>
               <div class="contact-item-text">
                 <strong>Address</strong>
-                <span>B1 - 20 - J Commercial Plaza, 4th Floor, Main Boulevard, Wapda City, Faisalabad,
+                <span>20 - J Commercial Plaza, 4th Floor, Main Boulevard, Wapda City, Faisalabad,
                   Pakistan</span>
               </div>
             </div>

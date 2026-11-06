@@ -98,9 +98,11 @@ contactForm.addEventListener("submit", (event) => {
    ========================================================================== */
 (function initSalaryTaxCalculator() {
   const salaryInput = document.getElementById('monthlySalary');
+  const salaryPeriodSelect = document.getElementById('salaryPeriod');
+  const salaryInputLabel = document.getElementById('salaryInputLabel');
   const taxYearSelect = document.getElementById('taxYear');
   const calculateBtn = document.getElementById('btnCalculateTax');
-  const presetPills = document.querySelectorAll('.preset-pill');
+  const presetsRow = document.getElementById('presetsRow');
   const slabTabs = document.querySelectorAll('.slabs-tabs .tab-btn');
 
   // Category Switcher Elements
@@ -169,10 +171,47 @@ contactForm.addEventListener("submit", (event) => {
     btnBackToSalaried.addEventListener('click', () => switchTaxCategory('salaried'));
   }
 
+  const PRESETS_DATA = {
+    monthly: [
+      { label: '50k', amount: 50000 },
+      { label: '100k', amount: 100000 },
+      { label: '150k', amount: 150000 },
+      { label: '250k', amount: 250000 },
+      { label: '500k', amount: 500000 }
+    ],
+    annually: [
+      { label: '600k', amount: 600000 },
+      { label: '1.2M', amount: 1200000 },
+      { label: '1.8M', amount: 1800000 },
+      { label: '3.0M', amount: 3000000 },
+      { label: '6.0M', amount: 6000000 }
+    ]
+  };
+
+  function renderPresets(period) {
+    if (!presetsRow) return;
+    presetsRow.innerHTML = '';
+    const presets = PRESETS_DATA[period] || PRESETS_DATA.monthly;
+    const currentVal = parseSalary(salaryInput.value);
+
+    presets.forEach((p) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'preset-pill' + (p.amount === currentVal ? ' active' : '');
+      btn.setAttribute('data-amount', p.amount);
+      btn.textContent = p.label;
+      btn.addEventListener('click', () => {
+        salaryInput.value = p.amount.toLocaleString('en-PK');
+        updateCalculator();
+      });
+      presetsRow.appendChild(btn);
+    });
+  }
+
   const TAX_DATA = {
     '2026-2027': {
       label: 'Tax Year 2026–2027',
-      title: 'Salaried Income Tax Slabs 2026–27',
+      title: 'Tax Year 2026–2027',
       desc: 'Tax year 2026-27 keeps the Rs 600,000 exemption but re-bands the middle and upper rates.',
       slabs: [
         {
@@ -259,7 +298,7 @@ contactForm.addEventListener("submit", (event) => {
     },
     '2025-2026': {
       label: 'Tax Year 2025–2026',
-      title: 'Salaried Income Tax Slabs (Tax Year 2025–26)',
+      title: 'Tax Year 2025–2026',
       desc: 'These are the progressive salary slab rates applied for Tax Year 2025-26 under the FBR Income Tax Ordinance.',
       slabs: [
         {
@@ -326,7 +365,7 @@ contactForm.addEventListener("submit", (event) => {
     },
     '2024-2025': {
       label: 'Tax Year 2024–2025',
-      title: 'Salaried Person Income Tax Slabs (FY 2024–25)',
+      title: 'Tax Year 2024–2025',
       desc: 'Official FBR tax slab rates for salaried individuals for Financial Year 2024–25.',
       slabs: [
         {
@@ -393,7 +432,7 @@ contactForm.addEventListener("submit", (event) => {
     },
     '2023-2024': {
       label: 'Tax Year 2023–2024',
-      title: 'Salaried Income Tax Slabs (Tax Year 2023–2024)',
+      title: 'Tax Year 2023–2024',
       desc: 'Official FBR tax slab rates for salaried individuals for Tax Year 2023–24.',
       slabs: [
         {
@@ -564,9 +603,43 @@ contactForm.addEventListener("submit", (event) => {
     });
   }
 
+  function syncPresetPillsActive(currentVal) {
+    if (!presetsRow) return;
+    const pills = presetsRow.querySelectorAll('.preset-pill');
+    pills.forEach((pill) => {
+      const pillVal = parseInt(pill.getAttribute('data-amount'), 10);
+      pill.classList.toggle('active', pillVal === currentVal);
+    });
+  }
+
+  function handleSalaryPeriodChange() {
+    const isAnnual = salaryPeriodSelect ? salaryPeriodSelect.value === 'annually' : false;
+    const currentVal = parseSalary(salaryInput.value);
+
+    if (isAnnual) {
+      if (salaryInputLabel) salaryInputLabel.textContent = 'Annual Salary (PKR)';
+      salaryInput.placeholder = 'e.g. 1,200,000';
+      if (currentVal > 0) {
+        const convertedAnnual = currentVal * 12;
+        salaryInput.value = convertedAnnual.toLocaleString('en-PK');
+      }
+      renderPresets('annually');
+    } else {
+      if (salaryInputLabel) salaryInputLabel.textContent = 'Monthly Salary (PKR)';
+      salaryInput.placeholder = 'e.g. 100,000';
+      if (currentVal > 0) {
+        const convertedMonthly = Math.round(currentVal / 12);
+        salaryInput.value = convertedMonthly.toLocaleString('en-PK');
+      }
+      renderPresets('monthly');
+    }
+    updateCalculator();
+  }
+
   function updateCalculator() {
-    const rawMonthly = parseSalary(salaryInput.value);
-    const annualSalary = rawMonthly * 12;
+    const isAnnual = salaryPeriodSelect ? salaryPeriodSelect.value === 'annually' : false;
+    const rawVal = parseSalary(salaryInput.value);
+    const annualSalary = isAnnual ? rawVal : rawVal * 12;
     const yearKey = taxYearSelect.value || '2026-2027';
 
     const result = calculateTax(annualSalary, yearKey);
@@ -596,13 +669,15 @@ contactForm.addEventListener("submit", (event) => {
     });
 
     // Sync preset pills active state
-    presetPills.forEach((pill) => {
-      const pillVal = parseInt(pill.getAttribute('data-amount'), 10);
-      pill.classList.toggle('active', pillVal === rawMonthly);
-    });
+    syncPresetPillsActive(rawVal);
 
     // Render table
     renderSlabsTable(result.config, result.matchedSlabIndex);
+  }
+
+  // Handle salary period toggle (Monthly vs Annually)
+  if (salaryPeriodSelect) {
+    salaryPeriodSelect.addEventListener('change', handleSalaryPeriodChange);
   }
 
   // Handle salary input with formatting
@@ -645,15 +720,6 @@ contactForm.addEventListener("submit", (event) => {
     });
   }
 
-  // Preset buttons
-  presetPills.forEach((pill) => {
-    pill.addEventListener('click', () => {
-      const amount = parseInt(pill.getAttribute('data-amount'), 10);
-      salaryInput.value = amount.toLocaleString('en-PK');
-      updateCalculator();
-    });
-  });
-
   // Slab table tabs
   slabTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -665,6 +731,8 @@ contactForm.addEventListener("submit", (event) => {
     });
   });
 
-  // Initial calculation on load
+  // Initial render of presets & calculation on load
+  const initialPeriod = salaryPeriodSelect ? salaryPeriodSelect.value : 'monthly';
+  renderPresets(initialPeriod);
   updateCalculator();
 })();
