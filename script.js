@@ -212,7 +212,7 @@ contactForm.addEventListener("submit", (event) => {
     '2026-2027': {
       label: 'Tax Year 2026–2027',
       title: 'Tax Year 2026–2027',
-      desc: 'Tax year 2026-27 keeps the Rs 600,000 exemption but re-bands the middle and upper rates.',
+      desc: 'Tax Year 2026–2027 retains the Rs 600,000 basic exemption while restructuring middle and upper bracket rates.',
       slabs: [
         {
           min: 0,
@@ -299,7 +299,7 @@ contactForm.addEventListener("submit", (event) => {
     '2025-2026': {
       label: 'Tax Year 2025–2026',
       title: 'Tax Year 2025–2026',
-      desc: 'These are the progressive salary slab rates applied for Tax Year 2025-26 under the FBR Income Tax Ordinance.',
+      desc: 'Progressive salary tax slab rates applicable for Tax Year 2025–2026 under the FBR Income Tax Ordinance.',
       slabs: [
         {
           min: 0,
@@ -366,7 +366,7 @@ contactForm.addEventListener("submit", (event) => {
     '2024-2025': {
       label: 'Tax Year 2024–2025',
       title: 'Tax Year 2024–2025',
-      desc: 'Official FBR tax slab rates for salaried individuals for Financial Year 2024–25.',
+      desc: 'Official FBR tax slab rates for salaried individuals for Tax Year 2024–2025.',
       slabs: [
         {
           min: 0,
@@ -433,7 +433,7 @@ contactForm.addEventListener("submit", (event) => {
     '2023-2024': {
       label: 'Tax Year 2023–2024',
       title: 'Tax Year 2023–2024',
-      desc: 'Official FBR tax slab rates for salaried individuals for Tax Year 2023–24.',
+      desc: 'Official FBR tax slab rates for salaried individuals for Tax Year 2023–2024.',
       slabs: [
         {
           min: 0,
