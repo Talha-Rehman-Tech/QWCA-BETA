@@ -589,7 +589,7 @@ contactForm.addEventListener("submit", (event) => {
 
       const tdRate = document.createElement('td');
       const rateStrong = document.createElement('strong');
-      rateStrong.style.color = '#16a34a';
+      rateStrong.style.color = '#A31D24';
       rateStrong.textContent = slab.rateText;
       tdRate.appendChild(rateStrong);
 
