@@ -1,5 +1,53 @@
 document.getElementById("year").textContent = new Date().getFullYear();
 
+// Mobile Navigation Drawer Toggle
+(function initMobileNav() {
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  if (!navToggle || !navLinks) return;
+
+  function toggleMenu(forceOpen) {
+    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !navLinks.classList.contains('active');
+    navToggle.classList.toggle('active', shouldOpen);
+    navLinks.classList.toggle('active', shouldOpen);
+    navToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+  }
+
+  navToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // Close when clicking any link inside navLinks
+  navLinks.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      toggleMenu(false);
+    });
+  });
+
+  // Close when clicking outside of navbar
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && !navToggle.contains(e.target)) {
+      toggleMenu(false);
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+      toggleMenu(false);
+    }
+  });
+
+  // Reset menu if window resized to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 960 && navLinks.classList.contains('active')) {
+      toggleMenu(false);
+    }
+  });
+})();
+
 const contactForm = document.querySelector('form[action="mailto:info@qwca.pk"]');
 const contactFormStatus = document.getElementById("contact-form-status");
 

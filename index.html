@@ -46,20 +46,41 @@
   <!-- Header / Navigation -->
   <header class="header">
     <div class="container nav">
-      <a class="brand" href="#home">
-        <img class="brand-mark" src="assets/logo.png" alt="" aria-hidden="true">
+      <a class="brand" href="#home" aria-label="QWCA - Qummar Waheed Chartered Accountants">
+        <img class="brand-mark" src="assets/logo.png" alt="QWCA Logo">
         <span class="brand-text">
-          <span>QWCA</span>
-          <small>Chartered Accountants</small>
+          <span class="brand-acronym">QWCA</span>
+          <span class="brand-fullname">Qummar Waheed Chartered Accountants</span>
         </span>
       </a>
-      <nav class="links" aria-label="Main navigation">
+
+      <!-- Mobile Hamburger Toggle Button -->
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle-icon">
+          <span class="bar bar-top"></span>
+          <span class="bar bar-mid"></span>
+          <span class="bar bar-bot"></span>
+        </span>
+      </button>
+
+      <!-- Navigation Links -->
+      <nav class="links" id="navLinks" aria-label="Main navigation">
         <a href="#services">Services</a>
         <a href="#tax-calculator">Tax Calculator</a>
         <a href="#calendar">Tax Calendar</a>
         <a href="#team">Team</a>
         <a href="#faq">FAQs</a>
         <a href="#contact">Contact</a>
+        <div class="nav-mobile-cta-wrap">
+          <a class="button nav-mobile-btn" href="#contact">
+            <span>Schedule a Consultation</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
       </nav>
     </div>
   </header>
