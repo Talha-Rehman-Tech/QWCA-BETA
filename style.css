@@ -157,15 +157,15 @@ a {
 }
 
 /* Sticky Navigation (Dark Section: #1A1D20 Dark Slate) */
+/* Sticky Navigation - Dual-Tone Design: White to Dark Slate merged at 45 degrees */
 .header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(26, 29, 32, 0.96);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  /* Both colors merged at 45 degrees at the center of the navbar */
+  background: linear-gradient(45deg, #ffffff 0%, #ffffff 47%, #1A1D20 53%, #1A1D20 100%);
+  border-bottom: 2px solid var(--primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
   transition: all 0.2s ease;
 }
 
@@ -178,12 +178,14 @@ a {
   position: relative;
 }
 
-/* Brand Logo / Mark */
+/* Brand Logo / Mark (Positioned on the White half) */
 .brand {
   display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  color: #ffffff;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  color: var(--navy-900);
   text-decoration: none;
   flex-shrink: 0;
   transition: opacity 0.2s ease;
@@ -193,9 +195,16 @@ a {
   text-decoration: none;
 }
 
+.brand-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1;
+}
+
 .brand-mark {
   width: auto;
-  height: 46px;
+  height: 38px;
   max-width: 52px;
   object-fit: contain;
   flex-shrink: 0;
@@ -203,38 +212,35 @@ a {
 }
 
 .brand:hover .brand-mark {
-  transform: scale(1.05);
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  line-height: 1.15;
+  transform: scale(1.06);
 }
 
 .brand-acronym {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--navy-900);
   letter-spacing: -0.01em;
-  line-height: 1.1;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.brand:hover .brand-acronym {
+  color: var(--primary);
 }
 
 .brand-fullname {
   display: block;
   font-size: 11px;
-  font-weight: 600;
-  color: #c9ced4;
+  font-weight: 700;
+  color: var(--navy-700);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-top: 3px;
   line-height: 1.2;
   transition: color 0.2s ease;
 }
 
 .brand:hover .brand-fullname {
-  color: #ffffff;
+  color: var(--navy-900);
 }
 
 /* Mobile Toggle - Hidden on Desktop */
@@ -705,17 +711,310 @@ h3 {
   border-color: transparent;
 }
 
-/* Business Placeholder Card */
-.business-placeholder-card {
+/* Business & Corporate Calculator Styles */
+.sme-regime-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.sme-regime-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  color: var(--navy-800);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.sme-regime-pill:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.sme-regime-pill.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(163, 29, 36, 0.25);
+}
+
+.field-hint-tag {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.opt-text {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.metric-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* Selected Entity Pill in Result Card */
+.biz-selected-entity-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-alt);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.biz-entity-pill-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.biz-entity-pill-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy-900);
+}
+
+/* Status Badges in Result Metrics Grid */
+.metric-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.metric-badge-tag.status-compliant {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.metric-badge-tag.status-warning {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+}
+
+.metric-badge-tag.status-special {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.biz-compliance-card {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--primary);
+}
+
+.biz-compliance-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.biz-compliance-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-light);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.biz-compliance-header h4 {
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--navy-900);
+  font-weight: 700;
+}
+
+.biz-compliance-header span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.biz-compliance-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.biz-compliance-pill-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: var(--bg-white);
+  padding: 7px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--navy-800);
+  line-height: 1.45;
+}
+
+.biz-compliance-pill-item strong {
+  color: var(--navy-900);
+}
+
+.biz-compliance-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+/* Super Tax Section 4C Schedule Box */
+.super-tax-schedule-card {
+  margin-top: 32px;
+  padding: 24px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+}
+
+.super-tax-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.super-tax-header h4 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  color: var(--navy-900);
+}
+
+.super-tax-header p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.super-tax-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.super-tax-bracket-item {
   background: var(--bg-white);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 48px 32px;
-  box-shadow: var(--shadow-sm);
-  text-align: center;
-  max-width: 760px;
-  margin: 0 auto 40px;
-  animation: fadeIn 0.25s ease;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.super-tax-bracket-item:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xs);
+}
+
+.super-tax-bracket-item.highlight-bracket {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.super-tax-bracket-item.active-st-bracket {
+  border-color: var(--primary) !important;
+  background: var(--primary-light) !important;
+  box-shadow: 0 4px 14px rgba(163, 29, 36, 0.18) !important;
+  transform: translateY(-2px);
+}
+
+.st-active-pill {
+  display: inline-block;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  margin-top: 3px;
+  width: fit-content;
+  letter-spacing: 0.04em;
+}
+
+.st-range {
+  font-size: 12px;
+  color: var(--navy-800);
+  font-weight: 600;
+}
+
+.st-rate {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.st-rate.zero-rate {
+  color: #16a34a;
+}
+
+.st-rate small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.biz-matrix-table td strong {
+  color: var(--navy-900);
+}
+
+.badge-smeda {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-sbp {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
 
 @keyframes fadeIn {
@@ -885,6 +1184,8 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-bottom: 6px;
 }
 
@@ -1034,6 +1335,26 @@ h3 {
 .calc-result-card {
   background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-subtle) 100%);
   border-left: 4px solid var(--primary);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+@keyframes resultPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(163, 29, 36, 0.45);
+    border-color: var(--primary);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(163, 29, 36, 0.15);
+    border-color: var(--primary);
+  }
+  100% {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--line);
+  }
+}
+
+.calc-result-card.calculating {
+  animation: resultPulse 0.45s ease;
 }
 
 .result-header {
@@ -1299,12 +1620,15 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
-.table-wrap {
+.table-wrap,
+.slabs-table-wrap {
+  width: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--bg-white);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -1985,6 +2309,10 @@ footer {
     scroll-margin-top: 74px;
   }
 
+  .header {
+    background: linear-gradient(45deg, #ffffff 0%, #ffffff 58%, #1A1D20 64%, #1A1D20 100%);
+  }
+
   .nav {
     min-height: 66px;
     padding: 10px 0;
@@ -1993,20 +2321,26 @@ footer {
   }
 
   .brand {
-    gap: 12px;
+    gap: 3px;
+  }
+
+  .brand-top {
+    gap: 8px;
   }
 
   .brand-mark {
-    height: 40px;
-    max-width: 48px;
+    height: 32px;
+    max-width: 44px;
   }
 
   .brand-acronym {
-    font-size: 20px;
+    font-size: 21px;
+    color: var(--navy-900);
   }
 
   .brand-fullname {
-    font-size: 10.5px;
+    font-size: 10.2px;
+    color: var(--navy-700);
     letter-spacing: 0.03em;
   }
 
@@ -2074,6 +2408,9 @@ footer {
     left: 0;
     right: 0;
     width: 100%;
+    max-height: calc(100vh - 76px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: rgba(26, 29, 32, 0.98);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -2227,10 +2564,29 @@ footer {
   .topbar-info {
     font-size: 11.5px;
     line-height: 1.4;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .topbar-info svg {
+    margin-top: 2px;
+    flex-shrink: 0;
   }
 
   .hero {
     padding: 36px 0 44px;
+  }
+
+  .hero h1 {
+    font-size: clamp(26px, 6.5vw, 36px);
+    margin: 8px 0 14px;
+  }
+
+  .hero p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 20px;
   }
 
   .hero-layout {
@@ -2344,36 +2700,64 @@ footer {
     padding: 1px 6px;
   }
 
-  .business-placeholder-card {
-    padding: 28px 16px;
-    margin-bottom: 28px;
+  /* Business Calculator Mobile */
+  .biz-matrix-table {
+    min-width: 660px;
   }
 
-  .business-placeholder-inner h3 {
-    font-size: 19px;
+  .biz-selected-entity-bar {
+    padding: 8px 12px;
+    gap: 6px;
   }
 
-  .business-placeholder-inner p {
-    font-size: 13px;
+  .biz-entity-pill-value {
+    font-size: 12.5px;
   }
 
-  .business-features-list {
-    padding: 12px 14px;
+  .sme-regime-pills {
+    gap: 6px;
+  }
+
+  .sme-regime-pill {
+    padding: 8px 12px;
+    font-size: 12.5px;
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    text-align: center;
+  }
+
+  .biz-compliance-card {
+    padding: 14px 14px;
+    margin-top: 16px;
+  }
+
+  .biz-compliance-pill-item {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .super-tax-schedule-card {
+    padding: 18px 16px;
+    margin-top: 24px;
+  }
+
+  .super-tax-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
   }
 
-  .biz-feat-item {
-    font-size: 12px;
+  .super-tax-header h4 {
+    font-size: 16px;
   }
 
-  .business-actions {
-    flex-direction: column;
-    width: 100%;
+  .super-tax-header p {
+    font-size: 12.5px;
   }
 
-  .business-actions .button {
-    width: 100%;
-    justify-content: center;
+  .super-tax-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   /* Tax Calculator Mobile */
@@ -2508,6 +2892,10 @@ footer {
   .slabs-table td {
     padding: 10px 12px;
     font-size: 13px;
+  }
+
+  .super-tax-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .team-department {
@@ -2718,12 +3106,30 @@ footer {
     object-position: center top;
   }
 
+  .faq-item summary {
+    padding: 16px 36px 16px 4px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .faq-item p {
+    margin: -4px 16px 16px 4px;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .contact-item {
+    padding: 14px 12px;
+    gap: 12px;
+  }
+
   input,
   select,
   textarea {
     font-size: 16px;
     /* strictly prevents iOS Safari zoom */
     padding: 12px 14px;
+    min-height: 44px;
   }
 
   form .button {
@@ -2732,9 +3138,29 @@ footer {
     justify-content: center;
     font-size: 15px;
   }
+
+  .image-modal {
+    padding: 16px;
+  }
+
+  .image-modal-close {
+    top: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .image-modal-img {
+    max-width: 94vw;
+    max-height: 75vh;
+  }
 }
 
 @media (max-width: 440px) {
+  .header {
+    background: linear-gradient(45deg, #ffffff 0%, #ffffff 61%, #1A1D20 67%, #1A1D20 100%);
+  }
+
   .container {
     width: min(100% - 20px, 1140px);
   }
@@ -2743,18 +3169,56 @@ footer {
     font-size: 11px;
   }
 
+  h2 {
+    font-size: 21px;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  .hero h1 {
+    font-size: 25px;
+    line-height: 1.2;
+    margin: 6px 0 12px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+
+  .category-tab {
+    padding: 8px 6px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .category-tab svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .cat-pill {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+
   .nav {
     min-height: 58px;
     padding: 6px 0;
   }
 
   .brand {
-    gap: 10px;
+    gap: 2px;
+  }
+
+  .brand-top {
+    gap: 7px;
   }
 
   .brand-mark {
-    height: 35px;
-    max-width: 40px;
+    height: 27px;
+    max-width: 36px;
   }
 
   .brand-acronym {
@@ -2762,7 +3226,7 @@ footer {
   }
 
   .brand-fullname {
-    font-size: 9.6px;
+    font-size: 9px;
     letter-spacing: 0.02em;
     margin-top: 1px;
   }
@@ -2909,7 +3373,64 @@ footer {
   }
 
   .res-value {
-    font-size: 21px;
+    font-size: 20px;
+    word-break: break-word;
+  }
+
+  .biz-selected-entity-bar {
+    padding: 8px 10px;
+    gap: 4px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .biz-entity-pill-value {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .biz-compliance-card {
+    padding: 12px 10px;
+    margin-top: 12px;
+  }
+
+  .biz-compliance-header h4 {
+    font-size: 13.5px;
+  }
+
+  .biz-compliance-header span {
+    font-size: 11px;
+  }
+
+  .biz-compliance-pill-item {
+    font-size: 11.5px;
+    padding: 6px 8px;
+    gap: 7px;
+  }
+
+  .super-tax-schedule-card {
+    padding: 14px 10px;
+    margin-top: 18px;
+  }
+
+  .super-tax-header h4 {
+    font-size: 15px;
+  }
+
+  .super-tax-header p {
+    font-size: 12px;
+  }
+
+  .super-tax-bracket-item {
+    padding: 10px 10px;
+  }
+
+  .st-range {
+    font-size: 11.5px;
+  }
+
+  .st-rate {
+    font-size: 15px;
   }
 
   .result-metrics-grid {
@@ -2938,6 +3459,77 @@ footer {
   .slabs-table td {
     padding: 9px 10px;
     font-size: 12px;
+  }
+
+  .biz-matrix-table {
+    min-width: 620px;
+  }
+
+  .biz-matrix-table th,
+  .biz-matrix-table td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .super-tax-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sme-regime-pill {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .social-pill {
+    font-size: 12.5px;
+    padding: 10px 12px;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .faq-item summary {
+    padding: 14px 32px 14px 2px;
+    font-size: 14px;
+  }
+
+  .faq-item p {
+    margin: -2px 8px 14px 2px;
+    font-size: 13px;
+  }
+
+  .contact-item {
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .contact-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .contact-item-text span,
+  .contact-item-text a {
+    font-size: 13px;
+    word-break: break-word;
+  }
+
+  form {
+    padding: 16px 12px;
+  }
+
+  footer {
+    padding: 28px 0;
+  }
+
+  .footer-credit {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .footer-note {
+    font-size: 11.5px;
   }
 }
 
@@ -3099,9 +3691,30 @@ img {
 }
 
 @media (max-width: 360px) {
+  .header {
+    background: linear-gradient(45deg, #ffffff 0%, #ffffff 64%, #1A1D20 70%, #1A1D20 100%);
+  }
+
+  .container {
+    width: min(100% - 16px, 1140px);
+  }
+
+  .topbar .container {
+    font-size: 10.5px;
+  }
+
+  .nav {
+    min-height: 54px;
+    padding: 4px 0;
+  }
+
+  .brand-top {
+    gap: 6px;
+  }
+
   .brand-mark {
-    height: 30px;
-    max-width: 34px;
+    height: 25px;
+    max-width: 32px;
   }
 
   .brand-acronym {
@@ -3109,7 +3722,73 @@ img {
   }
 
   .brand-fullname {
-    font-size: 8.8px;
+    font-size: 8.4px;
     letter-spacing: 0.01em;
+  }
+
+  .nav-toggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  h2 {
+    font-size: 19.5px;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+  }
+
+  .hero-photo-wrap {
+    max-width: 230px;
+  }
+
+  .hero-photo {
+    max-height: 290px;
+  }
+
+  .hero-photo-badge {
+    padding: 6px 9px;
+    gap: 6px;
+    bottom: -6px;
+    right: 6px;
+  }
+
+  .hero-photo-badge-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 9.5px;
+  }
+
+  .hero-photo-badge-text strong {
+    font-size: 10.5px;
+  }
+
+  .hero-photo-badge-text span {
+    font-size: 9px;
+  }
+
+  .res-value {
+    font-size: 18px;
+  }
+
+  .res-label {
+    font-size: 11px;
+  }
+
+  .slabs-tabs .tab-btn {
+    font-size: 10px;
+    padding: 6px 3px;
+  }
+
+  .preset-pill {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .social-pill {
+    font-size: 11.5px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
   }
 }

@@ -47,11 +47,11 @@
   <header class="header">
     <div class="container nav">
       <a class="brand" href="#home" aria-label="QWCA - Qummar Waheed Chartered Accountants">
-        <img class="brand-mark" src="assets/logo.png" alt="QWCA Logo">
-        <span class="brand-text">
+        <div class="brand-top">
+          <img class="brand-mark" src="assets/logo.png" alt="QWCA Logo">
           <span class="brand-acronym">QWCA</span>
-          <span class="brand-fullname">Qummar Waheed Chartered Accountants</span>
-        </span>
+        </div>
+        <span class="brand-fullname">Qummar Waheed Chartered Accountants</span>
       </a>
 
       <!-- Mobile Hamburger Toggle Button -->
@@ -238,8 +238,8 @@
                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
-              <span>Business / AOP</span>
-              <span class="cat-pill soon-pill">Coming Soon</span>
+              <span>Business / Company</span>
+              <span class="cat-pill active-pill">Active</span>
             </button>
           </div>
         </div>
@@ -431,53 +431,283 @@
         </div>
         <!-- /#salariedCalcView -->
 
-        <!-- Business / AOP Notice View (Displayed when Business tab is clicked) -->
-        <div class="business-placeholder-card" id="businessCalcView" hidden>
-          <div class="business-placeholder-inner">
-            <div class="business-status-pill">
-              <span class="status-dot"></span> Under Configuration (Coming Soon)
-            </div>
-            <div class="business-icon-wrap" aria-hidden="true">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-              </svg>
-            </div>
-            <h3>Business Individual &amp; AOP Tax Computation</h3>
-            <p>Tax slabs, turnover limits, and calculation models for <strong>Sole Proprietors, Partnership Firms
-                (AOPs), and Non-Salaried Individuals</strong> under Section 113 &amp; Division I, Part I of the First
-              Schedule are currently being configured.</p>
-            <div class="business-features-list">
-              <div class="biz-feat-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span>Non-salaried progressive tax bands (up to 45%)</span>
+        <!-- Business & Corporate Calculator View (Displayed when Business tab is clicked) -->
+        <div id="businessCalcView" hidden>
+          <div class="tax-calc-grid">
+            <!-- Business Input Card -->
+            <div class="calc-card calc-input-card">
+              <div class="calc-card-header">
+                <div class="calc-card-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3>Business &amp; Corporate Tax</h3>
+                  <p>Compute corporate income tax, Super Tax (Sec 4C), and compliance obligations</p>
+                </div>
               </div>
-              <div class="biz-feat-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+
+              <form id="bizTaxCalculatorForm" class="calc-form" onsubmit="event.preventDefault();">
+                <!-- Tax Year Field on Top -->
+                <div class="form-group">
+                  <label for="bizTaxYear">Tax Year</label>
+                  <select id="bizTaxYear" name="bizTaxYear">
+                    <option value="2026-2027" selected>Tax Year 2026–2027</option>
+                    <option value="2025-2026">Tax Year 2025–2026</option>
+                    <option value="2024-2025">Tax Year 2024–2025</option>
+                    <option value="2023-2024">Tax Year 2023–2024</option>
+                  </select>
+                </div>
+
+                <!-- Business / Corporate Category -->
+                <div class="form-group">
+                  <label for="bizCategory">Business / Corporate Category</label>
+                  <select id="bizCategory" name="bizCategory">
+                    <option value="general" selected>All Other Companies (General Corporate Rate: 29%)</option>
+                    <option value="small">Small Company (Turnover &le; 250M, Employees &le; 250: 20%)</option>
+                    <option value="banking">Banking Company (39%)</option>
+                    <option value="sme_cat1">SME Manufacturing — Category 1 (Turnover &le; 100M: 7.5% / 0.25%)</option>
+                    <option value="sme_cat2">SME Manufacturing — Category 2 (Turnover 100M–250M: 15%)</option>
+                    <option value="modaraba">Modaraba (25%)</option>
+                  </select>
+                </div>
+
+                <!-- SME Regime Switcher (Displays only when SME Cat 1 is active) -->
+                <div class="form-group" id="smeRegimeGroup" style="display: none;">
+                  <label>SME Tax Regime (Fourteenth Schedule)</label>
+                  <div class="sme-regime-pills" role="radiogroup" aria-label="SME Tax Regime Selection">
+                    <button type="button" class="sme-regime-pill active" id="btnRegimeNTR" data-regime="ntr" role="radio" aria-checked="true">
+                      <span>Normal Tax Regime (7.5% of Profit)</span>
+                    </button>
+                    <button type="button" class="sme-regime-pill" id="btnRegimeFTR" data-regime="ftr" role="radio" aria-checked="false">
+                      <span>Final Tax Regime (0.25% of Turnover)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Annual Taxable Profit / Income Input -->
+                <div class="form-group">
+                  <label for="bizTaxableProfit" id="bizProfitLabel">Annual Net Taxable Profit (PKR)</label>
+                  <div class="currency-input-wrap">
+                    <span class="currency-prefix">Rs</span>
+                    <input type="text" id="bizTaxableProfit" name="bizTaxableProfit" inputmode="numeric"
+                      placeholder="e.g. 10,000,000" value="10,000,000" autocomplete="off" required>
+                  </div>
+                </div>
+
+                <!-- Quick Profit Presets -->
+                <div class="salary-presets" id="bizProfitPresets" aria-label="Quick profit presets">
+                  <span class="presets-label">Quick select:</span>
+                  <div class="presets-row" id="bizProfitPresetsRow">
+                    <button type="button" class="preset-pill" data-bizamount="2000000">2M</button>
+                    <button type="button" class="preset-pill" data-bizamount="5000000">5M</button>
+                    <button type="button" class="preset-pill active" data-bizamount="10000000">10M</button>
+                    <button type="button" class="preset-pill" data-bizamount="50000000">50M</button>
+                    <button type="button" class="preset-pill" data-bizamount="200000000">200M</button>
+                  </div>
+                </div>
+
+                <!-- Annual Gross Turnover / Revenue Input -->
+                <div class="form-group">
+                  <div class="salary-input-header">
+                    <label for="bizTurnover">Annual Gross Turnover / Revenue (PKR)</label>
+                    <span class="field-hint-tag" id="bizTurnoverHint">Used for SME FTR &amp; Min Tax</span>
+                  </div>
+                  <div class="currency-input-wrap">
+                    <span class="currency-prefix">Rs</span>
+                    <input type="text" id="bizTurnover" name="bizTurnover" inputmode="numeric"
+                      placeholder="e.g. 50,000,000" value="50,000,000" autocomplete="off" required>
+                  </div>
+                </div>
+
+                <!-- Optional Accounting Profit for ACT 17% -->
+                <div class="form-group">
+                  <label for="bizAccountingProfit">Accounting Profit Before Tax (PKR) <span class="opt-text">(Optional for ACT 17%)</span></label>
+                  <div class="currency-input-wrap">
+                    <span class="currency-prefix">Rs</span>
+                    <input type="text" id="bizAccountingProfit" name="bizAccountingProfit" inputmode="numeric"
+                      placeholder="e.g. 10,000,000 (Defaults to Taxable Profit)" value="10,000,000" autocomplete="off">
+                  </div>
+                </div>
+
+                <button type="button" id="btnCalculateBizTax" class="button calc-btn">
+                  <span>Calculate Business Tax</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </form>
+
+              <div class="calc-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <span>Turnover tax &amp; Minimum Tax (Section 113) adjustments</span>
-              </div>
-              <div class="biz-feat-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span>Partnership profit-sharing apportionment</span>
+                <span>Calculated pursuant to Section 4C (Super Tax), Section 113 (Minimum Tax), Section 113C (ACT), Fourteenth Schedule (SMEs), and Division II, Part I of First Schedule to Income Tax Ordinance, 2001.</span>
               </div>
             </div>
-            <div class="business-actions">
-              <button type="button" class="button" id="btnBackToSalaried">
-                &larr; Switch to Salaried Calculator
-              </button>
-              <a href="#contact" class="button button-outline">
-                Consult QWCA for Business Tax &rarr;
-              </a>
+
+            <!-- Business Result Card -->
+            <div class="calc-card calc-result-card" id="bizCalcResults">
+              <div class="result-header">
+                <span class="result-badge" id="bizResYearBadge">Tax Year 2026–2027</span>
+                <h3>Corporate Tax Summary</h3>
+              </div>
+
+              <!-- Selected Entity Status Bar -->
+              <div class="biz-selected-entity-bar" id="bizSelectedEntityBar">
+                <span class="biz-entity-pill-label">Category:</span>
+                <span class="biz-entity-pill-value" id="bizResCategoryTag">All Other Companies (General Corporate Rate: 29%)</span>
+              </div>
+
+              <!-- Primary Hero Metrics (Profit After Tax & Total Tax) -->
+              <div class="result-highlight-box">
+                <div class="res-item primary-res">
+                  <span class="res-label">Profit After Tax (PAT)</span>
+                  <span class="res-value take-home" id="bizResPAT">Rs 7,100,000</span>
+                  <span class="res-sub">Net retained corporate earnings</span>
+                </div>
+                <div class="res-item highlight-tax">
+                  <span class="res-label">Total Tax Liability</span>
+                  <span class="res-value tax-amt" id="bizResTotalTax">Rs 2,900,000</span>
+                  <span class="res-sub" id="bizResTotalTaxSub">Corporate Tax + Super Tax (Sec 4C)</span>
+                </div>
+              </div>
+
+              <!-- Secondary 4-Metric Grid -->
+              <div class="result-metrics-grid">
+                <div class="metric-box">
+                  <span class="metric-label">Effective Tax Rate</span>
+                  <span class="metric-value" id="bizResEffectiveRate">29.00%</span>
+                  <span class="metric-sub" id="bizResRateSub">On Net Taxable Profit</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">Base Corporate Tax</span>
+                  <span class="metric-value" id="bizResBaseTax">Rs 2,900,000</span>
+                  <span class="metric-sub" id="bizResBaseTaxSub">29% Corporate Rate</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">Super Tax (Section 4C)</span>
+                  <span class="metric-value" id="bizResSuperTax">Rs 0</span>
+                  <span class="metric-sub" id="bizResSuperTaxSub">0% (Income &le; 150M)</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">ACT / Min Tax Status</span>
+                  <span class="metric-value"><span class="metric-badge-tag status-compliant" id="bizResACTStatus">Compliant</span></span>
+                  <span class="metric-sub" id="bizResACTSub">Normal Tax Exceeds ACT</span>
+                </div>
+              </div>
+
+              <!-- Statutory Compliance Box for Active Category -->
+              <div class="biz-compliance-card" id="bizComplianceBanner">
+                <div class="biz-compliance-header">
+                  <div class="biz-compliance-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 id="bizComplianceTitle">Statutory Deadlines &amp; Filing Schedule</h4>
+                    <span id="bizComplianceCategorySub">Key compliance requirements for selected category</span>
+                  </div>
+                </div>
+                <div class="biz-compliance-grid" id="bizComplianceList">
+                  <!-- Dynamically populated compliance points -->
+                </div>
+              </div>
+
+              <div class="calc-action-row biz-action-row">
+                <a href="#contact" class="calc-consult-link">Corporate tax planning, audit or SECP filing? Consult QWCA &rarr;</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Year-Wise Corporate Tax & Compliance Matrix Table -->
+          <div class="tax-slabs-container biz-matrix-container">
+            <div class="slabs-table-header">
+              <div>
+                <h3 id="bizMatrixTitle">Year-Wise Corporate Tax &amp; Statutory Compliance Matrix</h3>
+                <p id="bizMatrixDesc">Flat corporate rates, Super Tax (Section 4C), and statutory filing deadlines across tax years pursuant to FBR Finance Acts.</p>
+              </div>
+              <div class="slabs-tabs" role="tablist" aria-label="Business Tax Slabs Year Selection" id="bizYearTabs">
+                <button type="button" class="tab-btn active" data-bizyear="2026-2027" role="tab" aria-selected="true">Tax Year 2026–2027</button>
+                <button type="button" class="tab-btn" data-bizyear="2025-2026" role="tab" aria-selected="false">Tax Year 2025–2026</button>
+                <button type="button" class="tab-btn" data-bizyear="2024-2025" role="tab" aria-selected="false">Tax Year 2024–2025</button>
+                <button type="button" class="tab-btn" data-bizyear="2023-2024" role="tab" aria-selected="false">Tax Year 2023–2024</button>
+              </div>
+            </div>
+
+            <div class="table-wrap slabs-table-wrap">
+              <table class="slabs-table biz-matrix-table" id="bizMatrixTable">
+                <thead>
+                  <tr>
+                    <th>Entity Category &amp; Criteria</th>
+                    <th>Corporate Tax Rate</th>
+                    <th>Super Tax (Sec 4C)</th>
+                    <th>ACT / Min Tax</th>
+                    <th>Statutory Compliance &amp; Due Dates</th>
+                  </tr>
+                </thead>
+                <tbody id="bizMatrixTableBody">
+                  <!-- Dynamically populated from BUSINESS_TAX_DATA -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Super Tax Section 4C Schedule (Progressive Brackets from Image 2) -->
+            <div class="super-tax-schedule-card">
+              <div class="super-tax-header">
+                <div>
+                  <h4>Super Tax (Section 4C) Progressive Slab Schedule</h4>
+                  <p>Applied to high-earning companies based on taxable income brackets pursuant to Finance Act provisions.</p>
+                </div>
+                <span class="badge badge-fbr">Section 4C</span>
+              </div>
+              <div class="super-tax-grid" id="superTaxGrid">
+                <div class="super-tax-bracket-item" data-st-bracket="0">
+                  <span class="st-range">Up to PKR 150 Million</span>
+                  <span class="st-rate zero-rate">0% (Nil)</span>
+                </div>
+                <div class="super-tax-bracket-item" data-st-bracket="1">
+                  <span class="st-range">PKR 150M – PKR 200 Million</span>
+                  <span class="st-rate">1%</span>
+                </div>
+                <div class="super-tax-bracket-item" data-st-bracket="2">
+                  <span class="st-range">PKR 200M – PKR 250 Million</span>
+                  <span class="st-rate">2%</span>
+                </div>
+                <div class="super-tax-bracket-item" data-st-bracket="3">
+                  <span class="st-range">PKR 250M – PKR 300 Million</span>
+                  <span class="st-rate">3%</span>
+                </div>
+                <div class="super-tax-bracket-item" data-st-bracket="4">
+                  <span class="st-range">PKR 300M – PKR 350 Million</span>
+                  <span class="st-rate">4%</span>
+                </div>
+                <div class="super-tax-bracket-item" data-st-bracket="5">
+                  <span class="st-range">PKR 350M – PKR 400 Million</span>
+                  <span class="st-rate">6%</span>
+                </div>
+                <div class="super-tax-bracket-item" data-st-bracket="6">
+                  <span class="st-range">PKR 400M – PKR 500 Million</span>
+                  <span class="st-rate">8%</span>
+                </div>
+                <div class="super-tax-bracket-item highlight-bracket" data-st-bracket="7">
+                  <span class="st-range">Above PKR 500 Million</span>
+                  <span class="st-rate">10% <small>(8% non-banking TY26-27)</small></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
