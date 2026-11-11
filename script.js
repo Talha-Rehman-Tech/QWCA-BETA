@@ -235,6 +235,9 @@ contactForm.addEventListener("submit", (event) => {
     }
   }
 
+  // Expose globally for header and footer navigation
+  window.switchTaxCategory = switchTaxCategory;
+
   if (tabSalaried) {
     tabSalaried.addEventListener('click', () => switchTaxCategory('salaried'));
   }
@@ -888,20 +891,211 @@ contactForm.addEventListener("submit", (event) => {
   const bizMatrixTableBody = document.getElementById('bizMatrixTableBody');
   const bizYearTabs = document.querySelectorAll('#bizYearTabs .tab-btn');
 
+  // Entity Classification & Non-Salaried Elements
+  const btnEntityIndividual = document.getElementById('btnEntityIndividual');
+  const btnEntityCorporate = document.getElementById('btnEntityCorporate');
+  const bizIndividualRulesCallout = document.getElementById('bizIndividualRulesCallout');
+  const bizIndividualSlabBanner = document.getElementById('bizIndividualSlabBanner');
+  const bizResActiveSlabTitle = document.getElementById('bizResActiveSlabTitle');
+  const bizResActiveSlabDesc = document.getElementById('bizResActiveSlabDesc');
+  const bizResBaseTaxLabel = document.getElementById('bizResBaseTaxLabel');
+  const bizResSuperTaxLabel = document.getElementById('bizResSuperTaxLabel');
+  const bizResACTLabel = document.getElementById('bizResACTLabel');
+  const bizMatrixTableHead = document.getElementById('bizMatrixTableHead');
+  const nonSalariedRulesCard = document.getElementById('nonSalariedRulesCard');
+  const nonSalariedRulesTitle = document.getElementById('nonSalariedRulesTitle');
+  const nonSalariedRulesSub = document.getElementById('nonSalariedRulesSub');
+  const nonSalariedRulesGrid = document.getElementById('nonSalariedRulesGrid');
+  const superTaxScheduleCard = document.getElementById('superTaxScheduleCard');
+
   if (!bizTaxYear || !bizCategory || !bizTaxableProfit || !bizMatrixTableBody) {
     return; // Business calculator not present
   }
 
   let activeSmeRegime = 'ntr'; // 'ntr' | 'ftr'
 
+  // Non-Salaried & AOP Slabs Data (Directly from User Images 1, 2, 3, 4)
+  const NON_SALARIED_SLABS = {
+    '2026-2027': [
+      { min: 0, max: 600000, fixed: 0, rate: 0, rateText: '0%', desc: '0% (Tax-Free / Exempt)', rangeText: 'Up to Rs. 600,000' },
+      { min: 600000, max: 1200000, fixed: 0, rate: 0.15, rateText: '15%', desc: '15% of the amount exceeding Rs. 600,000', rangeText: 'Rs. 600,001 to Rs. 1,200,000' },
+      { min: 1200000, max: 1600000, fixed: 90000, rate: 0.20, rateText: '20%', desc: 'Rs. 90,000 + 20% of the amount exceeding Rs. 1,200,000', rangeText: 'Rs. 1,200,001 to Rs. 1,600,000' },
+      { min: 1600000, max: 3200000, fixed: 170000, rate: 0.30, rateText: '30%', desc: 'Rs. 170,000 + 30% of the amount exceeding Rs. 1,600,000', rangeText: 'Rs. 1,600,001 to Rs. 3,200,000' },
+      { min: 3200000, max: 5600000, fixed: 650000, rate: 0.40, rateText: '40%', desc: 'Rs. 650,000 + 40% of the amount exceeding Rs. 3,200,000 (Note: capped at 40% for qualifying professional firm AOPs)', rangeText: 'Rs. 3,200,001 to Rs. 5,600,000' },
+      { min: 5600000, max: Infinity, fixed: 1610000, rate: 0.45, rateText: '45%', desc: 'Rs. 1,610,000 + 45% of the amount exceeding Rs. 5,600,000', rangeText: 'Exceeding Rs. 5,600,000' }
+    ],
+    '2025-2026': [
+      { min: 0, max: 600000, fixed: 0, rate: 0, rateText: '0%', desc: '0% (Tax Free)', rangeText: 'Up to Rs. 600,000' },
+      { min: 600000, max: 1200000, fixed: 0, rate: 0.15, rateText: '15%', desc: '15% of the amount exceeding PKR 600,000', rangeText: 'Rs. 600,001 to Rs. 1,200,000' },
+      { min: 1200000, max: 1600000, fixed: 90000, rate: 0.20, rateText: '20%', desc: 'PKR 90,000 + 20% of the amount exceeding PKR 1,200,000', rangeText: 'Rs. 1,200,001 to Rs. 1,600,000' },
+      { min: 1600000, max: 3200000, fixed: 170000, rate: 0.30, rateText: '30%', desc: 'PKR 170,000 + 30% of the amount exceeding PKR 1,600,000', rangeText: 'Rs. 1,600,001 to Rs. 3,200,000' },
+      { min: 3200000, max: 5600000, fixed: 650000, rate: 0.40, rateText: '40%', desc: 'PKR 650,000 + 40% of the amount exceeding PKR 3,200,000', rangeText: 'Rs. 3,200,001 to Rs. 5,600,000' },
+      { min: 5600000, max: Infinity, fixed: 1610000, rate: 0.45, rateText: '45%', desc: 'PKR 1,610,000 + 45% of the amount exceeding PKR 5,600,000', rangeText: 'Above Rs. 5,600,000' }
+    ],
+    '2024-2025': [
+      { min: 0, max: 600000, fixed: 0, rate: 0, rateText: '0%', desc: '0% (Tax-Free)', rangeText: 'Up to Rs. 600,000' },
+      { min: 600000, max: 1200000, fixed: 0, rate: 0.15, rateText: '15%', desc: '15% of the amount exceeding Rs. 600,000', rangeText: 'Rs. 600,001 to Rs. 1,200,000' },
+      { min: 1200000, max: 1600000, fixed: 90000, rate: 0.20, rateText: '20%', desc: 'Rs. 90,000 + 20% of the amount exceeding Rs. 1,200,000', rangeText: 'Rs. 1,200,001 to Rs. 1,600,000' },
+      { min: 1600000, max: 3200000, fixed: 170000, rate: 0.30, rateText: '30%', desc: 'Rs. 170,000 + 30% of the amount exceeding Rs. 1,600,000', rangeText: 'Rs. 1,600,001 to Rs. 3,200,000' },
+      { min: 3200000, max: 5600000, fixed: 650000, rate: 0.40, rateText: '40%', desc: 'Rs. 650,000 + 40% of the amount exceeding Rs. 3,200,000', rangeText: 'Rs. 3,200,001 to Rs. 5,600,000' },
+      { min: 5600000, max: Infinity, fixed: 1610000, rate: 0.45, rateText: '45%', desc: 'Rs. 1,610,000 + 45% of the amount exceeding Rs. 5,600,000', rangeText: 'Above Rs. 5,600,000' }
+    ],
+    '2023-2024': [
+      { min: 0, max: 600000, fixed: 0, rate: 0, rateText: '0%', desc: '0% (Tax-free)', rangeText: 'Up to Rs. 600,000' },
+      { min: 600000, max: 800000, fixed: 0, rate: 0.075, rateText: '7.5%', desc: '7.5% of the amount exceeding Rs. 600,000', rangeText: 'Rs. 600,001 – Rs. 800,000' },
+      { min: 800000, max: 1200000, fixed: 15000, rate: 0.15, rateText: '15%', desc: 'Rs. 15,000 + 15% of the amount exceeding Rs. 800,000', rangeText: 'Rs. 800,001 – Rs. 1,200,000' },
+      { min: 1200000, max: 2400000, fixed: 75000, rate: 0.20, rateText: '20%', desc: 'Rs. 75,000 + 20% of the amount exceeding Rs. 1,200,000', rangeText: 'Rs. 1,200,001 – Rs. 2,400,000' },
+      { min: 2400000, max: 3000000, fixed: 315000, rate: 0.25, rateText: '25%', desc: 'Rs. 315,000 + 25% of the amount exceeding Rs. 2,400,000', rangeText: 'Rs. 2,400,001 – Rs. 3,000,000' },
+      { min: 3000000, max: 4000000, fixed: 465000, rate: 0.30, rateText: '30%', desc: 'Rs. 465,000 + 30% of the amount exceeding Rs. 3,000,000', rangeText: 'Rs. 3,000,001 – Rs. 4,000,000' },
+      { min: 4000000, max: Infinity, fixed: 765000, rate: 0.35, rateText: '35%', desc: 'Rs. 765,000 + 35% of the amount exceeding Rs. 4,000,000', rangeText: 'Above Rs. 4,000,000' }
+    ]
+  };
+
+  // Non-Salaried & AOP Key Rules Data (from User Images 1, 2, 3, 4)
+  const NON_SALARIED_RULES_DATA = {
+    '2026-2027': {
+      title: 'Key Rules & Surcharges for Non-Salaried Income (FY 2026–27)',
+      sub: 'Official Finance Act provisions, surcharges, and statutory thresholds (Image 2)',
+      rules: [
+        {
+          title: 'The 75% Rule',
+          badge: 'ICMA / FBR',
+          desc: 'You are classified under the non-salaried slab structure if <strong>less than 75%</strong> of your total taxable income comes from salary. If your business or side income pushes your salary share to 75% or less, the entire income shifts to the non-salaried table.'
+        },
+        {
+          title: 'High-Income Surcharge (10%)',
+          badge: 'Section 4AB',
+          desc: 'An additional <strong>10% surcharge</strong> applies to the total tax liability for non-salaried individuals and AOPs whose annual taxable income exceeds <strong>Rs. 10,000,000 (1 Crore)</strong> (unlike salaried individuals where this surcharge was abolished).'
+        },
+        {
+          title: 'Professional Firms (AOP) 40% Cap',
+          badge: 'ICMA Intl',
+          desc: 'Specified professional firm AOPs (such as legal, medical, or accountancy partnerships legally prohibited from incorporating) have a maximum capped rate of <strong>40%</strong>.'
+        },
+        {
+          title: 'Active Taxpayer List (ATL) Penalties',
+          badge: '10th Schedule',
+          desc: 'Non-filers face a <strong>100% increase (double withholding rates)</strong> on commercial transactions and penal assessment under Tenth Schedule rules.'
+        }
+      ]
+    },
+    '2025-2026': {
+      title: 'Key Provisions & Surcharges (Tax Year 2025–26)',
+      sub: 'Statutory non-salaried rules from ICMA / PwC Tax Summary (Image 3)',
+      rules: [
+        {
+          title: 'High-Income Surcharge (10%)',
+          badge: 'PwC / FBR',
+          desc: 'Non-salaried individuals and AOPs with taxable income exceeding <strong>PKR 10 Million</strong> in a year are subject to an additional <strong>10% surcharge</strong> on their calculated income tax.'
+        },
+        {
+          title: 'Professional AOPs 40% Cap',
+          badge: 'PwC Pakistan',
+          desc: 'For a professional AOP prohibited from incorporating by law or regulatory body rules, a maximum capped tax rate of <strong>40%</strong> applies.'
+        },
+        {
+          title: 'The 75% Salary Threshold',
+          badge: 'FBR Rule',
+          desc: 'If salary income is 75% or less of overall income, individual is assessed under the non-salaried progressive tax slabs.'
+        },
+        {
+          title: 'Section 113 Minimum Turnover Tax',
+          badge: 'Turnover > 100M',
+          desc: 'Minimum turnover tax of <strong>1.25%</strong> applies only if individual commercial turnover exceeds <strong>Rs. 100 Million</strong>.'
+        }
+      ]
+    },
+    '2024-2025': {
+      title: 'Key Provisions & Additional Rules (Tax Year 2024–25)',
+      sub: 'FBR Circular & Finance Act 2024 statutory non-salaried rules (Image 4)',
+      rules: [
+        {
+          title: 'Surcharge on High Incomes (Section 4AB)',
+          badge: 'PwC + FBR',
+          desc: 'Non-salaried individuals and AOPs with taxable income exceeding <strong>Rs. 10 Million (1 Crore)</strong> are subject to a <strong>10% surcharge</strong> on their calculated income tax.'
+        },
+        {
+          title: 'Professional AOPs (40% Cap)',
+          badge: 'PwC Pakistan',
+          desc: 'For AOPs that are professional firms legally prohibited from incorporating, the maximum tax rate is strictly capped at <strong>40%</strong>.'
+        },
+        {
+          title: 'FBR Wealth Statement & Form 114',
+          badge: 'Section 116',
+          desc: 'Mandatory annual income tax return (Form 114) and comprehensive wealth statement & wealth reconciliation by <strong>30th September</strong>.'
+        },
+        {
+          title: 'Advance Tax (Section 147)',
+          badge: 'Quarterly',
+          desc: 'Advance tax payable in 4 quarterly installments based on estimated turnover and taxable profit.'
+        }
+      ]
+    },
+    '2023-2024': {
+      title: 'Key Rules & Add-ons for TY 2023–24 (TY 2024)',
+      sub: 'Non-Salaried & AOP statutory provisions from Karachi Tax Bar / PwC (Image 1)',
+      rules: [
+        {
+          title: 'Surcharge (10% over Rs. 10M)',
+          badge: 'PwC',
+          desc: 'Non-salaried individuals and AOPs with taxable income exceeding <strong>Rs. 10 Million</strong> are subject to an additional surcharge of <strong>10% on the income tax payable</strong>.'
+        },
+        {
+          title: 'Professional AOPs Cap',
+          badge: 'PwC Pakistan',
+          desc: 'For professional firms/AOPs legally prohibited from incorporating, a maximum cap of <strong>40%</strong> applies.'
+        },
+        {
+          title: 'Active Taxpayer List (ATL)',
+          badge: 'ICMA Intl',
+          desc: 'Non-filers face significantly higher withholding and penal rates (often <strong>100% or more increase</strong> on standard withholding sections).'
+        },
+        {
+          title: 'Wealth Statement Reconciliation',
+          badge: 'FBR Statutory',
+          desc: 'Filing of annual return by 30th September along with full wealth statement reconciliation under Section 116.'
+        }
+      ]
+    }
+  };
+
   const BUSINESS_TAX_DATA = {
     '2026-2027': {
       label: 'Tax Year 2026–2027',
-      desc: 'For Tax Year 2026–27 in Pakistan, companies are taxed at flat corporate rates rather than progressive individual slabs (ICMA / FBR Finance Act). High earners are subject to Super Tax under Section 4C.',
+      desc: 'For Tax Year 2026–27 in Pakistan, commercial businesses are taxed based on entity structure: Individual businesses & AOPs follow progressive slabs, while companies pay flat corporate rates. Super Tax (Section 4C) applies to high earners.',
       categories: [
         {
+          id: 'individual',
+          name: 'Commercial Business / Sole Proprietor',
+          criteria: 'Sole Proprietorships & Commercial AOPs (0% – 45%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 45%)',
+          superTaxText: '10% Surcharge (>10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return (Form 114): Due 30th September (or notified FBR date)',
+            'Wealth Statement (Section 116): Mandatory wealth statement & reconciliation',
+            'Prescribed Books of Account: Income Tax Rules Rule 29 compliance',
+            'Advance Tax (Section 147): 4 quarterly installments where applicable'
+          ]
+        },
+        {
+          id: 'prof_aop',
+          name: 'Professional Firm AOP',
+          criteria: 'Professional Partnerships legally prohibited from incorporating (Capped at 40%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 40% Capped)',
+          superTaxText: '10% Surcharge (>10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return (Form 114): Due 30th September',
+            'Professional Firm Statutory Disclosures & Partner Accounts',
+            'Wealth Statement (Section 116): Partner-level reconciliation'
+          ]
+        },
+        {
           id: 'general',
-          name: 'All Other Companies (General Corporate)',
+          name: 'General Corporate Company',
           criteria: 'Public & Private Limited Companies (Standard)',
           rate: 0.29,
           rateText: '29%',
@@ -994,11 +1188,40 @@ contactForm.addEventListener("submit", (event) => {
     },
     '2025-2026': {
       label: 'Tax Year 2025–2026',
-      desc: 'Corporate income tax rates in Pakistan for Tax Year 2025–2026 are determined by company type and structure rather than progressive individual brackets. Alternate Corporate Tax (17%) and Minimum Turnover Tax (1.25%) apply.',
+      desc: 'Tax Year 2025–2026 rates distinguish between Individual / Sole Proprietor businesses (progressive individual slabs) and Corporate entities (flat corporate rates + ACT / Minimum Tax + Super Tax Section 4C).',
       categories: [
         {
+          id: 'individual',
+          name: 'Commercial Business / Sole Proprietor',
+          criteria: 'Commercial Sole Proprietorships & Non-Salaried Individuals (0% – 45%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 45%)',
+          superTaxText: '10% Surcharge (>10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return (Form 114): Due 30th September (or notified date)',
+            'Wealth Statement (Section 116): Mandatory annual wealth reconciliation',
+            'Books of Account: Rule 29 prescribed accounting records',
+            'Advance Tax (Section 147): 4 quarterly installments where applicable'
+          ]
+        },
+        {
+          id: 'prof_aop',
+          name: 'Professional Firm AOP',
+          criteria: 'Professional Partnerships prohibited from incorporating (Capped at 40%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 40% Capped)',
+          superTaxText: '10% Surcharge (>10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'Annual Return by 30th September',
+            'Professional Body & FBR statutory filings',
+            'Section 116 Wealth Reconciliation'
+          ]
+        },
+        {
           id: 'general',
-          name: 'General Companies',
+          name: 'General Corporate Company',
           criteria: 'Public & Private Limited Corporate Entities',
           rate: 0.29,
           rateText: '29%',
@@ -1007,8 +1230,22 @@ contactForm.addEventListener("submit", (event) => {
           compliancePoints: [
             'FBR Annual Return: Due 31st December (Special Year: 30th Sept)',
             'Advance Tax (Sec 147): 4 quarterly installments (25 Sep, 25 Dec, 25 Mar, 15 Jun)',
-            'SECP Annual Return (Form A/29) & audited financial statements within 30 days of AGM',
-            'Monthly Sales Tax & Withholding Tax reporting'
+            'SECP Statutory Return within 30 days of AGM',
+            'Monthly withholding and sales tax filings'
+          ]
+        },
+        {
+          id: 'banking',
+          name: 'Banking Companies',
+          criteria: 'Commercial Scheduled Banks (Seventh Schedule)',
+          rate: 0.39,
+          rateText: '39%',
+          superTaxText: '10% Flat Super Tax (Section 4C)',
+          actMinTaxText: 'Seventh Schedule assessment',
+          compliancePoints: [
+            'Seventh Schedule tax assessment',
+            'Advance tax in 12 monthly installments',
+            'SBP and SECP prudential reporting'
           ]
         },
         {
@@ -1018,25 +1255,11 @@ contactForm.addEventListener("submit", (event) => {
           rate: 0.20,
           rateText: '20%',
           superTaxText: 'Progressive Section 4C (0% up to 10% on income > 150M)',
-          actMinTaxText: '17% ACT (Sec 113C) & 1.25% Min Tax (Sec 113)',
+          actMinTaxText: '17% ACT & 1.25% Min Tax',
           compliancePoints: [
-            'Annual Corporate Return by 31st December',
+            'Annual Return by 31st December',
             'Quarterly Advance Tax under Section 147',
-            'SECP statutory filing with small company disclosures'
-          ]
-        },
-        {
-          id: 'banking',
-          name: 'Banking Companies',
-          criteria: 'Scheduled Commercial Banks',
-          rate: 0.39,
-          rateText: '39%',
-          superTaxText: '10% flat Super Tax (Section 4C)',
-          actMinTaxText: 'Seventh Schedule Rules',
-          compliancePoints: [
-            'Seventh Schedule tax assessment',
-            'Advance tax in 12 monthly installments',
-            'Regulatory SBP and SECP prudential reporting'
+            'SECP simplified disclosure filing'
           ]
         },
         {
@@ -1045,12 +1268,12 @@ contactForm.addEventListener("submit", (event) => {
           criteria: 'Turnover up to PKR 100 Million (Fourteenth Schedule)',
           rate: 0.075,
           rateText: '7.5% (NTR) / 0.25% (FTR)',
-          superTaxText: 'Exempt / Below threshold',
+          superTaxText: 'Exempt / Below Section 4C threshold',
           actMinTaxText: 'Exempt from Section 113 under FTR',
           compliancePoints: [
-            'SMEDA & FBR portal enrollment',
-            'Option to elect 7.5% NTR on profit or 0.25% FTR on gross turnover',
-            'Annual SME tax return by 31st December'
+            'SMEDA & FBR registration',
+            'Election between 7.5% NTR or 0.25% FTR on gross turnover',
+            'Annual return by 31st December'
           ]
         },
         {
@@ -1059,7 +1282,7 @@ contactForm.addEventListener("submit", (event) => {
           criteria: 'Turnover between PKR 100 Million and PKR 250 Million',
           rate: 0.15,
           rateText: '15% (NTR)',
-          superTaxText: 'Exempt / Below threshold',
+          superTaxText: 'Exempt / Below Section 4C threshold',
           actMinTaxText: '1.25% Minimum Turnover Tax applies',
           compliancePoints: [
             'Fourteenth Schedule books of account',
@@ -1070,7 +1293,7 @@ contactForm.addEventListener("submit", (event) => {
         {
           id: 'modaraba',
           name: 'Modaraba',
-          criteria: 'Registered Modarabas',
+          criteria: 'Modarabas registered under Modaraba Ordinance 1980',
           rate: 0.25,
           rateText: '25%',
           superTaxText: 'Progressive Section 4C (0% - 10%)',
@@ -1085,11 +1308,39 @@ contactForm.addEventListener("submit", (event) => {
     },
     '2024-2025': {
       label: 'Tax Year 2024–2025',
-      desc: 'Corporate tax rates and statutory compliance for Tax Year 2024–2025 under the Income Tax Ordinance, 2001. Super Tax under Section 4C applies to high earners.',
+      desc: 'Tax Year 2024–2025 rates for Individual business owners / AOPs (progressive individual slabs) and Corporate entities (flat corporate rates + ACT / Minimum Tax + Super Tax Section 4C).',
       categories: [
         {
+          id: 'individual',
+          name: 'Commercial Business / Sole Proprietor',
+          criteria: 'Commercial Businesses & Sole Proprietors (0% – 45%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 45%)',
+          superTaxText: '10% Surcharge (Sec 4AB > 10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return (Form 114): Due 30th September',
+            'Wealth Statement (Section 116): Mandatory wealth statement filing',
+            'Advance Tax: Quarterly installments under Section 147 where applicable'
+          ]
+        },
+        {
+          id: 'prof_aop',
+          name: 'Professional Firm AOP',
+          criteria: 'Professional Partnerships legally prohibited from incorporating (Capped at 40%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 40% Capped)',
+          superTaxText: '10% Surcharge (Sec 4AB > 10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return by 30th September',
+            'Partner profit allocation & Section 116 reconciliation',
+            'Advance Tax under Section 147'
+          ]
+        },
+        {
           id: 'general',
-          name: 'General Companies',
+          name: 'General Corporate Company',
           criteria: 'Public & Private Limited Entities',
           rate: 0.29,
           rateText: '29%',
@@ -1176,12 +1427,39 @@ contactForm.addEventListener("submit", (event) => {
     },
     '2023-2024': {
       label: 'Tax Year 2024 (TY 2023–2024)',
-      desc: 'The income tax rates for companies in Pakistan for Tax Year 2024 (TY 2023–2024) pursuant to Karachi Tax Bar / PwC / FBR Finance Act provisions.',
+      desc: 'Tax Year 2024 (TY 2023–2024) rates for Individual business owners / AOPs (progressive individual slabs) and Corporate entities pursuant to Karachi Tax Bar / PwC / FBR Finance Act provisions.',
       categories: [
         {
+          id: 'individual',
+          name: 'Commercial Business / Sole Proprietor',
+          criteria: 'Commercial Sole Proprietorships & Partnership Firms (0% – 35%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 35%)',
+          superTaxText: '10% Surcharge (>10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return (Form 114): Due 30th September',
+            'Wealth Statement (Section 116): Wealth reconciliation filing',
+            'Advance Tax: Quarterly installments under Section 147 where applicable'
+          ]
+        },
+        {
+          id: 'prof_aop',
+          name: 'Professional Firm AOP',
+          criteria: 'Professional Partnerships legally prohibited from incorporating (Capped at 40%)',
+          rate: 0,
+          rateText: 'Progressive Slabs (0% – 35%)',
+          superTaxText: '10% Surcharge (>10M) + Section 4C (>150M)',
+          actMinTaxText: 'ACT Exempt; 1.25% Min Tax (Turnover > 100M)',
+          compliancePoints: [
+            'FBR Annual Return by 30th September',
+            'Wealth Statement reconciliation under Section 116'
+          ]
+        },
+        {
           id: 'general',
-          name: 'Public / Private / Other Companies (General)',
-          criteria: 'Standard Corporate Companies (Image 3)',
+          name: 'General Corporate Company',
+          criteria: 'Standard Corporate Companies',
           rate: 0.29,
           rateText: '29%',
           superTaxText: 'Progressive Super Tax (Section 4C) ranging from 0% to 10% for income > 150M',
@@ -1359,13 +1637,177 @@ contactForm.addEventListener("submit", (event) => {
     }
   }
 
+  // Non-Salaried & AOP Progressive Slab Calculator (Exact logic from User Images 1, 2, 3, 4)
+  function calculateIndividualTax(profit, yearKey, isProfAop) {
+    if (profit <= 0) {
+      return {
+        baseTax: 0,
+        surchargeAmount: 0,
+        totalTax: 0,
+        rateText: '0%',
+        formula: '0% (Tax-Free / Exempt up to Rs. 600,000)',
+        rangeText: 'Up to Rs. 600,000',
+        activeSlabIndex: 0,
+        surchargeText: 'Profit ≤ 10M (No Surcharge)'
+      };
+    }
+
+    let baseTax = 0;
+    let rateText = '0%';
+    let formula = '';
+    let rangeText = '';
+    let activeSlabIndex = 0;
+
+    if (yearKey === '2023-2024') {
+      // TY 2023-24 (TY 2024 from Image 1)
+      if (profit <= 600000) {
+        baseTax = 0;
+        rateText = '0%';
+        formula = '0% (Tax-free threshold up to Rs. 600,000)';
+        rangeText = 'Up to Rs. 600,000';
+        activeSlabIndex = 0;
+      } else if (profit <= 800000) {
+        const taxable = profit - 600000;
+        baseTax = Math.round(taxable * 0.075);
+        rateText = '7.5%';
+        formula = `7.5% of amount exceeding Rs. 600,000 (${formatPKR(taxable)} × 7.5%)`;
+        rangeText = 'Rs. 600,001 – Rs. 800,000';
+        activeSlabIndex = 1;
+      } else if (profit <= 1200000) {
+        const taxable = profit - 800000;
+        baseTax = 15000 + Math.round(taxable * 0.15);
+        rateText = '15%';
+        formula = `Rs. 15,000 + 15% of amount exceeding Rs. 800,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 800,001 – Rs. 1,200,000';
+        activeSlabIndex = 2;
+      } else if (profit <= 2400000) {
+        const taxable = profit - 1200000;
+        baseTax = 75000 + Math.round(taxable * 0.20);
+        rateText = '20%';
+        formula = `Rs. 75,000 + 20% of amount exceeding Rs. 1,200,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 1,200,001 – Rs. 2,400,000';
+        activeSlabIndex = 3;
+      } else if (profit <= 3000000) {
+        const taxable = profit - 2400000;
+        baseTax = 315000 + Math.round(taxable * 0.25);
+        rateText = '25%';
+        formula = `Rs. 315,000 + 25% of amount exceeding Rs. 2,400,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 2,400,001 – Rs. 3,000,000';
+        activeSlabIndex = 4;
+      } else if (profit <= 4000000) {
+        const taxable = profit - 3000000;
+        baseTax = 465000 + Math.round(taxable * 0.30);
+        rateText = '30%';
+        formula = `Rs. 465,000 + 30% of amount exceeding Rs. 3,000,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 3,000,001 – Rs. 4,000,000';
+        activeSlabIndex = 5;
+      } else {
+        const taxable = profit - 4000000;
+        baseTax = 765000 + Math.round(taxable * 0.35);
+        rateText = '35%';
+        formula = `Rs. 765,000 + 35% of amount exceeding Rs. 4,000,000 (${formatPKR(taxable)})`;
+        rangeText = 'Above Rs. 4,000,000';
+        activeSlabIndex = 6;
+      }
+    } else {
+      // TY 2024-25, 2025-26, 2026-27 (Images 2, 3, 4)
+      if (profit <= 600000) {
+        baseTax = 0;
+        rateText = '0%';
+        formula = '0% (Tax-Free / Exempt up to Rs. 600,000)';
+        rangeText = 'Up to Rs. 600,000';
+        activeSlabIndex = 0;
+      } else if (profit <= 1200000) {
+        const taxable = profit - 600000;
+        baseTax = Math.round(taxable * 0.15);
+        rateText = '15%';
+        formula = `15% of amount exceeding Rs. 600,000 (${formatPKR(taxable)} × 15%)`;
+        rangeText = 'Rs. 600,001 to Rs. 1,200,000';
+        activeSlabIndex = 1;
+      } else if (profit <= 1600000) {
+        const taxable = profit - 1200000;
+        baseTax = 90000 + Math.round(taxable * 0.20);
+        rateText = '20%';
+        formula = `Rs. 90,000 + 20% of amount exceeding Rs. 1,200,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 1,200,001 to Rs. 1,600,000';
+        activeSlabIndex = 2;
+      } else if (profit <= 3200000) {
+        const taxable = profit - 1600000;
+        baseTax = 170000 + Math.round(taxable * 0.30);
+        rateText = '30%';
+        formula = `Rs. 170,000 + 30% of amount exceeding Rs. 1,600,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 1,600,001 to Rs. 3,200,000';
+        activeSlabIndex = 3;
+      } else if (profit <= 5600000) {
+        const taxable = profit - 3200000;
+        baseTax = 650000 + Math.round(taxable * 0.40);
+        rateText = isProfAop ? '40% (Capped)' : '40%';
+        formula = `Rs. 650,000 + 40% of amount exceeding Rs. 3,200,000 (${formatPKR(taxable)})`;
+        rangeText = 'Rs. 3,200,001 to Rs. 5,600,000';
+        activeSlabIndex = 4;
+      } else {
+        const taxable = profit - 5600000;
+        if (isProfAop) {
+          // Professional firm AOP legally prohibited from incorporating: capped at 40%
+          baseTax = 1610000 + Math.round(taxable * 0.40);
+          rateText = '40% (Capped)';
+          formula = `Rs. 1,610,000 + 40% (Professional AOP Cap) of amount exceeding Rs. 5,600,000 (${formatPKR(taxable)})`;
+          rangeText = 'Exceeding Rs. 5,600,000 (Capped at 40%)';
+        } else {
+          baseTax = 1610000 + Math.round(taxable * 0.45);
+          rateText = '45%';
+          formula = `Rs. 1,610,000 + 45% of amount exceeding Rs. 5,600,000 (${formatPKR(taxable)})`;
+          rangeText = 'Exceeding Rs. 5,600,000';
+        }
+        activeSlabIndex = 5;
+      }
+    }
+
+    // High-Income Surcharge (10% under Section 4AB for profit > Rs. 10 Million)
+    let surchargeAmount = 0;
+    let surchargeText = 'Profit ≤ 10M (No Surcharge)';
+    if (profit > 10000000) {
+      surchargeAmount = Math.round(baseTax * 0.10);
+      surchargeText = `10% Surcharge on Calculated Tax under Section 4AB (${formatPKR(surchargeAmount)})`;
+    }
+
+    const totalTax = baseTax + surchargeAmount;
+
+    return {
+      baseTax,
+      surchargeAmount,
+      totalTax,
+      rateText,
+      formula,
+      rangeText,
+      activeSlabIndex,
+      surchargeText
+    };
+  }
+
   function updateBusinessCalculator() {
     const yearKey = bizTaxYear.value || '2026-2027';
-    const catId = bizCategory.value || 'general';
+    const catId = bizCategory.value || 'individual';
     const profit = parseAmount(bizTaxableProfit.value);
     const turnover = parseAmount(bizTurnover.value);
     const acctProfitInput = parseAmount(bizAccountingProfit.value);
     const acctProfit = acctProfitInput > 0 ? acctProfitInput : profit;
+
+    const isIndividual = (catId === 'individual' || catId === 'prof_aop');
+    const isProfAop = (catId === 'prof_aop');
+
+    // Sync Entity Classification radio pills
+    if (btnEntityIndividual && btnEntityCorporate) {
+      btnEntityIndividual.classList.toggle('active', isIndividual);
+      btnEntityIndividual.setAttribute('aria-checked', isIndividual ? 'true' : 'false');
+      btnEntityCorporate.classList.toggle('active', !isIndividual);
+      btnEntityCorporate.setAttribute('aria-checked', !isIndividual ? 'true' : 'false');
+    }
+
+    // Show/hide Non-Salaried Key Rules Callout inside form
+    if (bizIndividualRulesCallout) {
+      bizIndividualRulesCallout.style.display = isIndividual ? 'block' : 'none';
+    }
 
     const yearData = BUSINESS_TAX_DATA[yearKey] || BUSINESS_TAX_DATA['2026-2027'];
     const activeCat = yearData.categories.find(c => c.id === catId) || yearData.categories[0];
@@ -1377,41 +1819,85 @@ contactForm.addEventListener("submit", (event) => {
       smeRegimeGroup.style.display = 'none';
     }
 
-    // Base Corporate Tax calculation
+    // Base Tax & Surcharge Calculation
     let baseTax = 0;
+    let surchargeAmount = 0;
     let baseTaxRateText = activeCat.rateText;
     let baseTaxSub = `${activeCat.rateText} Corporate Rate`;
+    let indTaxInfo = null;
 
-    if (catId === 'sme_cat1') {
-      if (activeSmeRegime === 'ftr') {
-        baseTax = Math.round(turnover * 0.0025);
-        baseTaxRateText = '0.25% (FTR)';
-        baseTaxSub = '0.25% Final Tax Regime on Gross Turnover';
-      } else {
-        baseTax = Math.round(profit * 0.075);
-        baseTaxRateText = '7.5% (NTR)';
-        baseTaxSub = '7.5% Normal Tax Regime on Taxable Profit';
+    if (isIndividual) {
+      indTaxInfo = calculateIndividualTax(profit, yearKey, isProfAop);
+      baseTax = indTaxInfo.baseTax;
+      surchargeAmount = indTaxInfo.surchargeAmount;
+      baseTaxRateText = indTaxInfo.rateText;
+      baseTaxSub = isProfAop 
+        ? 'Non-Salaried Progressive Slabs (40% Cap)'
+        : 'Non-Salaried Progressive Slabs (0% – 45%)';
+
+      if (bizIndividualSlabBanner) {
+        bizIndividualSlabBanner.style.display = 'flex';
       }
-    } else if (catId === 'sme_cat2') {
-      baseTax = Math.round(profit * 0.15);
-      baseTaxSub = '15% Normal Corporate Rate (SME Fourteenth Schedule)';
-    } else if (catId === 'small') {
-      baseTax = Math.round(profit * 0.20);
-      baseTaxSub = turnover > 250000000 
-        ? '20% Rate (Caution: Turnover > 250M may trigger 29% General Rate)'
-        : '20% Concessional Small Company Rate';
-    } else if (catId === 'banking') {
-      baseTax = Math.round(profit * 0.39);
-      baseTaxSub = '39% Banking Sector Flat Corporate Rate';
-    } else if (catId === 'modaraba') {
-      baseTax = Math.round(profit * 0.25);
-      baseTaxSub = '25% Modaraba Ordinance Corporate Rate';
+      if (bizResActiveSlabTitle) {
+        bizResActiveSlabTitle.textContent = `Active Non-Salaried Slab: ${indTaxInfo.rangeText} (${indTaxInfo.rateText})`;
+      }
+      if (bizResActiveSlabDesc) {
+        bizResActiveSlabDesc.textContent = indTaxInfo.formula;
+      }
+      if (bizResBaseTaxLabel) {
+        bizResBaseTaxLabel.textContent = 'Non-Salaried Slab Tax';
+      }
+      if (bizResSuperTaxLabel) {
+        bizResSuperTaxLabel.textContent = '10% Surcharge (Sec 4AB)';
+      }
+      if (bizResACTLabel) {
+        bizResACTLabel.textContent = 'Min Tax / ACT Status';
+      }
     } else {
-      baseTax = Math.round(profit * 0.29);
-      baseTaxSub = '29% Standard General Corporate Rate';
+      if (bizIndividualSlabBanner) {
+        bizIndividualSlabBanner.style.display = 'none';
+      }
+      if (bizResBaseTaxLabel) {
+        bizResBaseTaxLabel.textContent = 'Base Corporate Tax';
+      }
+      if (bizResSuperTaxLabel) {
+        bizResSuperTaxLabel.textContent = 'Super Tax (Section 4C)';
+      }
+      if (bizResACTLabel) {
+        bizResACTLabel.textContent = 'ACT / Min Tax Status';
+      }
+
+      if (catId === 'sme_cat1') {
+        if (activeSmeRegime === 'ftr') {
+          baseTax = Math.round(turnover * 0.0025);
+          baseTaxRateText = '0.25% (FTR)';
+          baseTaxSub = '0.25% Final Tax Regime on Gross Turnover';
+        } else {
+          baseTax = Math.round(profit * 0.075);
+          baseTaxRateText = '7.5% (NTR)';
+          baseTaxSub = '7.5% Normal Tax Regime on Taxable Profit';
+        }
+      } else if (catId === 'sme_cat2') {
+        baseTax = Math.round(profit * 0.15);
+        baseTaxSub = '15% Normal Corporate Rate (SME Fourteenth Schedule)';
+      } else if (catId === 'small') {
+        baseTax = Math.round(profit * 0.20);
+        baseTaxSub = turnover > 250000000 
+          ? '20% Rate (Caution: Turnover > 250M may trigger 29% General Rate)'
+          : '20% Concessional Small Company Rate';
+      } else if (catId === 'banking') {
+        baseTax = Math.round(profit * 0.39);
+        baseTaxSub = '39% Banking Sector Flat Corporate Rate';
+      } else if (catId === 'modaraba') {
+        baseTax = Math.round(profit * 0.25);
+        baseTaxSub = '25% Modaraba Ordinance Corporate Rate';
+      } else {
+        baseTax = Math.round(profit * 0.29);
+        baseTaxSub = '29% Standard General Corporate Rate';
+      }
     }
 
-    // Super Tax (Section 4C) calculation
+    // Super Tax (Section 4C) calculation (applies if profit > 150M)
     const superTaxRes = calculateSuperTax(profit, catId, yearKey);
     const superTaxAmount = (catId === 'sme_cat1' && activeSmeRegime === 'ftr') ? 0 : superTaxRes.tax;
 
@@ -1421,7 +1907,24 @@ contactForm.addEventListener("submit", (event) => {
     let actStatus = 'Compliant';
     let actSub = 'Normal Tax Exceeds ACT & Min Tax';
 
-    if (catId === 'sme_cat1' && activeSmeRegime === 'ftr') {
+    if (isIndividual) {
+      actAmount = 0;
+      // Minimum Turnover Tax for Individuals applies only if Annual Turnover > Rs 100 Million
+      if (turnover >= 100000000) {
+        minTaxAmount = Math.round(turnover * 0.0125);
+        if (minTaxAmount > (baseTax + surchargeAmount)) {
+          actStatus = 'Min Tax Applicable';
+          actSub = `1.25% Turnover Tax (${formatPKR(minTaxAmount)}) exceeds slab liability (${formatPKR(baseTax + surchargeAmount)})`;
+        } else {
+          actStatus = 'Compliant';
+          actSub = `Slab tax (${formatPKR(baseTax + surchargeAmount)}) exceeds 1.25% Min Tax (${formatPKR(minTaxAmount)})`;
+        }
+      } else {
+        minTaxAmount = 0;
+        actStatus = 'ACT Exempt';
+        actSub = 'Turnover < 100M: Min Tax under Sec 113 Exempt (ACT applies to companies only)';
+      }
+    } else if (catId === 'sme_cat1' && activeSmeRegime === 'ftr') {
       actStatus = 'Exempt';
       actSub = 'FTR Exempt from Section 113 & 113C';
     } else if (catId !== 'banking') {
@@ -1445,7 +1948,9 @@ contactForm.addEventListener("submit", (event) => {
 
     // Total tax liability
     let effectiveBaseTax = baseTax;
-    if (catId !== 'banking' && !(catId === 'sme_cat1' && activeSmeRegime === 'ftr')) {
+    if (isIndividual) {
+      effectiveBaseTax = Math.max(baseTax + surchargeAmount, minTaxAmount);
+    } else if (catId !== 'banking' && !(catId === 'sme_cat1' && activeSmeRegime === 'ftr')) {
       effectiveBaseTax = Math.max(baseTax, actAmount, minTaxAmount);
     }
     const totalTaxLiability = effectiveBaseTax + superTaxAmount;
@@ -1454,32 +1959,60 @@ contactForm.addEventListener("submit", (event) => {
 
     // Update Result Card UI
     if (bizResYearBadge) bizResYearBadge.textContent = yearData.label;
-    if (bizResCategoryTitle) bizResCategoryTitle.textContent = 'Corporate Tax Summary';
-    if (bizResCategoryTag) bizResCategoryTag.textContent = `${activeCat.name} (${activeCat.rateText})`;
+    if (bizResCategoryTitle) {
+      bizResCategoryTitle.textContent = isProfAop
+        ? 'Professional AOP Tax Summary'
+        : isIndividual 
+          ? 'Non-Salaried & AOP Tax Summary' 
+          : 'Corporate Tax Summary';
+    }
+    if (bizResCategoryTag) {
+      bizResCategoryTag.textContent = isProfAop
+        ? 'Professional Firm AOP · Capped at 40%'
+        : isIndividual 
+          ? `${activeCat.name} · Progressive Slabs`
+          : `${activeCat.name} · ${activeCat.rateText}`;
+    }
 
     // Hero metrics: PAT (Profit After Tax) and Total Tax Liability
     if (bizResPAT) bizResPAT.textContent = formatPKR(pat);
     if (bizResTotalTax) bizResTotalTax.textContent = formatPKR(totalTaxLiability);
     if (bizResTotalTaxSub) {
-      bizResTotalTaxSub.textContent = superTaxAmount > 0 
-        ? `Base Tax (${formatPKR(effectiveBaseTax)}) + Super Tax (${formatPKR(superTaxAmount)})` 
-        : 'Flat Corporate Tax Liability';
+      if (isIndividual) {
+        if (surchargeAmount > 0) {
+          bizResTotalTaxSub.textContent = `Slab Tax (${formatPKR(baseTax)}) + 10% Surcharge (${formatPKR(surchargeAmount)})`;
+        } else {
+          bizResTotalTaxSub.textContent = 'Non-Salaried Progressive Slab Tax';
+        }
+      } else {
+        bizResTotalTaxSub.textContent = superTaxAmount > 0 
+          ? `Base Tax (${formatPKR(effectiveBaseTax)}) + Super Tax (${formatPKR(superTaxAmount)})` 
+          : 'Flat Corporate Tax Liability';
+      }
     }
 
     // 4-Metrics Grid
     if (bizResEffectiveRate) bizResEffectiveRate.textContent = `${effectiveRate.toFixed(2)}%`;
     if (bizResRateSub) bizResRateSub.textContent = `On Net Taxable Profit (${formatPKR(profit)})`;
-    if (bizResBaseTax) bizResBaseTax.textContent = formatPKR(effectiveBaseTax);
+    if (bizResBaseTax) bizResBaseTax.textContent = formatPKR(baseTax);
     if (bizResBaseTaxSub) bizResBaseTaxSub.textContent = baseTaxSub;
-    if (bizResSuperTax) bizResSuperTax.textContent = formatPKR(superTaxAmount);
-    if (bizResSuperTaxSub) bizResSuperTaxSub.textContent = superTaxRes.bracketText;
+
+    if (bizResSuperTax) {
+      if (isIndividual) {
+        bizResSuperTax.textContent = formatPKR(surchargeAmount);
+        if (bizResSuperTaxSub) bizResSuperTaxSub.textContent = indTaxInfo ? indTaxInfo.surchargeText : 'Profit ≤ 10M (No Surcharge)';
+      } else {
+        bizResSuperTax.textContent = formatPKR(superTaxAmount);
+        if (bizResSuperTaxSub) bizResSuperTaxSub.textContent = superTaxRes.bracketText;
+      }
+    }
     
     // Status Badge for ACT / Min Tax
     if (bizResACTStatus) {
       bizResACTStatus.textContent = actStatus;
       let badgeClass = 'metric-badge-tag ';
       if (actStatus === 'Compliant') badgeClass += 'status-compliant';
-      else if (actStatus === 'Exempt') badgeClass += 'status-special';
+      else if (actStatus === 'Exempt' || actStatus === 'ACT Exempt') badgeClass += 'status-special';
       else if (actStatus === 'Special Regime') badgeClass += 'status-special';
       else badgeClass += 'status-warning';
       bizResACTStatus.className = badgeClass;
@@ -1515,7 +2048,7 @@ contactForm.addEventListener("submit", (event) => {
       });
     }
 
-    // Highlight active Super Tax bracket in the schedule grid
+    // Highlight active Super Tax bracket in the schedule grid (if visible)
     if (superTaxGrid) {
       const items = superTaxGrid.querySelectorAll('.super-tax-bracket-item');
       const activeIdx = (catId === 'sme_cat1' && activeSmeRegime === 'ftr') ? 0 : superTaxRes.bracketIndex;
@@ -1533,14 +2066,14 @@ contactForm.addEventListener("submit", (event) => {
       });
     }
 
-    // Render Year-Wise Matrix Table
+    // Render Year-Wise Matrix / Slabs Table
     renderBusinessMatrixTable(yearKey, catId);
   }
 
   function renderBusinessMatrixTable(yearKey, activeCatId) {
-    const yearData = BUSINESS_TAX_DATA[yearKey] || BUSINESS_TAX_DATA['2026-2027'];
-    if (bizMatrixTitle) bizMatrixTitle.textContent = `${yearData.label} Corporate Tax & Statutory Compliance Matrix`;
-    if (bizMatrixDesc) bizMatrixDesc.textContent = yearData.desc;
+    const isInd = (activeCatId === 'individual' || activeCatId === 'prof_aop');
+    const isProfAop = (activeCatId === 'prof_aop');
+    const profit = parseAmount(bizTaxableProfit.value);
 
     // Sync Year tabs
     bizYearTabs.forEach(tab => {
@@ -1549,68 +2082,177 @@ contactForm.addEventListener("submit", (event) => {
       tab.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
     });
 
-    bizMatrixTableBody.innerHTML = '';
-    yearData.categories.forEach(cat => {
-      const tr = document.createElement('tr');
-      const isSelected = cat.id === activeCatId;
-      if (isSelected) {
-        tr.className = 'active-slab-row';
+    if (isInd) {
+      // NON-SALARIED & AOP SLABS TABLE VIEW (DIRECTLY MATCHING USER IMAGES)
+      const yearLabel = (yearKey === '2026-2027') ? 'FY 2026-27' :
+                        (yearKey === '2025-2026') ? 'Tax Year 2025–26' :
+                        (yearKey === '2024-2025') ? 'Tax Year 2024-25' : 'TY 2023–24';
+
+      if (bizMatrixTitle) bizMatrixTitle.textContent = `Non-Salaried & AOP Income Tax Slabs (${yearLabel})`;
+      if (bizMatrixDesc) {
+        bizMatrixDesc.textContent = `Official progressive tax slabs and statutory surcharges for non-salaried individuals, sole proprietors, and AOPs under the First Schedule to Income Tax Ordinance, 2001.`;
       }
 
-      // 1. Entity & Criteria
-      const tdEntity = document.createElement('td');
-      const strong = document.createElement('strong');
-      strong.textContent = cat.name;
-      tdEntity.appendChild(strong);
-      const sub = document.createElement('div');
-      sub.style.fontSize = '12px';
-      sub.style.color = 'var(--text-muted)';
-      sub.style.marginTop = '2px';
-      sub.textContent = cat.criteria;
-      tdEntity.appendChild(sub);
-      if (isSelected) {
-        const badge = document.createElement('span');
-        badge.className = 'slab-active-tag';
-        badge.textContent = 'Selected Entity';
-        tdEntity.appendChild(badge);
+      // Update Table Head
+      if (bizMatrixTableHead) {
+        bizMatrixTableHead.innerHTML = `
+          <tr>
+            <th style="width: 28%;">Taxable Income Range (PKR)</th>
+            <th style="width: 50%;">Tax Rate &amp; Fixed Amount (Calculation)</th>
+            <th style="width: 22%;">Slab Status</th>
+          </tr>
+        `;
       }
 
-      // 2. Corporate Rate
-      const tdRate = document.createElement('td');
-      const rateStrong = document.createElement('strong');
-      rateStrong.style.color = '#A31D24';
-      rateStrong.textContent = cat.rateText;
-      tdRate.appendChild(rateStrong);
+      // Populate Slabs Body
+      bizMatrixTableBody.innerHTML = '';
+      const slabs = NON_SALARIED_SLABS[yearKey] || NON_SALARIED_SLABS['2026-2027'];
+      const indCalc = calculateIndividualTax(profit, yearKey, isProfAop);
 
-      // 3. Super Tax
-      const tdSuper = document.createElement('td');
-      tdSuper.textContent = cat.superTaxText;
+      slabs.forEach((slab, idx) => {
+        const tr = document.createElement('tr');
+        const isSelected = (idx === indCalc.activeSlabIndex);
+        if (isSelected) {
+          tr.className = 'active-slab-row';
+        }
 
-      // 4. ACT / Min Tax
-      const tdAct = document.createElement('td');
-      tdAct.textContent = cat.actMinTaxText;
+        // Col 1: Range
+        const tdRange = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = slab.rangeText;
+        tdRange.appendChild(strong);
 
-      // 5. Compliance
-      const tdCompliance = document.createElement('td');
-      const compList = document.createElement('ul');
-      compList.style.margin = '0';
-      compList.style.paddingLeft = '18px';
-      compList.style.fontSize = '12.5px';
-      compList.style.lineHeight = '1.45';
-      cat.compliancePoints.forEach(p => {
-        const li = document.createElement('li');
-        li.textContent = p;
-        compList.appendChild(li);
+        // Col 2: Rate & Formula
+        const tdRate = document.createElement('td');
+        let descText = slab.desc;
+        if (isProfAop && idx === 5 && yearKey !== '2023-2024') {
+          descText = 'Rs. 1,610,000 + 40% (Professional AOP Cap) of amount exceeding Rs. 5,600,000';
+        }
+        tdRate.innerHTML = `<span>${descText}</span>`;
+
+        // Col 3: Status
+        const tdStatus = document.createElement('td');
+        if (isSelected) {
+          const badge = document.createElement('span');
+          badge.className = 'slab-active-tag';
+          badge.textContent = 'Active Slab';
+          tdStatus.appendChild(badge);
+        } else {
+          tdStatus.innerHTML = `<span style="font-size: 11.5px; color: var(--text-muted);">Tier ${idx + 1}</span>`;
+        }
+
+        tr.appendChild(tdRange);
+        tr.appendChild(tdRate);
+        tr.appendChild(tdStatus);
+        bizMatrixTableBody.appendChild(tr);
       });
-      tdCompliance.appendChild(compList);
 
-      tr.appendChild(tdEntity);
-      tr.appendChild(tdRate);
-      tr.appendChild(tdSuper);
-      tr.appendChild(tdAct);
-      tr.appendChild(tdCompliance);
-      bizMatrixTableBody.appendChild(tr);
-    });
+      // Show Non-Salaried Rules Card & populate from Image data
+      if (nonSalariedRulesCard) {
+        nonSalariedRulesCard.style.display = 'block';
+        const rulesInfo = NON_SALARIED_RULES_DATA[yearKey] || NON_SALARIED_RULES_DATA['2026-2027'];
+        if (nonSalariedRulesTitle) nonSalariedRulesTitle.textContent = rulesInfo.title;
+        if (nonSalariedRulesSub) nonSalariedRulesSub.textContent = rulesInfo.sub;
+        if (nonSalariedRulesGrid) {
+          nonSalariedRulesGrid.innerHTML = '';
+          rulesInfo.rules.forEach(rule => {
+            const item = document.createElement('div');
+            item.className = 'ns-rule-item';
+            item.innerHTML = `
+              <div class="ns-rule-item-header">
+                <span class="ns-rule-title">${rule.title}</span>
+                <span class="ns-source-pill">${rule.badge}</span>
+              </div>
+              <p class="ns-rule-desc">${rule.desc}</p>
+            `;
+            nonSalariedRulesGrid.appendChild(item);
+          });
+        }
+      }
+
+      if (superTaxScheduleCard) {
+        superTaxScheduleCard.style.display = (profit > 150000000) ? 'block' : 'none';
+      }
+
+    } else {
+      // CORPORATE MATRIX TABLE VIEW
+      const yearData = BUSINESS_TAX_DATA[yearKey] || BUSINESS_TAX_DATA['2026-2027'];
+      if (bizMatrixTitle) bizMatrixTitle.textContent = `${yearData.label} Corporate Tax & Statutory Compliance Matrix`;
+      if (bizMatrixDesc) bizMatrixDesc.textContent = yearData.desc;
+
+      if (bizMatrixTableHead) {
+        bizMatrixTableHead.innerHTML = `
+          <tr>
+            <th>Entity Category &amp; Criteria</th>
+            <th>Applicable Corporate Rate</th>
+            <th>Super Tax (Sec 4C)</th>
+            <th>ACT / Min Tax</th>
+            <th>Statutory Compliance &amp; Due Dates</th>
+          </tr>
+        `;
+      }
+
+      bizMatrixTableBody.innerHTML = '';
+      yearData.categories.forEach(cat => {
+        const tr = document.createElement('tr');
+        const isSelected = (cat.id === activeCatId);
+        if (isSelected) {
+          tr.className = 'active-slab-row';
+        }
+
+        const tdEntity = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = cat.name;
+        tdEntity.appendChild(strong);
+        const sub = document.createElement('div');
+        sub.style.fontSize = '12px';
+        sub.style.color = 'var(--text-muted)';
+        sub.style.marginTop = '2px';
+        sub.textContent = cat.criteria;
+        tdEntity.appendChild(sub);
+        if (isSelected) {
+          const badge = document.createElement('span');
+          badge.className = 'slab-active-tag';
+          badge.textContent = 'Selected Entity';
+          tdEntity.appendChild(badge);
+        }
+
+        const tdRate = document.createElement('td');
+        const rateStrong = document.createElement('strong');
+        rateStrong.style.color = '#A31D24';
+        rateStrong.textContent = cat.rateText;
+        tdRate.appendChild(rateStrong);
+
+        const tdSuper = document.createElement('td');
+        tdSuper.textContent = cat.superTaxText;
+
+        const tdAct = document.createElement('td');
+        tdAct.textContent = cat.actMinTaxText;
+
+        const tdCompliance = document.createElement('td');
+        const compList = document.createElement('ul');
+        compList.style.margin = '0';
+        compList.style.paddingLeft = '18px';
+        compList.style.fontSize = '12.5px';
+        compList.style.lineHeight = '1.45';
+        cat.compliancePoints.forEach(p => {
+          const li = document.createElement('li');
+          li.textContent = p;
+          compList.appendChild(li);
+        });
+        tdCompliance.appendChild(compList);
+
+        tr.appendChild(tdEntity);
+        tr.appendChild(tdRate);
+        tr.appendChild(tdSuper);
+        tr.appendChild(tdAct);
+        tr.appendChild(tdCompliance);
+        bizMatrixTableBody.appendChild(tr);
+      });
+
+      if (nonSalariedRulesCard) nonSalariedRulesCard.style.display = 'none';
+      if (superTaxScheduleCard) superTaxScheduleCard.style.display = 'block';
+    }
   }
 
   // Currency input live formatting helper (formats without auto-calculating)
@@ -1659,19 +2301,63 @@ contactForm.addEventListener("submit", (event) => {
     });
   }
 
+  // Entity Classification switcher (Individual vs Corporate)
+  if (btnEntityIndividual && btnEntityCorporate) {
+    btnEntityIndividual.addEventListener('click', () => {
+      btnEntityIndividual.classList.add('active');
+      btnEntityIndividual.setAttribute('aria-checked', 'true');
+      btnEntityCorporate.classList.remove('active');
+      btnEntityCorporate.setAttribute('aria-checked', 'false');
+      if (bizCategory.value !== 'individual' && bizCategory.value !== 'prof_aop') {
+        bizCategory.value = 'individual';
+      }
+      smeRegimeGroup.style.display = 'none';
+      if (bizIndividualRulesCallout) bizIndividualRulesCallout.style.display = 'block';
+      renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
+    });
+
+    btnEntityCorporate.addEventListener('click', () => {
+      btnEntityCorporate.classList.add('active');
+      btnEntityCorporate.setAttribute('aria-checked', 'true');
+      btnEntityIndividual.classList.remove('active');
+      btnEntityIndividual.setAttribute('aria-checked', 'false');
+      if (bizCategory.value === 'individual' || bizCategory.value === 'prof_aop') {
+        bizCategory.value = 'general';
+      }
+      if (bizCategory.value === 'sme_cat1') {
+        smeRegimeGroup.style.display = 'block';
+      } else {
+        smeRegimeGroup.style.display = 'none';
+      }
+      if (bizIndividualRulesCallout) bizIndividualRulesCallout.style.display = 'none';
+      renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
+    });
+  }
+
   // Tax year change (updates matrix table view without auto-calculating)
   bizTaxYear.addEventListener('change', () => {
     renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
   });
 
-  // Category change (toggles SME regime pills without auto-calculating)
+  // Category change (syncs entity buttons and SME regime pills without auto-calculating)
   bizCategory.addEventListener('change', () => {
     const catId = bizCategory.value;
+    const isInd = (catId === 'individual' || catId === 'prof_aop');
+    if (btnEntityIndividual && btnEntityCorporate) {
+      btnEntityIndividual.classList.toggle('active', isInd);
+      btnEntityIndividual.setAttribute('aria-checked', isInd ? 'true' : 'false');
+      btnEntityCorporate.classList.toggle('active', !isInd);
+      btnEntityCorporate.setAttribute('aria-checked', !isInd ? 'true' : 'false');
+    }
+    if (bizIndividualRulesCallout) {
+      bizIndividualRulesCallout.style.display = isInd ? 'block' : 'none';
+    }
     if (catId === 'sme_cat1') {
       smeRegimeGroup.style.display = 'block';
     } else {
       smeRegimeGroup.style.display = 'none';
     }
+    renderBusinessMatrixTable(bizTaxYear.value, catId);
   });
 
   // SME Regime pills click (updates regime state without auto-calculating)
@@ -1974,7 +2660,7 @@ contactForm.addEventListener("submit", (event) => {
 
     // Category Tag
     if (rentalResCategoryTag) {
-      const ownerLabel = isCompany ? 'Company / Corporate Landlord' : 'Individual / Association of Persons (AOP)';
+      const ownerLabel = isCompany ? 'Corporate Company' : 'Individual / AOP';
       const filerLabel = isFiler ? 'Active Taxpayer (Filer)' : 'Non-Filer (Doubled Rates)';
       rentalResCategoryTag.textContent = `${ownerLabel} · ${filerLabel}`;
     }
@@ -2179,4 +2865,108 @@ contactForm.addEventListener("submit", (event) => {
 
   // Initial render on load
   updateRentalCalculator();
+})();
+
+/* ==========================================================================
+   Footer Actions & Legal Modals (Privacy Policy & Terms of Use)
+   ========================================================================== */
+(function initLegalModalsAndFooter() {
+  const privacyModal = document.getElementById('privacyModal');
+  const termsModal = document.getElementById('termsModal');
+
+  function openModal(modalEl) {
+    if (!modalEl) return;
+    modalEl.classList.add('active');
+    modalEl.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = modalEl.querySelector('.policy-modal-close');
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeModal(modalEl) {
+    if (!modalEl) return;
+    modalEl.classList.remove('active');
+    modalEl.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function closeAllModals() {
+    closeModal(privacyModal);
+    closeModal(termsModal);
+  }
+
+  // Privacy triggers
+  const privacyTriggers = [
+    'footerPrivacyTrigger',
+    'btnDisclaimerPrivacy',
+    'footerNavPrivacy'
+  ];
+  privacyTriggers.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(privacyModal);
+      });
+    }
+  });
+
+  // Terms triggers
+  const termsTriggers = [
+    'footerTermsTrigger',
+    'footerNavTerms'
+  ];
+  termsTriggers.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(termsModal);
+      });
+    }
+  });
+
+  // Close buttons inside modals
+  document.querySelectorAll('.policy-modal-close, .policy-modal-dismiss').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeAllModals();
+    });
+  });
+
+  // Backdrop click closes
+  [privacyModal, termsModal].forEach(modal => {
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal(modal);
+        }
+      });
+    }
+  });
+
+  // ESC key closes
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllModals();
+    }
+  });
+
+  // Print Privacy Policy
+  const btnPrint = document.getElementById('btnPrintPrivacyPolicy');
+  if (btnPrint) {
+    btnPrint.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // Footer tax calculator quick switcher links
+  document.querySelectorAll('[data-switch-calc]').forEach(link => {
+    link.addEventListener('click', () => {
+      const targetCalc = link.getAttribute('data-switch-calc');
+      if (typeof window.switchTaxCategory === 'function' && targetCalc) {
+        window.switchTaxCategory(targetCalc);
+      }
+    });
+  });
 })();

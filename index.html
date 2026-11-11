@@ -472,17 +472,54 @@
                   </select>
                 </div>
 
-                <!-- Business / Corporate Category -->
+                <!-- Business Entity Classification (Individual vs Corporate) -->
                 <div class="form-group">
-                  <label for="bizCategory">Business / Corporate Category</label>
+                  <label>Business Entity Classification</label>
+                  <div class="sme-regime-pills" role="radiogroup" aria-label="Business Entity Classification">
+                    <button type="button" class="sme-regime-pill active" id="btnEntityIndividual" data-bizentity="individual" role="radio" aria-checked="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      <span>Individual / Sole Proprietor / AOP</span>
+                    </button>
+                    <button type="button" class="sme-regime-pill" id="btnEntityCorporate" data-bizentity="corporate" role="radio" aria-checked="false">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                      <span>Corporate / Companies</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Business / Corporate Category -->
+                <div class="form-group" id="bizCategoryGroup">
+                  <label for="bizCategory" id="bizCategoryLabel">Business / Corporate Category</label>
                   <select id="bizCategory" name="bizCategory">
-                    <option value="general" selected>All Other Companies (General Corporate Rate: 29%)</option>
-                    <option value="small">Small Company (Turnover &le; 250M, Employees &le; 250: 20%)</option>
-                    <option value="banking">Banking Company (39%)</option>
-                    <option value="sme_cat1">SME Manufacturing — Category 1 (Turnover &le; 100M: 7.5% / 0.25%)</option>
-                    <option value="sme_cat2">SME Manufacturing — Category 2 (Turnover 100M–250M: 15%)</option>
-                    <option value="modaraba">Modaraba (25%)</option>
+                    <optgroup label="Individual &amp; AOP" id="optgroupIndividual">
+                      <option value="individual" selected>Commercial Business / Sole Proprietor</option>
+                      <option value="prof_aop">Professional Firm AOP</option>
+                    </optgroup>
+                    <optgroup label="Corporate Entities" id="optgroupCorporate">
+                      <option value="general">General Corporate Company</option>
+                      <option value="small">Small Company</option>
+                      <option value="banking">Banking Company</option>
+                      <option value="sme_cat1">SME Manufacturing — Category 1</option>
+                      <option value="sme_cat2">SME Manufacturing — Category 2</option>
+                      <option value="modaraba">Modaraba</option>
+                    </optgroup>
                   </select>
+                </div>
+
+                <!-- FBR Non-Salaried & AOP Key Provisions Callout (Shown for Individual / AOP) -->
+                <div class="biz-rules-callout" id="bizIndividualRulesCallout">
+                  <div class="biz-rules-callout-header">
+                    <div class="rules-callout-title">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      <span>FBR Non-Salaried &amp; AOP Rules</span>
+                    </div>
+                    <span class="rules-pill-tag">First Schedule</span>
+                  </div>
+                  <ul class="biz-rules-list">
+                    <li><strong>The 75% Rule:</strong> If less than 75% of your total income comes from salary, the entire income shifts to this non-salaried schedule.</li>
+                    <li><strong>High-Income Surcharge (10%):</strong> An additional 10% surcharge (Sec 4AB) applies to calculated tax if profit exceeds Rs. 10 Million.</li>
+                    <li><strong>Professional AOP Cap (40%):</strong> Qualifying professional partnerships (legal, medical, CA) are capped at a maximum 40% rate.</li>
+                  </ul>
                 </div>
 
                 <!-- SME Regime Switcher (Displays only when SME Cat 1 is active) -->
@@ -599,19 +636,34 @@
                   <span class="metric-sub" id="bizResRateSub">On Net Taxable Profit</span>
                 </div>
                 <div class="metric-box">
-                  <span class="metric-label">Base Corporate Tax</span>
+                  <span class="metric-label" id="bizResBaseTaxLabel">Base Corporate Tax</span>
                   <span class="metric-value" id="bizResBaseTax">Rs 2,900,000</span>
                   <span class="metric-sub" id="bizResBaseTaxSub">29% Corporate Rate</span>
                 </div>
                 <div class="metric-box">
-                  <span class="metric-label">Super Tax (Section 4C)</span>
+                  <span class="metric-label" id="bizResSuperTaxLabel">Super Tax (Section 4C)</span>
                   <span class="metric-value" id="bizResSuperTax">Rs 0</span>
                   <span class="metric-sub" id="bizResSuperTaxSub">0% (Income &le; 150M)</span>
                 </div>
                 <div class="metric-box">
-                  <span class="metric-label">ACT / Min Tax Status</span>
+                  <span class="metric-label" id="bizResACTLabel">ACT / Min Tax Status</span>
                   <span class="metric-value"><span class="metric-badge-tag status-compliant" id="bizResACTStatus">Compliant</span></span>
                   <span class="metric-sub" id="bizResACTSub">Normal Tax Exceeds ACT</span>
+                </div>
+              </div>
+
+              <!-- Active Individual Slab Highlight Banner (Shown for Individual / AOP) -->
+              <div class="active-slab-banner" id="bizIndividualSlabBanner" style="display: none;">
+                <div class="slab-banner-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                  </svg>
+                </div>
+                <div class="slab-banner-text">
+                  <strong id="bizResActiveSlabTitle">Active Individual Slab: Above Rs 4,100,000 (35%)</strong>
+                  <span id="bizResActiveSlabDesc">Rs 616,000 + 35% of taxable profit exceeding Rs 4,100,000</span>
                 </div>
               </div>
 
@@ -647,8 +699,8 @@
           <div class="tax-slabs-container biz-matrix-container">
             <div class="slabs-table-header">
               <div>
-                <h3 id="bizMatrixTitle">Year-Wise Corporate Tax &amp; Statutory Compliance Matrix</h3>
-                <p id="bizMatrixDesc">Flat corporate rates, Super Tax (Section 4C), and statutory filing deadlines across tax years pursuant to FBR Finance Acts.</p>
+                <h3 id="bizMatrixTitle">Year-Wise Business &amp; Corporate Tax Matrix</h3>
+                <p id="bizMatrixDesc">Individual progressive slabs, flat corporate rates, Super Tax (Section 4C), and statutory compliance schedules across tax years.</p>
               </div>
               <div class="slabs-tabs" role="tablist" aria-label="Business Tax Slabs Year Selection" id="bizYearTabs">
                 <button type="button" class="tab-btn active" data-bizyear="2026-2027" role="tab" aria-selected="true">Tax Year 2026–2027</button>
@@ -660,10 +712,10 @@
 
             <div class="table-wrap slabs-table-wrap">
               <table class="slabs-table biz-matrix-table" id="bizMatrixTable">
-                <thead>
+                <thead id="bizMatrixTableHead">
                   <tr>
                     <th>Entity Category &amp; Criteria</th>
-                    <th>Corporate Tax Rate</th>
+                    <th>Applicable Tax Rate / Slabs</th>
                     <th>Super Tax (Sec 4C)</th>
                     <th>ACT / Min Tax</th>
                     <th>Statutory Compliance &amp; Due Dates</th>
@@ -675,8 +727,22 @@
               </table>
             </div>
 
+            <!-- Non-Salaried & AOP Key Rules Card (Directly from User Images) -->
+            <div class="non-salaried-rules-card" id="nonSalariedRulesCard">
+              <div class="super-tax-header">
+                <div>
+                  <h4 id="nonSalariedRulesTitle">Key Rules &amp; Surcharges for Non-Salaried Income</h4>
+                  <p id="nonSalariedRulesSub">Statutory provisions, high-income surcharges, and AOP caps under the First Schedule.</p>
+                </div>
+                <span class="badge badge-fbr">Non-Salaried Provisions</span>
+              </div>
+              <div class="non-salaried-rules-grid" id="nonSalariedRulesGrid">
+                <!-- Dynamically populated per tax year -->
+              </div>
+            </div>
+
             <!-- Super Tax Section 4C Schedule (Progressive Brackets from Image 2) -->
-            <div class="super-tax-schedule-card">
+            <div class="super-tax-schedule-card" id="superTaxScheduleCard" style="display: none;">
               <div class="super-tax-header">
                 <div>
                   <h4>Super Tax (Section 4C) Progressive Slab Schedule</h4>
@@ -737,7 +803,7 @@
                 </div>
                 <div>
                   <h3>Rental Income Tax</h3>
-                  <p>Compute withholding tax (Sec 155), allowable deductions (Sec 15A), and net property tax liability</p>
+                  <p>Compute rental income withholding tax (Section 155) and net take-home property income</p>
                 </div>
               </div>
 
@@ -746,7 +812,7 @@
                 <div class="form-group">
                   <label for="rentalTaxYear">Tax Year</label>
                   <select id="rentalTaxYear" name="rentalTaxYear">
-                    <option value="2026-2027" selected>Tax Year 2026–2027 (FY 2027)</option>
+                    <option value="2026-2027" selected>Tax Year 2026–2027</option>
                     <option value="2025-2026">Tax Year 2025–2026</option>
                     <option value="2024-2025">Tax Year 2024–2025</option>
                     <option value="2023-2024">Tax Year 2023–2024</option>
@@ -757,24 +823,9 @@
                 <div class="form-group">
                   <label for="rentalOwnerType">Property Ownership Type</label>
                   <select id="rentalOwnerType" name="rentalOwnerType">
-                    <option value="individual" selected>Individual / Association of Persons (AOP) — Progressive Slabs</option>
-                    <option value="company">Company / Corporate Landlord — Flat Rate (15% Filer / 30% Non-Filer)</option>
+                    <option value="individual" selected>Individual / AOP</option>
+                    <option value="company">Corporate Company</option>
                   </select>
-                </div>
-
-                <!-- Active Taxpayer Status (Filer / Non-Filer) -->
-                <div class="form-group">
-                  <label>FBR Active Taxpayer Status (ATL)</label>
-                  <div class="sme-regime-pills" role="radiogroup" aria-label="FBR Taxpayer Status">
-                    <button type="button" class="sme-regime-pill active" id="btnRentalFiler" data-rentalfiler="filer" role="radio" aria-checked="true">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                      <span>Active Taxpayer (Filer)</span>
-                    </button>
-                    <button type="button" class="sme-regime-pill" id="btnRentalNonFiler" data-rentalfiler="non-filer" role="radio" aria-checked="false">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                      <span>Non-Filer (100% Surcharge)</span>
-                    </button>
-                  </div>
                 </div>
 
                 <!-- Gross Rent Input with Monthly / Annually Option -->
@@ -806,71 +857,6 @@
                   </div>
                 </div>
 
-                <!-- Allowable Deductions Container (Section 15A) -->
-                <div class="rental-deductions-box" id="rentalDeductionsGroup">
-                  <div class="rental-deductions-header">
-                    <div class="rental-deductions-title-row">
-                      <span class="field-hint-tag">Section 15A Deductions</span>
-                      <span class="deduction-tag-pill">Reduces Net Property Tax</span>
-                    </div>
-                    <label class="custom-checkbox-wrap" for="rentalClaimRepairs">
-                      <input type="checkbox" id="rentalClaimRepairs" checked>
-                      <span class="custom-checkbox-mark"></span>
-                      <span class="checkbox-title">Claim Statutory 20% Repair Allowance</span>
-                    </label>
-                    <p class="deduction-subnote">Automatic statutory deduction &mdash; <strong>no invoices or receipts required</strong> pursuant to Section 15A.</p>
-                  </div>
-
-                  <!-- Optional Additional Deductions Accordion -->
-                  <div class="rental-extra-toggle-wrap">
-                    <button type="button" class="btn-extra-deductions" id="btnToggleOtherDeductions" aria-expanded="false">
-                      <span id="extraDeductionsText">+ Add Other Allowable Expenses (Taxes, Markup, Insurance)</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-                  </div>
-
-                  <div class="rental-extra-deductions-fields" id="rentalExtraFields" hidden>
-                    <div class="form-group">
-                      <label for="rentalPropertyTax">Annual Local / Property Taxes &amp; Ground Rent (PKR)</label>
-                      <div class="currency-input-wrap">
-                        <span class="currency-prefix">Rs</span>
-                        <input type="text" id="rentalPropertyTax" name="rentalPropertyTax" inputmode="numeric"
-                          placeholder="e.g. 0" value="0" autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="rentalLoanInterest">Annual Mortgage / Loan Mark-up on Property (PKR)</label>
-                      <div class="currency-input-wrap">
-                        <span class="currency-prefix">Rs</span>
-                        <input type="text" id="rentalLoanInterest" name="rentalLoanInterest" inputmode="numeric"
-                          placeholder="e.g. 0" value="0" autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="rentalInsurance">Annual Building Insurance Premium (PKR)</label>
-                      <div class="currency-input-wrap">
-                        <span class="currency-prefix">Rs</span>
-                        <input type="text" id="rentalInsurance" name="rentalInsurance" inputmode="numeric"
-                          placeholder="e.g. 0" value="0" autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <div class="salary-input-header">
-                        <label for="rentalAdminCharges">Annual Admin &amp; Collection Charges (PKR)</label>
-                        <span class="field-hint-tag">Max 4% of rent</span>
-                      </div>
-                      <div class="currency-input-wrap">
-                        <span class="currency-prefix">Rs</span>
-                        <input type="text" id="rentalAdminCharges" name="rentalAdminCharges" inputmode="numeric"
-                          placeholder="e.g. 0" value="0" autocomplete="off">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <button type="button" id="btnCalculateRentalTax" class="button calc-btn">
                   <span>Calculate Rental Tax</span>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -888,7 +874,7 @@
                   <line x1="12" y1="8" x2="12" y2="12"></line>
                   <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <span>Calculated pursuant to Section 15 (Income from Property), Section 15A (Allowable Deductions), Section 155 (Withholding on Rent), and Tenth Schedule (Non-Filer Surcharge) to the Income Tax Ordinance, 2001.</span>
+                <span>Calculated pursuant to Section 15 (Income from Property) and Section 155 (Withholding on Property Rent) of the Income Tax Ordinance, 2001.</span>
               </div>
             </div>
 
@@ -902,7 +888,7 @@
               <!-- Selected Entity Status Bar -->
               <div class="biz-selected-entity-bar" id="rentalSelectedEntityBar">
                 <span class="biz-entity-pill-label">Category:</span>
-                <span class="biz-entity-pill-value" id="rentalResCategoryTag">Individual / AOP &middot; Active Taxpayer (Filer)</span>
+                <span class="biz-entity-pill-value" id="rentalResCategoryTag">Individual / AOP</span>
               </div>
 
               <!-- Primary Hero Metrics (Net Rental Income & Total Tax) -->
@@ -927,19 +913,19 @@
                   <span class="metric-sub">On Annual Gross Rent</span>
                 </div>
                 <div class="metric-box">
+                  <span class="metric-label">Annual Gross Rent</span>
+                  <span class="metric-value" id="rentalResAnnualGross">Rs 1,200,000</span>
+                  <span class="metric-sub" id="rentalResAnnualGrossSub">Rs 100,000 / month gross</span>
+                </div>
+                <div class="metric-box">
                   <span class="metric-label">Monthly WHT Deduction</span>
                   <span class="metric-value" id="rentalResMonthlyTax">Rs 6,250</span>
                   <span class="metric-sub">Deducted at source (Sec 155)</span>
                 </div>
                 <div class="metric-box">
-                  <span class="metric-label">Sec 15A Deductions</span>
-                  <span class="metric-value" id="rentalResTotalDeductions">Rs 240,000</span>
-                  <span class="metric-sub" id="rentalResDeductionsSub">Statutory 20% Repair Deduction</span>
-                </div>
-                <div class="metric-box">
-                  <span class="metric-label">Net Taxable Rent</span>
-                  <span class="metric-value" id="rentalResNetTaxableRent">Rs 960,000</span>
-                  <span class="metric-sub">Assessable Property Income</span>
+                  <span class="metric-label">Monthly Take-Home</span>
+                  <span class="metric-value" id="rentalResMonthlyTakeHome">Rs 93,750</span>
+                  <span class="metric-sub" id="rentalResMonthlyTakeHomeSub">In-pocket each month</span>
                 </div>
               </div>
 
@@ -955,17 +941,6 @@
                 <div class="slab-banner-text">
                   <strong id="rentalResActiveSlab">Active Bracket: Rs 600,001 – Rs 2,000,000 (10%)</strong>
                   <span id="rentalResActiveSlabDesc">Rs 15,000 + 10% of the gross rental amount exceeding Rs 600,000.</span>
-                </div>
-              </div>
-
-              <!-- Filer Advantage / Non-Filer Warning Box -->
-              <div class="rental-status-card" id="rentalFilerAlertBox">
-                <div class="rental-status-content">
-                  <div class="rental-status-badge status-benefit">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <span>Filer Advantage</span>
-                  </div>
-                  <p id="rentalFilerAlertText">As an Active Taxpayer on the FBR ATL, you pay standard progressive withholding rates and save <strong>Rs 75,000</strong> compared to non-filers.</p>
                 </div>
               </div>
 
@@ -1469,35 +1444,360 @@
   </main>
 
   <!-- Footer -->
-  <footer>
-    <div class="container footer-content">
-      <div class="footer-meta">
-        <span>&copy; <span id="year">2026</span> Qummar Waheed Chartered Accountants. All Rights Reserved.</span>
-        <span class="footer-credit">Designed and Developed by <a href="https://www.linkedin.com/in/talharehman23542/"
-            target="_blank" rel="noopener noreferrer" class="credit-link">Talha Rehman</a></span>
-        <span class="footer-note">Information on this website is for general informational purposes only and does not
-          constitute formal legal or professional tax advice.</span>
+  <footer class="site-footer">
+    <div class="container footer-container">
+      
+      <!-- Footer Top / Main 4-Column Grid -->
+      <div class="footer-main-grid">
+        <!-- Col 1: Firm Overview & Affiliation -->
+        <div class="footer-col footer-col-brand">
+          <a class="footer-brand" href="#home" aria-label="QWCA - Qummar Waheed Chartered Accountants">
+            <div class="brand-top">
+              <img class="brand-mark" src="assets/logo.png" alt="QWCA Logo">
+              <span class="brand-acronym">QWCA</span>
+            </div>
+            <span class="brand-fullname">Qummar Waheed Chartered Accountants</span>
+          </a>
+          <p class="footer-firm-desc">
+            A premier practicing firm affiliated with the Institute of Chartered Accountants of Pakistan (ICAP). Providing audit, assurance, taxation, SECP corporate compliance, and strategic business advisory with uncompromising ethical and professional excellence.
+          </p>
+          <div class="footer-badges-row">
+            <span class="footer-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ICAP Member Firm
+            </span>
+            <span class="footer-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              FBR Authorized Representative
+            </span>
+          </div>
+        </div>
+
+        <!-- Col 2: Practice Areas -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Practice Areas</h4>
+          <ul class="footer-links-list">
+            <li><a href="#services">Corporate &amp; Individual Taxation</a></li>
+            <li><a href="#services">Statutory &amp; Internal Audit</a></li>
+            <li><a href="#services">SECP Compliance &amp; Incorporation</a></li>
+            <li><a href="#services">SEZ Tax Concessions Advisory</a></li>
+            <li><a href="#services">Sales Tax &amp; Provincial PRAs</a></li>
+            <li><a href="#services">Accounting &amp; Financial Outsourcing</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Tax Tools & Calculators -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Tax Tools (FY 2026–27)</h4>
+          <ul class="footer-links-list">
+            <li><a href="#tax-calculator" data-switch-calc="salaried">Salary Tax Calculator</a></li>
+            <li><a href="#tax-calculator" data-switch-calc="business">Business &amp; Corporate Tax (ACT/Min)</a></li>
+            <li><a href="#tax-calculator" data-switch-calc="rental">Rental Income Tax (Sec 155 &amp; 15A)</a></li>
+            <li><a href="#tax-calculator" data-switch-calc="business">Super Tax (Section 4C) Slabs</a></li>
+            <li><a href="#tax-calculator" data-switch-calc="rental">FBR Active Taxpayer (ATL) Penalty</a></li>
+            <li><a href="#tax-calendar">FBR Statutory Compliance Calendar</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Faisalabad Office & Legal -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Office &amp; Governance</h4>
+          <div class="footer-office-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>20 - J Commercial Plaza, 4th Floor, Main Blvd, Wapda City, Faisalabad, Pakistan</span>
+          </div>
+          <div class="footer-office-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="tel:+92415392192">+92-41-5392192</a>
+          </div>
+          <div class="footer-office-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <a href="mailto:info@qwca.pk">info@qwca.pk</a>
+          </div>
+          <div class="footer-governance-links">
+            <button type="button" class="footer-inline-legal-btn" id="footerPrivacyTrigger">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>View Full Privacy Policy</span>
+            </button>
+            <button type="button" class="footer-inline-legal-btn" id="footerTermsTrigger">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Terms of Use &amp; Disclaimers</span>
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="footer-social-links" aria-label="Official Social Channels">
-        <a href="https://www.linkedin.com/company/qummar-waheed-chartered-accountants/posts/?feedView=all"
-          target="_blank" rel="noopener noreferrer" class="footer-social-icon linkedin" title="Follow on LinkedIn"
-          aria-label="LinkedIn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path
-              d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.46 1.46 0 0 0-2.91 0c0 .8.65 1.45 1.46 1.45m1.37 9.74v-8.37H5.09v8.37z" />
+
+      <!-- Prominent Tax Calculations & Professional Consultation Notice -->
+      <div class="footer-disclaimer-card" id="taxDisclaimerCard">
+        <div class="footer-disclaimer-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
-        </a>
-        <a href="https://www.facebook.com/p/Qummar-Waheed-Chartered-Accountants-61558036131738/" target="_blank"
-          rel="noopener noreferrer" class="footer-social-icon facebook" title="Visit Facebook Page"
-          aria-label="Facebook">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path
-              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-          </svg>
-        </a>
+        </div>
+        <div class="footer-disclaimer-body">
+          <div class="footer-disclaimer-header">
+            <h4>Mandatory Notice: Tax Calculations Are Indicative &amp; Not Final</h4>
+            <span class="disclaimer-alert-pill">Always Consult a Qualified Accountant</span>
+          </div>
+          <p>
+            All computations and figures generated by the tax calculators on this website (Salary, Business / Corporate, and Rental Property Income) are automated mathematical simulations based on the standard statutory provisions of the <strong>Income Tax Ordinance, 2001</strong> and prevailing Finance Acts. <strong>These computations are NOT final tax assessments, do not constitute formal legal or tax opinions, and must not be used as official declarations.</strong>
+          </p>
+          <p>
+            Actual tax liability, admissible deductions, withholding tax adjustments, Minimum Turnover Tax (Sec 113), Alternate Corporate Tax (Sec 113C), and Super Tax (Sec 4C) require scrutiny of audited books, statutory records, entity classifications, and sector-specific SROs. <strong>Always consult a qualified Chartered Accountant at QWCA or a licensed tax advisor before making financial decisions, signing contracts, or filing statutory tax returns.</strong>
+          </p>
+          <div class="footer-disclaimer-actions">
+            <a href="#contact" class="disclaimer-action-btn primary">
+              <span>Book Accountant Consultation</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <button type="button" class="disclaimer-action-btn secondary" id="btnDisclaimerPrivacy">
+              <span>Read QWCA Privacy Policy</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom-bar">
+        <div class="footer-bottom-left">
+          <span class="footer-copyright">&copy; <span id="year">2026</span> Qummar Waheed Chartered Accountants. All Rights Reserved.</span>
+          <span class="footer-credit">Designed and Developed by <a href="https://www.linkedin.com/in/talharehman23542/" target="_blank" rel="noopener noreferrer" class="credit-link">Talha Rehman</a></span>
+        </div>
+
+        <div class="footer-bottom-nav">
+          <button type="button" class="footer-bottom-link" id="footerNavPrivacy">Privacy Policy</button>
+          <span class="footer-sep">&bull;</span>
+          <button type="button" class="footer-bottom-link" id="footerNavTerms">Terms of Use</button>
+          <span class="footer-sep">&bull;</span>
+          <a href="#tax-calculator" class="footer-bottom-link">Tax Calculators</a>
+          <span class="footer-sep">&bull;</span>
+          <a href="#contact" class="footer-bottom-link">Contact</a>
+        </div>
+
+        <div class="footer-social-links" aria-label="Official Social Channels">
+          <a href="https://www.linkedin.com/company/qummar-waheed-chartered-accountants/posts/?feedView=all" target="_blank" rel="noopener noreferrer" class="footer-social-icon linkedin" title="Follow QWCA on LinkedIn" aria-label="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.46 1.46 0 0 0-2.91 0c0 .8.65 1.45 1.46 1.45m1.37 9.74v-8.37H5.09v8.37z" /></svg>
+          </a>
+          <a href="https://www.facebook.com/p/Qummar-Waheed-Chartered-Accountants-61558036131738/" target="_blank" rel="noopener noreferrer" class="footer-social-icon facebook" title="Visit QWCA on Facebook" aria-label="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+          </a>
+        </div>
       </div>
     </div>
   </footer>
+
+  <!-- Dedicated Privacy Policy Modal -->
+  <div id="privacyModal" class="policy-modal" aria-hidden="true" role="dialog" aria-labelledby="privacyModalTitle">
+    <div class="policy-modal-dialog">
+      <div class="policy-modal-header">
+        <div class="policy-modal-title-wrap">
+          <span class="policy-modal-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Official Privacy &amp; Data Protection Policy
+          </span>
+          <h3 class="policy-modal-title" id="privacyModalTitle">Privacy Policy</h3>
+          <p class="policy-modal-subtitle">Qummar Waheed Chartered Accountants (QWCA) &middot; Effective Date: July 1, 2024 &middot; Last Revised: Tax Year 2026–2027</p>
+        </div>
+        <div class="policy-modal-actions">
+          <button type="button" class="policy-modal-btn" id="btnPrintPrivacyPolicy" title="Print this Privacy Policy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            <span>Print</span>
+          </button>
+          <button type="button" class="policy-modal-close" aria-label="Close Privacy Policy dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="policy-modal-body">
+        <!-- Callout 1: Zero Storage Guarantee -->
+        <div class="policy-callout success">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <div>
+            <strong>100% Private Client-Side Tax Calculators:</strong> All figures entered into the Salary, Business, Corporate, and Rental calculators on this website run strictly in your local browser. No financial data, salary amounts, profits, or rent numbers are ever transmitted, logged, or stored on our servers.
+          </div>
+        </div>
+
+        <!-- Callout 2: Mandatory Professional Consultation Notice -->
+        <div class="policy-callout warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <strong>Calculations Are Indicative &amp; Not Final:</strong> Online tax calculations are automated estimations based on general statutory slabs of the Income Tax Ordinance, 2001. They do NOT constitute formal legal, accounting, or tax opinions. You must always consult a qualified Chartered Accountant before making any financial decisions or submitting statutory tax returns.
+          </div>
+        </div>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">01</span> Practice Identity &amp; Regulatory Framework</h4>
+          <p>
+            Qummar Waheed Chartered Accountants (QWCA) is a public practice chartered accountancy firm registered with and regulated by the <strong>Institute of Chartered Accountants of Pakistan (ICAP)</strong> under the Chartered Accountants Ordinance, 1961. We operate from our principal practice offices located at 20 - J Commercial Plaza, 4th Floor, Main Boulevard, Wapda City, Faisalabad, Pakistan.
+          </p>
+          <p>
+            This Privacy Policy explains how QWCA collects, utilizes, safeguards, and respects information collected through our official digital platform (<code>qwca.pk</code>), communication channels, and client engagement procedures in compliance with ICAP’s Code of Ethics and applicable laws of Pakistan.
+          </p>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">02</span> Zero-Storage Architecture for Tax Calculators</h4>
+          <p>
+            We recognize that financial and taxation data is deeply sensitive. To guarantee total client confidentiality:
+          </p>
+          <ul>
+            <li><strong>Browser-Local Execution:</strong> All interactive calculations (Salary Tax, Corporate Tax, Alternate Corporate Tax, Minimum Turnover Tax, Super Tax Section 4C, and Rental Withholding &amp; Deductions) are computed entirely client-side using JavaScript in your browser memory.</li>
+            <li><strong>No Database Recording:</strong> When you enter monthly salary, corporate turnover, profit before tax, or gross rental receipts, this data is <strong>never uploaded to our servers, never recorded in a database, and never attached to your IP address or cookies</strong>.</li>
+            <li><strong>Session Ephemerality:</strong> Closing or refreshing your browser tab immediately flushes all entered numbers from memory.</li>
+          </ul>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">03</span> Information Collected via Contact &amp; Consultation Inquiries</h4>
+          <p>
+            We collect personal information solely when you voluntarily provide it through our website contact form, direct email (<code>info@qwca.pk</code>), or telephone communications (+92-41-5392192). This information includes:
+          </p>
+          <ul>
+            <li><strong>Identity &amp; Contact Details:</strong> Full Name, corporate email address, contact telephone or WhatsApp number, and business entity name.</li>
+            <li><strong>Nature of Advisory Requested:</strong> Selected service category (Taxation &amp; Advisory, Statutory Audit, SECP Corporate Secretarial, SEZ Advisory, Accounting &amp; Bookkeeping) and details of your business inquiry.</li>
+            <li><strong>Engagement Data:</strong> For contracted clients, statutory details (NTN, STRN, CNIC, SECP Incorporation numbers, audited financial records, and payroll data) are gathered strictly under formal Engagement Letters and non-disclosure obligations.</li>
+          </ul>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">04</span> Professional Confidentiality &amp; ICAP Code of Ethics</h4>
+          <p>
+            As chartered accountants, QWCA is bound by Section 114 (Confidentiality) of the <strong>ICAP Code of Ethics for Chartered Accountants</strong>. Under these professional obligations:
+          </p>
+          <ul>
+            <li>We maintain absolute confidentiality regarding information acquired as a result of professional and business relationships.</li>
+            <li>We do not disclose confidential information outside the firm without proper and specific authority from the client, unless there is a legal or professional duty or right to disclose.</li>
+            <li>We do NOT use confidential client information acquired through professional relationships for personal advantage or the advantage of third parties.</li>
+            <li><strong>Zero Marketing Resale:</strong> We never sell, lease, rent, trade, or distribute your personal or commercial data to advertising networks, telemarketers, or commercial brokers.</li>
+          </ul>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">05</span> Statutory Exceptions &amp; Regulatory Disclosures</h4>
+          <p>
+            Client or inquiry information may only be disclosed in the following legally mandated situations:
+          </p>
+          <ul>
+            <li>Where disclosure is authorized or required by law (e.g., in response to a formal summons or statutory demand under the Income Tax Ordinance, 2001 or the Companies Act, 2017).</li>
+            <li>To comply with the quality control review or investigation processes of the Institute of Chartered Accountants of Pakistan (ICAP) or the Audit Oversight Board (AOB).</li>
+            <li>To protect the professional rights of QWCA in legal proceedings initiated by or against the firm.</li>
+          </ul>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">06</span> Data Security, Storage &amp; Encryption</h4>
+          <p>
+            QWCA implements robust technical and organizational security controls to protect information against unauthorized access, alteration, disclosure, or destruction:
+          </p>
+          <ul>
+            <li><strong>Transport Layer Security:</strong> All digital communication with <code>qwca.pk</code> is protected using 256-bit SSL/TLS cryptographic encryption.</li>
+            <li><strong>Access Control:</strong> Client files, audited workpapers, and tax credentials are restricted strictly to designated engagement partners and authorized audit teams on a need-to-know basis.</li>
+            <li><strong>Statutory Retention:</strong> Statutory audit and tax engagement files are retained in accordance with the mandatory statutory retention schedules under the Companies Act, 2017 and FBR regulations (minimum 6 to 10 years).</li>
+          </ul>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">07</span> Your Rights &amp; Data Inquiries</h4>
+          <p>
+            You have the right to request clarification regarding any personal contact data you have submitted to QWCA, to request correction of inaccurate records, or to request deletion of non-statutory communication records.
+          </p>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">08</span> Data Protection Officer &amp; Practice Contact</h4>
+          <p>
+            If you have questions, feedback, or concerns regarding this Privacy Policy or our professional data governance, please reach out to our practice leadership:
+          </p>
+          <div class="policy-callout" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+            <div>
+              <strong>Qummar Waheed Chartered Accountants</strong><br>
+              Managing Partner: Qummar Waheed, ACA<br>
+              Practice Office: 20 - J Commercial Plaza, 4th Floor, Main Boulevard, Wapda City, Faisalabad, Pakistan<br>
+              Telephone: <a href="tel:+92415392192" style="color: var(--primary-light);">+92-41-5392192</a> | Official Email: <a href="mailto:info@qwca.pk" style="color: var(--primary-light);">info@qwca.pk</a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="policy-modal-footer">
+        <span class="policy-modal-contact-note">
+          Need formal accounting advisory? <a href="#contact" class="policy-modal-dismiss">Contact our partners &rarr;</a>
+        </span>
+        <button type="button" class="button policy-modal-dismiss" style="padding: 8px 18px; font-size: 13px;">Close Policy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Use & Legal Disclaimers Modal -->
+  <div id="termsModal" class="policy-modal" aria-hidden="true" role="dialog" aria-labelledby="termsModalTitle">
+    <div class="policy-modal-dialog">
+      <div class="policy-modal-header">
+        <div class="policy-modal-title-wrap">
+          <span class="policy-modal-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Terms of Website Use &amp; Professional Disclaimers
+          </span>
+          <h3 class="policy-modal-title" id="termsModalTitle">Terms of Use &amp; Disclaimers</h3>
+          <p class="policy-modal-subtitle">Qummar Waheed Chartered Accountants (QWCA) &middot; Faisalabad, Pakistan</p>
+        </div>
+        <div class="policy-modal-actions">
+          <button type="button" class="policy-modal-close" aria-label="Close Terms of Use dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="policy-modal-body">
+        <div class="policy-callout warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <strong>No Professional-Client Relationship:</strong> Browsing this website, submitting an inquiry form, or using our online tax calculators does NOT create a Chartered Accountant-client relationship between you and QWCA. A formal relationship is created solely upon the mutual signing of an official Engagement Letter.
+          </div>
+        </div>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">01</span> Informational Nature of Tax Calculators</h4>
+          <p>
+            The interactive tax calculators (Salary, Corporate, and Rental) provided on this website are designed purely as automated preliminary planning aids based on standard statutory tax slabs under the Income Tax Ordinance, 2001. <strong>These estimates are NOT final tax determinations and must not be used as official FBR submissions.</strong>
+          </p>
+          <p>
+            Individual tax liabilities, permissible business expenses, Super Tax obligations, and withholding tax adjustments vary significantly based on audited financial statements, provincial jurisdictions, specific withholding tax certificates, and official assessments by the Federal Board of Revenue. <strong>Always consult a qualified Chartered Accountant before making financial decisions or filing statutory tax returns.</strong>
+          </p>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">02</span> Disclaimer of Warranties &amp; Limitation of Liability</h4>
+          <p>
+            While QWCA makes every reasonable effort to keep the information and tax calculations on this platform accurate and reflective of the latest Finance Acts and statutory regulatory orders (SROs), all materials are provided "as is" without warranties of any kind. QWCA and its partners explicitly disclaim all liability for any loss, damage, tax penalty, or surcharge arising from actions taken solely on the basis of website calculators or commentary without engaging a licensed professional.
+          </p>
+        </section>
+
+        <section class="policy-section">
+          <h4><span class="sec-num">03</span> Intellectual Property &amp; Governing Law</h4>
+          <p>
+            All website design, proprietary tax matrices, visual branding, and professional content are the intellectual property of Qummar Waheed Chartered Accountants. Any disputes arising from the use of this website shall be governed by the laws of Pakistan and subject to the exclusive jurisdiction of the competent courts in Faisalabad, Punjab, Pakistan.
+          </p>
+        </section>
+      </div>
+
+      <div class="policy-modal-footer">
+        <span class="policy-modal-contact-note">
+          Questions regarding terms? Email us at <a href="mailto:info@qwca.pk">info@qwca.pk</a>
+        </span>
+        <button type="button" class="button policy-modal-dismiss" style="padding: 8px 18px; font-size: 13px;">Close Terms</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Fullscreen Image Preview Lightbox -->
   <div id="imageModal" class="image-modal" aria-hidden="true" role="dialog" aria-label="Image Preview">
