@@ -950,12 +950,12 @@
             </div>
           </div>
 
-          <!-- Rental Tax Slabs & Deductions Matrix Table Container -->
+          <!-- Rental Tax Slabs Matrix Table Container -->
           <div class="tax-slabs-container biz-matrix-container">
             <div class="slabs-table-header">
               <div>
-                <h3 id="rentalMatrixTitle">Official Rental Income Tax Slabs (Section 155 &amp; Tenth Schedule)</h3>
-                <p id="rentalMatrixDesc">Withholding tax rates for individuals, AOPs, and companies, alongside allowable deductions under Section 15A of the Income Tax Ordinance, 2001.</p>
+                <h3 id="rentalMatrixTitle">Official Rental Income Tax Slabs (Section 155)</h3>
+                <p id="rentalMatrixDesc">Statutory withholding tax rates for individuals, AOPs, and corporate landlords under the Income Tax Ordinance, 2001.</p>
               </div>
               <div class="slabs-tabs" role="tablist" aria-label="Rental Tax Year Selection" id="rentalYearTabs">
                 <button type="button" class="tab-btn active" data-rentyear="2026-2027" role="tab" aria-selected="true">Tax Year 2026–2027</button>
@@ -969,10 +969,9 @@
               <table class="slabs-table biz-matrix-table" id="rentalMatrixTable">
                 <thead>
                   <tr>
-                    <th>Gross Rental Income Bracket / Entity</th>
-                    <th>Active Filer Rate (Sec 155)</th>
-                    <th>Non-Filer Rate (10th Sched. 2x)</th>
-                    <th>Allowable Deductions (Sec 15A)</th>
+                    <th>Rental Income Bracket / Entity</th>
+                    <th>Tax Rate (Section 155)</th>
+                    <th>Calculation Formula</th>
                     <th>Statutory Treatment &amp; Notes</th>
                   </tr>
                 </thead>
@@ -980,71 +979,66 @@
                   <tr data-rent-slab="0">
                     <td><strong>Up to Rs. 300,000</strong></td>
                     <td><span class="st-rate zero-rate">0% (Nil)</span></td>
-                    <td><span class="st-rate zero-rate">0% (Nil)</span></td>
-                    <td>Flat 20% Repair Allowance</td>
+                    <td>Rs. 0 (Tax-Free)</td>
                     <td>Tax-free threshold for individuals &amp; AOPs</td>
                   </tr>
                   <tr data-rent-slab="1">
                     <td><strong>Rs. 300,001 to Rs. 600,000</strong></td>
-                    <td><strong>5%</strong> of amount &gt; Rs. 300k</td>
-                    <td><span class="text-primary font-bold">10%</span> of amount &gt; Rs. 300k</td>
-                    <td>20% Repair + Property Taxes</td>
-                    <td>Withheld monthly/annually at source</td>
+                    <td><span class="st-rate">5%</span></td>
+                    <td>5% of gross rent exceeding Rs. 300,000</td>
+                    <td>Withheld monthly or annually at source</td>
                   </tr>
                   <tr data-rent-slab="2" class="active-slab-row">
                     <td><strong>Rs. 600,001 to Rs. 2,000,000</strong></td>
-                    <td><strong>Rs. 15,000 + 10%</strong> of amount &gt; Rs. 600k</td>
-                    <td><span class="text-primary font-bold">Rs. 30,000 + 20%</span> of amount &gt; Rs. 600k</td>
-                    <td>20% Repair + Loan Markup + Taxes</td>
+                    <td><span class="st-rate">10%</span></td>
+                    <td>Rs. 15,000 + 10% of amount exceeding Rs. 600,000</td>
                     <td>Adjustable against annual income tax return</td>
                   </tr>
                   <tr data-rent-slab="3">
                     <td><strong>Above Rs. 2,000,000</strong></td>
-                    <td><strong>Rs. 155,000 + 25%</strong> of amount &gt; Rs. 2M</td>
-                    <td><span class="text-primary font-bold">Rs. 310,000 + 50%</span> of amount &gt; Rs. 2M</td>
-                    <td>All Section 15A expenses allowable</td>
-                    <td>Higher bracket for premium commercial / residential</td>
+                    <td><span class="st-rate">25%</span></td>
+                    <td>Rs. 155,000 + 25% of amount exceeding Rs. 2,000,000</td>
+                    <td>Standard progressive rate for high rental properties</td>
                   </tr>
                   <tr data-rent-slab="company">
-                    <td><strong>Company / Corporate Landlord</strong></td>
-                    <td><strong>Flat 15%</strong> of gross rent</td>
-                    <td><span class="text-primary font-bold">Flat 30%</span> of gross rent</td>
-                    <td>Subject to Corporate Accounting rules</td>
-                    <td>Applies from rupee one; no tax-free slab</td>
+                    <td><strong>Corporate Company</strong></td>
+                    <td><span class="st-rate">15%</span></td>
+                    <td>Flat 15% on total gross rental income</td>
+                    <td>Applies from rupee one; no tax-free threshold</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <!-- Section 15A Deductions Explanatory Cards -->
+            <!-- Key Rental Tax Rules Card -->
             <div class="super-tax-schedule-card">
               <div class="super-tax-header">
                 <div>
-                  <h4>Allowable Deductions from Rental Income (Section 15A)</h4>
-                  <p>When filing annual income tax returns, landlords can legally subtract allowable expenses from gross rent to arrive at net taxable property income:</p>
+                  <h4>Key Provisions &amp; Notes on Rental Tax (Section 155)</h4>
+                  <p>Essential statutory rules governing withholding and tax assessment on property income in Pakistan:</p>
                 </div>
-                <span class="badge badge-fbr">Section 15A</span>
+                <span class="badge badge-fbr">Section 155</span>
               </div>
               <div class="rental-deductions-grid">
                 <div class="super-tax-bracket-item highlight-bracket">
-                  <span class="st-range">Statutory Repairs Allowance</span>
-                  <span class="st-rate">Flat 20%</span>
-                  <p class="biz-feat-item">A mandatory statutory deduction of 20% of gross rent allowed to every individual/AOP landlord. <strong>No receipts, invoices, or proof required</strong>.</p>
+                  <span class="st-range">Tax-Free Exemption</span>
+                  <span class="st-rate">Up to Rs. 300k</span>
+                  <p class="biz-feat-item">First Rs. 300,000 of annual rental income is completely tax-free (0% tax) for Individual and AOP landlords.</p>
                 </div>
                 <div class="super-tax-bracket-item">
-                  <span class="st-range">Local &amp; Property Taxes</span>
-                  <span class="st-rate">Actual Paid</span>
-                  <p class="biz-feat-item">Local rates, provincial property tax, municipal charges, and ground rent paid during the tax year are fully deductible.</p>
+                  <span class="st-range">Withholding at Source</span>
+                  <span class="st-rate">Monthly / Annual</span>
+                  <p class="biz-feat-item">Prescribed persons, companies, and corporate tenants must deduct withholding tax under Section 155 when paying rent.</p>
                 </div>
                 <div class="super-tax-bracket-item">
-                  <span class="st-range">Loan Mark-up / Interest</span>
-                  <span class="st-rate">Actual Paid</span>
-                  <p class="biz-feat-item">Profit or markup paid on loans borrowed from financial institutions (HBFC, scheduled banks) to acquire, construct, or renovate the property.</p>
+                  <span class="st-range">Adjustable Withholding Tax</span>
+                  <span class="st-rate">FBR Form 114</span>
+                  <p class="biz-feat-item">Tax deducted by tenants is adjustable against your final income tax liability when filing your annual return.</p>
                 </div>
                 <div class="super-tax-bracket-item">
-                  <span class="st-range">Collection &amp; Administration</span>
-                  <span class="st-rate">Up to 4%</span>
-                  <p class="biz-feat-item">Administrative, rent collection, and legal expenses incurred to defend title, capped at a maximum of 4% of gross rental receipts.</p>
+                  <span class="st-range">Corporate Landlords</span>
+                  <span class="st-rate">Flat 15%</span>
+                  <p class="biz-feat-item">Companies owning property are subject to a flat 15% withholding rate on total gross rent from rupee one.</p>
                 </div>
               </div>
             </div>
