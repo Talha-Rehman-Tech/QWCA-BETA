@@ -1029,6 +1029,199 @@ h3 {
   }
 }
 
+/* ==========================================================================
+   Rental Income Tax Calculator Styles (Section 15, 15A & 155)
+   ========================================================================== */
+.rental-deductions-box {
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rental-deductions-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rental-deductions-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deduction-tag-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.custom-checkbox-wrap {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  margin: 4px 0 0;
+}
+
+.custom-checkbox-wrap input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.custom-checkbox-mark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #94a3b8;
+  border-radius: 5px;
+  background: var(--bg-white);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s ease;
+}
+
+.custom-checkbox-wrap input[type="checkbox"]:checked ~ .custom-checkbox-mark {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.custom-checkbox-wrap input[type="checkbox"]:checked ~ .custom-checkbox-mark::after {
+  content: "";
+  width: 5px;
+  height: 10px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.checkbox-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy-900);
+}
+
+.deduction-subnote {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.rental-extra-toggle-wrap {
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+.btn-extra-deductions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.btn-extra-deductions:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.rental-extra-deductions-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.rental-status-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  background: var(--bg-white);
+  transition: all 0.25s ease;
+}
+
+.rental-status-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rental-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+}
+
+.rental-status-badge.status-benefit {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.rental-status-badge.status-penalty {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+}
+
+.rental-status-content p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--navy-800);
+  line-height: 1.5;
+}
+
+.rental-status-content strong {
+  color: var(--navy-900);
+}
+
+.rental-deductions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.rental-deductions-grid .super-tax-bracket-item p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
 .business-placeholder-inner {
   display: flex;
   flex-direction: column;
@@ -2543,6 +2736,11 @@ footer {
   .tax-slabs-container {
     padding: 24px 20px;
   }
+
+  .rental-deductions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 }
 
 @media (max-width: 700px) {
@@ -2685,19 +2883,31 @@ footer {
   .tax-category-switch {
     width: 100%;
     display: flex;
+    gap: 4px;
+    padding: 4px;
   }
 
   .category-tab {
     flex: 1;
     justify-content: center;
-    padding: 9px 8px;
-    font-size: 12px;
-    gap: 5px;
+    padding: 8px 6px;
+    font-size: 11.5px;
+    gap: 4px;
   }
 
   .cat-pill {
-    font-size: 9.5px;
-    padding: 1px 6px;
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+
+  /* Rental Calculator Mobile */
+  .rental-deductions-box {
+    padding: 14px;
+  }
+
+  .rental-deductions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   /* Business Calculator Mobile */
@@ -3187,20 +3397,42 @@ footer {
     margin-bottom: 18px;
   }
 
+  .tax-category-switch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    gap: 3px;
+  }
+
   .category-tab {
-    padding: 8px 6px;
-    font-size: 11px;
-    gap: 4px;
+    padding: 7px 3px;
+    font-size: 10.5px;
+    border-radius: var(--radius-sm);
+    gap: 3px;
   }
 
   .category-tab svg {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
   }
 
   .cat-pill {
-    font-size: 9px;
-    padding: 1px 5px;
+    font-size: 8.5px;
+    padding: 1px 4px;
+  }
+
+  .rental-deductions-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .checkbox-title {
+    font-size: 12px;
+  }
+
+  .btn-extra-deductions {
+    font-size: 11.5px;
   }
 
   .nav {
@@ -3784,6 +4016,12 @@ img {
   .preset-pill {
     padding: 5px 8px;
     font-size: 11px;
+  }
+
+  .category-tab {
+    font-size: 9.5px;
+    padding: 6px 2px;
+    gap: 2px;
   }
 
   .social-pill {

@@ -156,8 +156,10 @@ contactForm.addEventListener("submit", (event) => {
   // Category Switcher Elements
   const tabSalaried = document.getElementById('tabSalaried');
   const tabBusiness = document.getElementById('tabBusiness');
+  const tabRental = document.getElementById('tabRental');
   const salariedCalcView = document.getElementById('salariedCalcView');
   const businessCalcView = document.getElementById('businessCalcView');
+  const rentalCalcView = document.getElementById('rentalCalcView');
   const btnBackToSalaried = document.getElementById('btnBackToSalaried');
 
   const resMonthlyTakeHome = document.getElementById('resMonthlyTakeHome');
@@ -180,16 +182,28 @@ contactForm.addEventListener("submit", (event) => {
 
   // Category Switcher Handler
   function switchTaxCategory(category) {
+    if (tabSalaried) {
+      tabSalaried.classList.remove('active');
+      tabSalaried.setAttribute('aria-selected', 'false');
+    }
+    if (tabBusiness) {
+      tabBusiness.classList.remove('active');
+      tabBusiness.setAttribute('aria-selected', 'false');
+    }
+    if (tabRental) {
+      tabRental.classList.remove('active');
+      tabRental.setAttribute('aria-selected', 'false');
+    }
+
+    if (salariedCalcView) salariedCalcView.hidden = true;
+    if (businessCalcView) businessCalcView.hidden = true;
+    if (rentalCalcView) rentalCalcView.hidden = true;
+
     if (category === 'business') {
-      if (tabSalaried) {
-        tabSalaried.classList.remove('active');
-        tabSalaried.setAttribute('aria-selected', 'false');
-      }
       if (tabBusiness) {
         tabBusiness.classList.add('active');
         tabBusiness.setAttribute('aria-selected', 'true');
       }
-      if (salariedCalcView) salariedCalcView.hidden = true;
       if (businessCalcView) {
         businessCalcView.hidden = false;
         businessCalcView.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -197,17 +211,26 @@ contactForm.addEventListener("submit", (event) => {
       if (typeof window.updateBusinessCalculator === 'function') {
         window.updateBusinessCalculator();
       }
-    } else {
-      if (tabBusiness) {
-        tabBusiness.classList.remove('active');
-        tabBusiness.setAttribute('aria-selected', 'false');
+    } else if (category === 'rental') {
+      if (tabRental) {
+        tabRental.classList.add('active');
+        tabRental.setAttribute('aria-selected', 'true');
       }
+      if (rentalCalcView) {
+        rentalCalcView.hidden = false;
+        rentalCalcView.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      if (typeof window.updateRentalCalculator === 'function') {
+        window.updateRentalCalculator();
+      }
+    } else {
       if (tabSalaried) {
         tabSalaried.classList.add('active');
         tabSalaried.setAttribute('aria-selected', 'true');
       }
-      if (businessCalcView) businessCalcView.hidden = true;
-      if (salariedCalcView) salariedCalcView.hidden = false;
+      if (salariedCalcView) {
+        salariedCalcView.hidden = false;
+      }
       updateCalculator();
     }
   }
@@ -217,6 +240,9 @@ contactForm.addEventListener("submit", (event) => {
   }
   if (tabBusiness) {
     tabBusiness.addEventListener('click', () => switchTaxCategory('business'));
+  }
+  if (tabRental) {
+    tabRental.addEventListener('click', () => switchTaxCategory('rental'));
   }
   if (btnBackToSalaried) {
     btnBackToSalaried.addEventListener('click', () => switchTaxCategory('salaried'));
@@ -1710,4 +1736,447 @@ contactForm.addEventListener("submit", (event) => {
 
   // Initial render on load
   updateBusinessCalculator();
+})();
+
+/* ==========================================================================
+   FBR Rental Income Tax Calculator (Section 15, 15A, 155 & Tenth Schedule)
+   ========================================================================== */
+(function initRentalCalculator() {
+  const rentalTaxYear = document.getElementById('rentalTaxYear');
+  const rentalOwnerType = document.getElementById('rentalOwnerType');
+  const btnRentalFiler = document.getElementById('btnRentalFiler');
+  const btnRentalNonFiler = document.getElementById('btnRentalNonFiler');
+  const rentalRentPeriod = document.getElementById('rentalRentPeriod');
+  const rentalGrossRent = document.getElementById('rentalGrossRent');
+  const rentalRentLabel = document.getElementById('rentalRentLabel');
+  const rentalPresetsRow = document.getElementById('rentalPresetsRow');
+  const rentalDeductionsGroup = document.getElementById('rentalDeductionsGroup');
+  const rentalClaimRepairs = document.getElementById('rentalClaimRepairs');
+  const btnToggleOtherDeductions = document.getElementById('btnToggleOtherDeductions');
+  const extraDeductionsText = document.getElementById('extraDeductionsText');
+  const rentalExtraFields = document.getElementById('rentalExtraFields');
+  const rentalPropertyTax = document.getElementById('rentalPropertyTax');
+  const rentalLoanInterest = document.getElementById('rentalLoanInterest');
+  const rentalInsurance = document.getElementById('rentalInsurance');
+  const rentalAdminCharges = document.getElementById('rentalAdminCharges');
+  const btnCalculateRentalTax = document.getElementById('btnCalculateRentalTax');
+  const rentalForm = document.getElementById('rentalTaxCalculatorForm');
+
+  // Result Elements
+  const rentalCalcResults = document.getElementById('rentalCalcResults');
+  const rentalResYearBadge = document.getElementById('rentalResYearBadge');
+  const rentalResCategoryTag = document.getElementById('rentalResCategoryTag');
+  const rentalResNetTakeHome = document.getElementById('rentalResNetTakeHome');
+  const rentalResNetTakeHomeSub = document.getElementById('rentalResNetTakeHomeSub');
+  const rentalResTotalTax = document.getElementById('rentalResTotalTax');
+  const rentalResTotalTaxSub = document.getElementById('rentalResTotalTaxSub');
+  const rentalResEffectiveRate = document.getElementById('rentalResEffectiveRate');
+  const rentalResMonthlyTax = document.getElementById('rentalResMonthlyTax');
+  const rentalResTotalDeductions = document.getElementById('rentalResTotalDeductions');
+  const rentalResDeductionsSub = document.getElementById('rentalResDeductionsSub');
+  const rentalResNetTaxableRent = document.getElementById('rentalResNetTaxableRent');
+  const rentalResActiveSlab = document.getElementById('rentalResActiveSlab');
+  const rentalResActiveSlabDesc = document.getElementById('rentalResActiveSlabDesc');
+  const rentalFilerAlertBox = document.getElementById('rentalFilerAlertBox');
+  const rentalFilerAlertText = document.getElementById('rentalFilerAlertText');
+  const rentalMatrixTableBody = document.getElementById('rentalMatrixTableBody');
+  const rentalYearTabs = document.querySelectorAll('#rentalYearTabs .tab-btn');
+
+  if (!rentalGrossRent || !rentalOwnerType || !rentalMatrixTableBody) {
+    return;
+  }
+
+  // Presets Data
+  const RENTAL_PRESETS = {
+    monthly: [
+      { label: '30k', amount: 30000 },
+      { label: '60k', amount: 60000 },
+      { label: '100k', amount: 100000 },
+      { label: '200k', amount: 200000 },
+      { label: '500k', amount: 500000 }
+    ],
+    annually: [
+      { label: '360k', amount: 360000 },
+      { label: '720k', amount: 720000 },
+      { label: '1.2M', amount: 1200000 },
+      { label: '2.4M', amount: 2400000 },
+      { label: '6.0M', amount: 6000000 }
+    ]
+  };
+
+  function parseAmount(val) {
+    if (!val) return 0;
+    const clean = String(val).replace(/[^0-9.]/g, '');
+    const num = parseFloat(clean);
+    return isNaN(num) ? 0 : Math.round(num);
+  }
+
+  function formatPKR(amount) {
+    if (isNaN(amount) || amount === null || amount === undefined) return 'Rs 0';
+    return 'Rs ' + Math.round(amount).toLocaleString('en-PK');
+  }
+
+  function setupCurrencyInput(inputEl) {
+    if (!inputEl) return;
+    inputEl.addEventListener('input', () => {
+      const cursorPos = inputEl.selectionStart;
+      const oldLength = inputEl.value.length;
+      const rawVal = parseAmount(inputEl.value);
+
+      if (rawVal === 0 && inputEl.value.trim() === '') {
+        inputEl.value = '';
+      } else {
+        inputEl.value = rawVal.toLocaleString('en-PK');
+      }
+
+      const newLength = inputEl.value.length;
+      const newCursor = Math.max(0, cursorPos + (newLength - oldLength));
+      try {
+        inputEl.setSelectionRange(newCursor, newCursor);
+      } catch (_) {}
+    });
+  }
+
+  setupCurrencyInput(rentalGrossRent);
+  setupCurrencyInput(rentalPropertyTax);
+  setupCurrencyInput(rentalLoanInterest);
+  setupCurrencyInput(rentalInsurance);
+  setupCurrencyInput(rentalAdminCharges);
+
+  // Render Presets
+  function renderRentalPresets(period) {
+    if (!rentalPresetsRow) return;
+    rentalPresetsRow.innerHTML = '';
+    const presets = RENTAL_PRESETS[period] || RENTAL_PRESETS.monthly;
+    const currentVal = parseAmount(rentalGrossRent.value);
+
+    presets.forEach(p => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'preset-pill' + (currentVal === p.amount ? ' active' : '');
+      btn.setAttribute('data-rentamount', p.amount);
+      btn.textContent = p.label;
+      btn.addEventListener('click', () => {
+        rentalGrossRent.value = p.amount.toLocaleString('en-PK');
+        rentalPresetsRow.querySelectorAll('.preset-pill').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        updateRentalCalculator();
+      });
+      rentalPresetsRow.appendChild(btn);
+    });
+  }
+
+  renderRentalPresets('monthly');
+
+  // Rental Period Change
+  if (rentalRentPeriod) {
+    rentalRentPeriod.addEventListener('change', () => {
+      const isMonthly = rentalRentPeriod.value === 'monthly';
+      if (rentalRentLabel) {
+        rentalRentLabel.textContent = isMonthly ? 'Monthly Gross Rent (PKR)' : 'Annual Gross Rent (PKR)';
+      }
+      renderRentalPresets(rentalRentPeriod.value);
+    });
+  }
+
+  // Active Taxpayer Status (Filer / Non-Filer) Toggles
+  let isFiler = true;
+  if (btnRentalFiler && btnRentalNonFiler) {
+    btnRentalFiler.addEventListener('click', () => {
+      if (!isFiler) {
+        isFiler = true;
+        btnRentalFiler.classList.add('active');
+        btnRentalFiler.setAttribute('aria-checked', 'true');
+        btnRentalNonFiler.classList.remove('active');
+        btnRentalNonFiler.setAttribute('aria-checked', 'false');
+        updateRentalCalculator();
+      }
+    });
+
+    btnRentalNonFiler.addEventListener('click', () => {
+      if (isFiler) {
+        isFiler = false;
+        btnRentalNonFiler.classList.add('active');
+        btnRentalNonFiler.setAttribute('aria-checked', 'true');
+        btnRentalFiler.classList.remove('active');
+        btnRentalFiler.setAttribute('aria-checked', 'false');
+        updateRentalCalculator();
+      }
+    });
+  }
+
+  // Property Ownership Type change
+  if (rentalOwnerType) {
+    rentalOwnerType.addEventListener('change', () => {
+      const isCompany = rentalOwnerType.value === 'company';
+      if (rentalDeductionsGroup) {
+        rentalDeductionsGroup.hidden = isCompany;
+      }
+      updateRentalCalculator();
+    });
+  }
+
+  // Toggle Other Deductions Accordion
+  if (btnToggleOtherDeductions && rentalExtraFields) {
+    btnToggleOtherDeductions.addEventListener('click', () => {
+      const isHidden = rentalExtraFields.hidden;
+      rentalExtraFields.hidden = !isHidden;
+      btnToggleOtherDeductions.setAttribute('aria-expanded', String(isHidden));
+      if (extraDeductionsText) {
+        extraDeductionsText.textContent = isHidden
+          ? '− Hide Additional Allowable Expenses'
+          : '+ Add Other Allowable Expenses (Taxes, Markup, Insurance)';
+      }
+    });
+  }
+
+  // Year Selection Change
+  if (rentalTaxYear) {
+    rentalTaxYear.addEventListener('change', () => {
+      const year = rentalTaxYear.value;
+      rentalYearTabs.forEach(t => {
+        const matches = t.getAttribute('data-rentyear') === year;
+        t.classList.toggle('active', matches);
+        t.setAttribute('aria-selected', String(matches));
+      });
+      updateRentalCalculator();
+    });
+  }
+
+  // Year Matrix Tabs click
+  rentalYearTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const year = tab.getAttribute('data-rentyear');
+      if (year && rentalTaxYear) {
+        rentalTaxYear.value = year;
+        rentalYearTabs.forEach(t => {
+          t.classList.toggle('active', t === tab);
+          t.setAttribute('aria-selected', String(t === tab));
+        });
+        updateRentalCalculator();
+      }
+    });
+  });
+
+  // Calculate Function
+  function updateRentalCalculator() {
+    const isCompany = rentalOwnerType.value === 'company';
+    const isMonthly = rentalRentPeriod ? rentalRentPeriod.value === 'monthly' : true;
+    const rawRent = parseAmount(rentalGrossRent.value);
+    const annualGrossRent = isMonthly ? rawRent * 12 : rawRent;
+    const yearKey = rentalTaxYear.value || '2026-2027';
+
+    // Year Badge
+    if (rentalResYearBadge) {
+      const yearLabel = rentalTaxYear.options[rentalTaxYear.selectedIndex]?.text || `Tax Year ${yearKey}`;
+      rentalResYearBadge.textContent = yearLabel.split('(')[0].trim();
+    }
+
+    // Category Tag
+    if (rentalResCategoryTag) {
+      const ownerLabel = isCompany ? 'Company / Corporate Landlord' : 'Individual / Association of Persons (AOP)';
+      const filerLabel = isFiler ? 'Active Taxpayer (Filer)' : 'Non-Filer (Doubled Rates)';
+      rentalResCategoryTag.textContent = `${ownerLabel} · ${filerLabel}`;
+    }
+
+    let repairDeduction = 0;
+    let otherDeductions = 0;
+    let totalDeductions = 0;
+    let netTaxableRent = annualGrossRent;
+    let totalTax = 0;
+    let slabIndex = 0;
+    let activeSlabText = '';
+    let activeSlabDescText = '';
+    let filerTax = 0;
+    let nonFilerTax = 0;
+
+    if (isCompany) {
+      // Corporate property withholding: flat 15% for filers, 30% for non-filers
+      const rate = isFiler ? 0.15 : 0.30;
+      totalTax = Math.round(annualGrossRent * rate);
+      filerTax = Math.round(annualGrossRent * 0.15);
+      nonFilerTax = Math.round(annualGrossRent * 0.30);
+      slabIndex = 'company';
+      netTaxableRent = annualGrossRent;
+      totalDeductions = 0;
+
+      activeSlabText = isFiler
+        ? 'Corporate Flat Rate: 15% on Gross Rent'
+        : 'Corporate Non-Filer: 30% Flat Rate (Doubled)';
+      activeSlabDescText = isFiler
+        ? 'Section 155 requires 15% withholding on gross rent paid to corporate landlords from rupee one.'
+        : 'Under Tenth Schedule, non-filer companies pay 30% flat withholding on gross rent.';
+    } else {
+      // Individual / AOP Deductions under Section 15A
+      const claimRepairs = rentalClaimRepairs ? rentalClaimRepairs.checked : true;
+      repairDeduction = claimRepairs ? Math.round(annualGrossRent * 0.20) : 0;
+
+      const propTax = parseAmount(rentalPropertyTax?.value);
+      const loanInterest = parseAmount(rentalLoanInterest?.value);
+      const insurance = parseAmount(rentalInsurance?.value);
+      const adminCharges = parseAmount(rentalAdminCharges?.value);
+      const maxAdmin = Math.round(annualGrossRent * 0.04);
+      const allowedAdmin = Math.min(adminCharges, maxAdmin);
+
+      otherDeductions = propTax + loanInterest + insurance + allowedAdmin;
+      totalDeductions = repairDeduction + otherDeductions;
+      netTaxableRent = Math.max(0, annualGrossRent - totalDeductions);
+
+      // Section 155 Withholding Slabs (on gross rent)
+      function getIndividualTax(amount, filer) {
+        if (amount <= 300000) {
+          return { tax: 0, index: 0, desc: 'Tax-free exemption limit up to Rs. 300,000 (0% tax).' };
+        }
+        if (amount <= 600000) {
+          const rate = filer ? 0.05 : 0.10;
+          const tax = Math.round((amount - 300000) * rate);
+          return {
+            tax,
+            index: 1,
+            desc: filer 
+              ? '5% of the gross rental amount exceeding Rs. 300,000.'
+              : '10% of the gross rental amount exceeding Rs. 300,000 (100% non-filer surcharge).'
+          };
+        }
+        if (amount <= 2000000) {
+          const base = filer ? 15000 : 30000;
+          const rate = filer ? 0.10 : 0.20;
+          const tax = Math.round(base + (amount - 600000) * rate);
+          return {
+            tax,
+            index: 2,
+            desc: filer
+              ? 'Rs. 15,000 + 10% of the gross rental amount exceeding Rs. 600,000.'
+              : 'Rs. 30,000 + 20% of the gross rental amount exceeding Rs. 600,000 (Doubled).'
+          };
+        }
+        const base = filer ? 155000 : 310000;
+        const rate = filer ? 0.25 : 0.50;
+        const tax = Math.round(base + (amount - 2000000) * rate);
+        return {
+          tax,
+          index: 3,
+          desc: filer
+            ? 'Rs. 155,000 + 25% of the gross rental amount exceeding Rs. 2,000,000.'
+            : 'Rs. 310,000 + 50% of the gross rental amount exceeding Rs. 2,000,000 (Doubled).'
+        };
+      }
+
+      const calcRes = getIndividualTax(annualGrossRent, isFiler);
+      totalTax = calcRes.tax;
+      slabIndex = calcRes.index;
+      activeSlabDescText = calcRes.desc;
+
+      const filerRes = getIndividualTax(annualGrossRent, true);
+      const nonFilerRes = getIndividualTax(annualGrossRent, false);
+      filerTax = filerRes.tax;
+      nonFilerTax = nonFilerRes.tax;
+
+      const slabNames = [
+        'Up to Rs. 300,000 (0% Exempt)',
+        `Rs. 300,001 to Rs. 600,000 (${isFiler ? '5%' : '10%'})`,
+        `Rs. 600,001 to Rs. 2,000,000 (${isFiler ? '10%' : '20%'})`,
+        `Above Rs. 2,000,000 (${isFiler ? '25%' : '50%'})`
+      ];
+      activeSlabText = `Active Bracket: ${slabNames[slabIndex]}`;
+    }
+
+    const monthlyTax = Math.round(totalTax / 12);
+    const netTakeHome = Math.max(0, annualGrossRent - totalTax);
+    const monthlyTakeHome = Math.round(netTakeHome / 12);
+    const effectiveRate = annualGrossRent > 0 ? (totalTax / annualGrossRent) * 100 : 0;
+    const penaltyDifference = Math.max(0, nonFilerTax - filerTax);
+
+    // Primary Hero Metrics
+    if (rentalResNetTakeHome) rentalResNetTakeHome.textContent = formatPKR(netTakeHome);
+    if (rentalResNetTakeHomeSub) rentalResNetTakeHomeSub.textContent = `${formatPKR(monthlyTakeHome)} / month take-home`;
+    if (rentalResTotalTax) rentalResTotalTax.textContent = formatPKR(totalTax);
+    if (rentalResTotalTaxSub) {
+      rentalResTotalTaxSub.textContent = isCompany
+        ? `${formatPKR(monthlyTax)} / month (${isFiler ? '15%' : '30%'} flat withholding)`
+        : `${formatPKR(monthlyTax)} / month withholding (WHT)`;
+    }
+
+    // Secondary 4-Metric Grid
+    if (rentalResEffectiveRate) rentalResEffectiveRate.textContent = `${effectiveRate.toFixed(2)}%`;
+    if (rentalResMonthlyTax) rentalResMonthlyTax.textContent = formatPKR(monthlyTax);
+    if (rentalResTotalDeductions) {
+      rentalResTotalDeductions.textContent = isCompany ? 'N/A' : formatPKR(totalDeductions);
+    }
+    if (rentalResDeductionsSub) {
+      if (isCompany) {
+        rentalResDeductionsSub.textContent = 'Flat 15%/30% on gross rent';
+      } else if (otherDeductions > 0 && repairDeduction > 0) {
+        rentalResDeductionsSub.textContent = '20% Repair + Sec 15A Expenses';
+      } else if (repairDeduction > 0) {
+        rentalResDeductionsSub.textContent = 'Statutory 20% Repair Allowance';
+      } else if (otherDeductions > 0) {
+        rentalResDeductionsSub.textContent = 'Itemized Sec 15A Expenses';
+      } else {
+        rentalResDeductionsSub.textContent = 'No Deductions Claimed';
+      }
+    }
+    if (rentalResNetTaxableRent) {
+      rentalResNetTaxableRent.textContent = formatPKR(netTaxableRent);
+    }
+
+    // Active Slab Banner
+    if (rentalResActiveSlab) rentalResActiveSlab.textContent = activeSlabText;
+    if (rentalResActiveSlabDesc) rentalResActiveSlabDesc.textContent = activeSlabDescText;
+
+    // Filer / Non-Filer Warning Box
+    if (rentalFilerAlertBox && rentalFilerAlertText) {
+      if (isFiler) {
+        rentalFilerAlertBox.classList.remove('penalty-alert');
+        rentalFilerAlertText.innerHTML = `As an Active Taxpayer on the FBR ATL, you pay standard progressive withholding rates and save <strong>${formatPKR(penaltyDifference)}</strong> compared to non-filers.`;
+      } else {
+        rentalFilerAlertBox.classList.add('penalty-alert');
+        rentalFilerAlertText.innerHTML = `Under Rule 1 of the Tenth Schedule, withholding tax rates are doubled (100% surcharge). You are paying <strong>${formatPKR(penaltyDifference)}</strong> in additional penalty taxes. Become an active filer to save!`;
+      }
+    }
+
+    // Highlight row in Rental Matrix Table
+    if (rentalMatrixTableBody) {
+      const rows = rentalMatrixTableBody.querySelectorAll('tr[data-rent-slab]');
+      rows.forEach(row => {
+        const slabAttr = row.getAttribute('data-rent-slab');
+        const isActive = isCompany 
+          ? slabAttr === 'company' 
+          : slabAttr === String(slabIndex);
+        row.classList.toggle('active-slab-row', isActive);
+      });
+    }
+  }
+
+  // Calculate Button Click
+  if (btnCalculateRentalTax) {
+    btnCalculateRentalTax.addEventListener('click', () => {
+      updateRentalCalculator();
+
+      if (rentalCalcResults) {
+        rentalCalcResults.classList.remove('calculating');
+        void rentalCalcResults.offsetWidth; // trigger reflow
+        rentalCalcResults.classList.add('calculating');
+        setTimeout(() => rentalCalcResults.classList.remove('calculating'), 500);
+
+        if (window.innerWidth < 768) {
+          rentalCalcResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    });
+  }
+
+  // Handle Form Enter Submission
+  if (rentalForm) {
+    rentalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (btnCalculateRentalTax) btnCalculateRentalTax.click();
+    });
+  }
+
+  // Expose globally so switchTaxCategory can invoke it
+  window.updateRentalCalculator = updateRentalCalculator;
+
+  // Initial render on load
+  updateRentalCalculator();
 })();
