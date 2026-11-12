@@ -151,7 +151,7 @@ contactForm.addEventListener("submit", (event) => {
   const taxYearSelect = document.getElementById('taxYear');
   const calculateBtn = document.getElementById('btnCalculateTax');
   const presetsRow = document.getElementById('presetsRow');
-  const slabTabs = document.querySelectorAll('.slabs-tabs .tab-btn');
+  const slabTabs = document.querySelectorAll('#taxYearTabs .tab-btn');
 
   // Category Switcher Elements
   const tabSalaried = document.getElementById('tabSalaried');
@@ -853,14 +853,52 @@ contactForm.addEventListener("submit", (event) => {
 (function initBusinessTaxCalculator() {
   const bizTaxYear = document.getElementById('bizTaxYear');
   const bizCategory = document.getElementById('bizCategory');
-  const smeRegimeGroup = document.getElementById('smeRegimeGroup');
-  const btnRegimeNTR = document.getElementById('btnRegimeNTR');
-  const btnRegimeFTR = document.getElementById('btnRegimeFTR');
+  const bizCategoryLabel = document.getElementById('bizCategoryLabel');
   const bizTaxableProfit = document.getElementById('bizTaxableProfit');
-  const bizTurnover = document.getElementById('bizTurnover');
-  const bizAccountingProfit = document.getElementById('bizAccountingProfit');
   const btnCalculateBizTax = document.getElementById('btnCalculateBizTax');
   const bizProfitPresetsRow = document.getElementById('bizProfitPresetsRow');
+
+  const INDIVIDUAL_CATEGORIES = [
+    { value: 'individual', label: 'Commercial Business / Sole Proprietor' },
+    { value: 'prof_aop', label: 'Professional Firm AOP' }
+  ];
+
+  const CORPORATE_CATEGORIES = [
+    { value: 'general', label: 'General Corporate Company' },
+    { value: 'small', label: 'Small Company' },
+    { value: 'banking', label: 'Banking Company' },
+    { value: 'sme_cat1', label: 'SME Manufacturing — Category 1' },
+    { value: 'sme_cat2', label: 'SME Manufacturing — Category 2' },
+    { value: 'modaraba', label: 'Modaraba' }
+  ];
+
+  function populateCategoryOptions(entityType, selectedValue) {
+    if (!bizCategory) return;
+    const isInd = (entityType === 'individual');
+    const options = isInd ? INDIVIDUAL_CATEGORIES : CORPORATE_CATEGORIES;
+
+    if (bizCategoryLabel) {
+      bizCategoryLabel.textContent = isInd
+        ? 'Individual Business Category'
+        : 'Corporate Company Category';
+    }
+
+    bizCategory.innerHTML = '';
+    options.forEach(opt => {
+      const optionEl = document.createElement('option');
+      optionEl.value = opt.value;
+      optionEl.textContent = opt.label;
+      if (selectedValue && opt.value === selectedValue) {
+        optionEl.selected = true;
+      }
+      bizCategory.appendChild(optionEl);
+    });
+
+    const validValues = options.map(o => o.value);
+    if (!validValues.includes(bizCategory.value)) {
+      bizCategory.value = isInd ? 'individual' : 'general';
+    }
+  }
 
   // Result Elements
   const bizResYearBadge = document.getElementById('bizResYearBadge');
@@ -1789,9 +1827,6 @@ contactForm.addEventListener("submit", (event) => {
     const yearKey = bizTaxYear.value || '2026-2027';
     const catId = bizCategory.value || 'individual';
     const profit = parseAmount(bizTaxableProfit.value);
-    const turnover = parseAmount(bizTurnover.value);
-    const acctProfitInput = parseAmount(bizAccountingProfit.value);
-    const acctProfit = acctProfitInput > 0 ? acctProfitInput : profit;
 
     const isIndividual = (catId === 'individual' || catId === 'prof_aop');
     const isProfAop = (catId === 'prof_aop');
@@ -1811,13 +1846,6 @@ contactForm.addEventListener("submit", (event) => {
 
     const yearData = BUSINESS_TAX_DATA[yearKey] || BUSINESS_TAX_DATA['2026-2027'];
     const activeCat = yearData.categories.find(c => c.id === catId) || yearData.categories[0];
-
-    // Show/hide SME regime switcher
-    if (catId === 'sme_cat1') {
-      smeRegimeGroup.style.display = 'block';
-    } else {
-      smeRegimeGroup.style.display = 'none';
-    }
 
     // Base Tax & Surcharge Calculation
     let baseTax = 0;
@@ -1851,7 +1879,14 @@ contactForm.addEventListener("submit", (event) => {
         bizResSuperTaxLabel.textContent = '10% Surcharge (Sec 4AB)';
       }
       if (bizResACTLabel) {
-        bizResACTLabel.textContent = 'Min Tax / ACT Status';
+        bizResACTLabel.textContent = 'Statutory Return';
+      }
+      if (bizResACTStatus) {
+        bizResACTStatus.textContent = 'Form 114';
+        bizResACTStatus.className = 'metric-badge-tag status-compliant';
+      }
+      if (bizResACTSub) {
+        bizResACTSub.textContent = 'Annual Return due 30th September';
       }
     } else {
       if (bizIndividualSlabBanner) {
@@ -1864,27 +1899,26 @@ contactForm.addEventListener("submit", (event) => {
         bizResSuperTaxLabel.textContent = 'Super Tax (Section 4C)';
       }
       if (bizResACTLabel) {
-        bizResACTLabel.textContent = 'ACT / Min Tax Status';
+        bizResACTLabel.textContent = 'Statutory Return';
+      }
+      if (bizResACTStatus) {
+        bizResACTStatus.textContent = 'Form 114 / SECP';
+        bizResACTStatus.className = 'metric-badge-tag status-compliant';
+      }
+      if (bizResACTSub) {
+        bizResACTSub.textContent = 'Corporate Return due 31st December';
       }
 
       if (catId === 'sme_cat1') {
-        if (activeSmeRegime === 'ftr') {
-          baseTax = Math.round(turnover * 0.0025);
-          baseTaxRateText = '0.25% (FTR)';
-          baseTaxSub = '0.25% Final Tax Regime on Gross Turnover';
-        } else {
-          baseTax = Math.round(profit * 0.075);
-          baseTaxRateText = '7.5% (NTR)';
-          baseTaxSub = '7.5% Normal Tax Regime on Taxable Profit';
-        }
+        baseTax = Math.round(profit * 0.075);
+        baseTaxRateText = '7.5%';
+        baseTaxSub = '7.5% SME Normal Tax Regime (Fourteenth Schedule)';
       } else if (catId === 'sme_cat2') {
         baseTax = Math.round(profit * 0.15);
         baseTaxSub = '15% Normal Corporate Rate (SME Fourteenth Schedule)';
       } else if (catId === 'small') {
         baseTax = Math.round(profit * 0.20);
-        baseTaxSub = turnover > 250000000 
-          ? '20% Rate (Caution: Turnover > 250M may trigger 29% General Rate)'
-          : '20% Concessional Small Company Rate';
+        baseTaxSub = '20% Concessional Small Company Rate';
       } else if (catId === 'banking') {
         baseTax = Math.round(profit * 0.39);
         baseTaxSub = '39% Banking Sector Flat Corporate Rate';
@@ -1899,61 +1933,10 @@ contactForm.addEventListener("submit", (event) => {
 
     // Super Tax (Section 4C) calculation (applies if profit > 150M)
     const superTaxRes = calculateSuperTax(profit, catId, yearKey);
-    const superTaxAmount = (catId === 'sme_cat1' && activeSmeRegime === 'ftr') ? 0 : superTaxRes.tax;
-
-    // Alternate Corporate Tax (ACT Sec 113C: 17%) & Minimum Tax (Sec 113: 1.25%)
-    let actAmount = 0;
-    let minTaxAmount = 0;
-    let actStatus = 'Compliant';
-    let actSub = 'Normal Tax Exceeds ACT & Min Tax';
-
-    if (isIndividual) {
-      actAmount = 0;
-      // Minimum Turnover Tax for Individuals applies only if Annual Turnover > Rs 100 Million
-      if (turnover >= 100000000) {
-        minTaxAmount = Math.round(turnover * 0.0125);
-        if (minTaxAmount > (baseTax + surchargeAmount)) {
-          actStatus = 'Min Tax Applicable';
-          actSub = `1.25% Turnover Tax (${formatPKR(minTaxAmount)}) exceeds slab liability (${formatPKR(baseTax + surchargeAmount)})`;
-        } else {
-          actStatus = 'Compliant';
-          actSub = `Slab tax (${formatPKR(baseTax + surchargeAmount)}) exceeds 1.25% Min Tax (${formatPKR(minTaxAmount)})`;
-        }
-      } else {
-        minTaxAmount = 0;
-        actStatus = 'ACT Exempt';
-        actSub = 'Turnover < 100M: Min Tax under Sec 113 Exempt (ACT applies to companies only)';
-      }
-    } else if (catId === 'sme_cat1' && activeSmeRegime === 'ftr') {
-      actStatus = 'Exempt';
-      actSub = 'FTR Exempt from Section 113 & 113C';
-    } else if (catId !== 'banking') {
-      actAmount = Math.round(acctProfit * 0.17);
-      minTaxAmount = Math.round(turnover * 0.0125);
-
-      if (actAmount > baseTax && actAmount >= minTaxAmount) {
-        actStatus = 'ACT Applicable';
-        actSub = `17% ACT (${formatPKR(actAmount)}) exceeds normal tax (${formatPKR(baseTax)})`;
-      } else if (minTaxAmount > baseTax && minTaxAmount > actAmount) {
-        actStatus = 'Min Tax Applicable';
-        actSub = `1.25% Turnover Tax (${formatPKR(minTaxAmount)}) exceeds normal tax`;
-      } else {
-        actStatus = 'Compliant';
-        actSub = `Normal tax (${formatPKR(baseTax)}) exceeds ACT & Min Tax`;
-      }
-    } else {
-      actStatus = 'Special Regime';
-      actSub = 'Governed by Seventh Schedule Rules';
-    }
+    const superTaxAmount = superTaxRes.tax;
 
     // Total tax liability
-    let effectiveBaseTax = baseTax;
-    if (isIndividual) {
-      effectiveBaseTax = Math.max(baseTax + surchargeAmount, minTaxAmount);
-    } else if (catId !== 'banking' && !(catId === 'sme_cat1' && activeSmeRegime === 'ftr')) {
-      effectiveBaseTax = Math.max(baseTax, actAmount, minTaxAmount);
-    }
-    const totalTaxLiability = effectiveBaseTax + superTaxAmount;
+    const totalTaxLiability = baseTax + surchargeAmount + superTaxAmount;
     const effectiveRate = profit > 0 ? (totalTaxLiability / profit) * 100 : 0;
     const pat = Math.max(0, profit - totalTaxLiability);
 
@@ -1986,8 +1969,8 @@ contactForm.addEventListener("submit", (event) => {
         }
       } else {
         bizResTotalTaxSub.textContent = superTaxAmount > 0 
-          ? `Base Tax (${formatPKR(effectiveBaseTax)}) + Super Tax (${formatPKR(superTaxAmount)})` 
-          : 'Flat Corporate Tax Liability';
+          ? `Base Corporate Tax (${formatPKR(baseTax)}) + Super Tax (${formatPKR(superTaxAmount)})` 
+          : `${activeCat.rateText} Flat Corporate Tax Liability`;
       }
     }
 
@@ -2007,18 +1990,6 @@ contactForm.addEventListener("submit", (event) => {
       }
     }
     
-    // Status Badge for ACT / Min Tax
-    if (bizResACTStatus) {
-      bizResACTStatus.textContent = actStatus;
-      let badgeClass = 'metric-badge-tag ';
-      if (actStatus === 'Compliant') badgeClass += 'status-compliant';
-      else if (actStatus === 'Exempt' || actStatus === 'ACT Exempt') badgeClass += 'status-special';
-      else if (actStatus === 'Special Regime') badgeClass += 'status-special';
-      else badgeClass += 'status-warning';
-      bizResACTStatus.className = badgeClass;
-    }
-    if (bizResACTSub) bizResACTSub.textContent = actSub;
-
     // Update Category Compliance Banner (3 clean structured items)
     if (bizComplianceTitle) bizComplianceTitle.textContent = `Statutory Deadlines & Filing Schedule (${yearData.label})`;
     if (bizComplianceCategorySub) bizComplianceCategorySub.textContent = `${activeCat.name} — ${activeCat.criteria}`;
@@ -2193,7 +2164,8 @@ contactForm.addEventListener("submit", (event) => {
       }
 
       bizMatrixTableBody.innerHTML = '';
-      yearData.categories.forEach(cat => {
+      const corporateCats = yearData.categories.filter(cat => cat.id !== 'individual' && cat.id !== 'prof_aop');
+      corporateCats.forEach(cat => {
         const tr = document.createElement('tr');
         const isSelected = (cat.id === activeCatId);
         if (isSelected) {
@@ -2278,8 +2250,6 @@ contactForm.addEventListener("submit", (event) => {
   }
 
   setupCurrencyInput(bizTaxableProfit);
-  setupCurrencyInput(bizTurnover);
-  setupCurrencyInput(bizAccountingProfit);
 
   // Profit presets click (populates inputs without auto-calculating)
   if (bizProfitPresetsRow) {
@@ -2291,13 +2261,16 @@ contactForm.addEventListener("submit", (event) => {
         const amount = parseInt(pill.getAttribute('data-bizamount'), 10);
         if (amount > 0) {
           bizTaxableProfit.value = amount.toLocaleString('en-PK');
-          // Proportionate turnover suggestion if turnover is lower than profit
-          const currentTurnover = parseAmount(bizTurnover.value);
-          if (currentTurnover < amount * 3) {
-            bizTurnover.value = (amount * 5).toLocaleString('en-PK');
-          }
+          renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
         }
       });
+    });
+  }
+
+  // Live update active slab highlight when typing profit
+  if (bizTaxableProfit) {
+    bizTaxableProfit.addEventListener('input', () => {
+      renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
     });
   }
 
@@ -2308,12 +2281,9 @@ contactForm.addEventListener("submit", (event) => {
       btnEntityIndividual.setAttribute('aria-checked', 'true');
       btnEntityCorporate.classList.remove('active');
       btnEntityCorporate.setAttribute('aria-checked', 'false');
-      if (bizCategory.value !== 'individual' && bizCategory.value !== 'prof_aop') {
-        bizCategory.value = 'individual';
-      }
-      smeRegimeGroup.style.display = 'none';
+      populateCategoryOptions('individual', 'individual');
       if (bizIndividualRulesCallout) bizIndividualRulesCallout.style.display = 'block';
-      renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
+      updateBusinessCalculator();
     });
 
     btnEntityCorporate.addEventListener('click', () => {
@@ -2321,65 +2291,23 @@ contactForm.addEventListener("submit", (event) => {
       btnEntityCorporate.setAttribute('aria-checked', 'true');
       btnEntityIndividual.classList.remove('active');
       btnEntityIndividual.setAttribute('aria-checked', 'false');
-      if (bizCategory.value === 'individual' || bizCategory.value === 'prof_aop') {
-        bizCategory.value = 'general';
-      }
-      if (bizCategory.value === 'sme_cat1') {
-        smeRegimeGroup.style.display = 'block';
-      } else {
-        smeRegimeGroup.style.display = 'none';
-      }
+      populateCategoryOptions('corporate', 'general');
       if (bizIndividualRulesCallout) bizIndividualRulesCallout.style.display = 'none';
-      renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
+      updateBusinessCalculator();
     });
   }
 
-  // Tax year change (updates matrix table view without auto-calculating)
+  // Tax year change (synchronizes slabs and updates calculator)
   bizTaxYear.addEventListener('change', () => {
-    renderBusinessMatrixTable(bizTaxYear.value, bizCategory.value);
+    updateBusinessCalculator();
   });
 
-  // Category change (syncs entity buttons and SME regime pills without auto-calculating)
+  // Category change (synchronizes active row and updates calculator)
   bizCategory.addEventListener('change', () => {
-    const catId = bizCategory.value;
-    const isInd = (catId === 'individual' || catId === 'prof_aop');
-    if (btnEntityIndividual && btnEntityCorporate) {
-      btnEntityIndividual.classList.toggle('active', isInd);
-      btnEntityIndividual.setAttribute('aria-checked', isInd ? 'true' : 'false');
-      btnEntityCorporate.classList.toggle('active', !isInd);
-      btnEntityCorporate.setAttribute('aria-checked', !isInd ? 'true' : 'false');
-    }
-    if (bizIndividualRulesCallout) {
-      bizIndividualRulesCallout.style.display = isInd ? 'block' : 'none';
-    }
-    if (catId === 'sme_cat1') {
-      smeRegimeGroup.style.display = 'block';
-    } else {
-      smeRegimeGroup.style.display = 'none';
-    }
-    renderBusinessMatrixTable(bizTaxYear.value, catId);
+    updateBusinessCalculator();
   });
 
-  // SME Regime pills click (updates regime state without auto-calculating)
-  if (btnRegimeNTR && btnRegimeFTR) {
-    btnRegimeNTR.addEventListener('click', () => {
-      activeSmeRegime = 'ntr';
-      btnRegimeNTR.classList.add('active');
-      btnRegimeNTR.setAttribute('aria-checked', 'true');
-      btnRegimeFTR.classList.remove('active');
-      btnRegimeFTR.setAttribute('aria-checked', 'false');
-    });
-
-    btnRegimeFTR.addEventListener('click', () => {
-      activeSmeRegime = 'ftr';
-      btnRegimeFTR.classList.add('active');
-      btnRegimeFTR.setAttribute('aria-checked', 'true');
-      btnRegimeNTR.classList.remove('active');
-      btnRegimeNTR.setAttribute('aria-checked', 'false');
-    });
-  }
-
-  // Calculate button: performs calculation only on explicit button click
+  // Calculate button: performs calculation on explicit button click
   if (btnCalculateBizTax) {
     btnCalculateBizTax.addEventListener('click', () => {
       updateBusinessCalculator();
@@ -2406,13 +2334,13 @@ contactForm.addEventListener("submit", (event) => {
     });
   }
 
-  // Year Matrix tabs click (view specific year in matrix without auto-calculating)
+  // Year Matrix tabs click (filters slabs table and updates calculation)
   bizYearTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const year = tab.getAttribute('data-bizyear');
       if (year && BUSINESS_TAX_DATA[year]) {
         bizTaxYear.value = year;
-        renderBusinessMatrixTable(year, bizCategory.value);
+        updateBusinessCalculator();
       }
     });
   });
@@ -2420,7 +2348,11 @@ contactForm.addEventListener("submit", (event) => {
   // Expose globally so switchTaxCategory can invoke it
   window.updateBusinessCalculator = updateBusinessCalculator;
 
+  // Initialize category options to match default entity (Individual)
+  populateCategoryOptions('individual', 'individual');
+
   // Initial render on load
+  renderBusinessMatrixTable(bizTaxYear.value, 'individual');
   updateBusinessCalculator();
 })();
 
