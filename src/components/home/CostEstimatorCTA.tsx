@@ -64,61 +64,34 @@ export default function CostEstimatorCTA() {
       <div className="container">
         <div
           ref={cardRef}
-          style={{
-            background: 'linear-gradient(135deg, #141618 0%, #1A1D20 60%, #2a1517 100%)',
-            border: '1px solid rgba(163, 29, 36, 0.35)',
-            borderRadius: 'var(--radius-xl)',
-            padding: '48px 40px',
-            color: '#fff',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '36px',
-            alignItems: 'center',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
-          }}
+          className="cost-cta-card-wrap"
         >
-          <div>
+          <div className="cost-cta-content-col">
             <div
-              className="cost-cta-item"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-full)',
-                background: 'rgba(163, 29, 36, 0.25)',
-                color: '#ff8a8f',
-                fontSize: '13px',
-                fontWeight: 600,
-                marginBottom: '16px',
-                border: '1px solid rgba(163, 29, 36, 0.4)',
-              }}
+              className="cost-cta-item cost-cta-badge"
             >
               <Calculator size={15} />
               <span>Interactive Decision Tool</span>
             </div>
             <h2
-              className="cost-cta-item"
-              style={{ color: '#fff', fontSize: '32px', marginBottom: '14px', lineHeight: 1.25 }}
+              className="cost-cta-item cost-cta-title"
             >
               Estimate Your Total Company Setup Cost in Under 60 Seconds
             </h2>
             <p
-              className="cost-cta-item"
-              style={{ color: '#ced4da', fontSize: '16px', lineHeight: 1.6, marginBottom: '24px' }}
+              className="cost-cta-item cost-cta-desc"
             >
               Transparent pricing with no hidden charges. Select your business structure, authorized capital, SECP filing, FBR tax registrations, Chamber of Commerce, and trademark options to view instant statutory vs advisory estimates.
             </p>
 
             <div
-              className="cost-cta-item"
-              style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '28px' }}
+              className="cost-cta-item cost-cta-features"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#e9ecef' }}>
+              <div className="cost-cta-feature-pill">
                 <CheckCircle2 size={16} color="var(--primary)" />
                 <span>Real-Time Government Fee Slabs</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#e9ecef' }}>
+              <div className="cost-cta-feature-pill">
                 <ShieldCheck size={16} color="var(--primary)" />
                 <span>Zero Data Stored · 100% Client-Side</span>
               </div>
@@ -126,43 +99,32 @@ export default function CostEstimatorCTA() {
 
             <Link
               href="/cost-estimator"
-              className="button cost-cta-item"
-              style={{ padding: '14px 28px', fontSize: '16px' }}
+              className="button cost-cta-item cost-cta-launch-btn"
             >
               <span>Launch Cost Calculator</span>
               <ArrowRight size={16} />
             </Link>
           </div>
 
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '30px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-            }}
-          >
-            <div style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#adb5bd', fontWeight: 600 }}>
+          <div className="cost-cta-box">
+            <div className="cost-cta-box-header">
               Included Cost Breakdown Engines
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <span>SECP Official Filing Fee</span>
-              <strong style={{ color: '#ff8a8f' }}>Computed Live</strong>
+            <div className="cost-cta-row">
+              <span className="cost-cta-row-label">SECP Official Filing Fee</span>
+              <strong className="cost-cta-tag-red">Computed Live</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <span>National Tax Number (NTN) &amp; Bank Resolution</span>
-              <strong style={{ color: '#4ade80' }}>Free with Package</strong>
+            <div className="cost-cta-row">
+              <span className="cost-cta-row-label">National Tax Number (NTN) &amp; Bank Resolution</span>
+              <strong className="cost-cta-tag-green">Free with Package</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <span>Chamber of Commerce &amp; WeBOC Option</span>
-              <strong style={{ color: '#e9ecef' }}>Configurable</strong>
+            <div className="cost-cta-row">
+              <span className="cost-cta-row-label">Chamber of Commerce &amp; WeBOC Option</span>
+              <strong className="cost-cta-tag-gray">Configurable</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
-              <span style={{ fontWeight: 600 }}>Summary Schedule</span>
-              <span style={{ color: '#ff8a8f', fontSize: '14px', fontWeight: 600 }}>Instant PDF Export</span>
+            <div className="cost-cta-row cost-cta-row-last">
+              <span className="cost-cta-row-label" style={{ fontWeight: 600 }}>Summary Schedule</span>
+              <span className="cost-cta-tag-pdf">Instant PDF Export</span>
             </div>
           </div>
         </div>

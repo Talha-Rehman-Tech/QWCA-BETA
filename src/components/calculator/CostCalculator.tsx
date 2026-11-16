@@ -110,7 +110,7 @@ export default function CostCalculator() {
           {/* Step 1: Choose Entity Structure */}
           <div className="calc-step-card">
             <div className="calc-step-header">
-              <span className="step-badge">Step 1</span>
+              <span className="step-badge">STEP 01</span>
               <div>
                 <h3 className="step-title">Select Business Legal Structure</h3>
                 <p className="step-desc">
@@ -159,7 +159,7 @@ export default function CostCalculator() {
           {/* Step 2: Authorized Share Capital */}
           <div className="calc-step-card">
             <div className="calc-step-header">
-              <span className="step-badge">Step 2</span>
+              <span className="step-badge">STEP 02</span>
               <div>
                 <h3 className="step-title">Select Authorized Capital Tier</h3>
                 <p className="step-desc">
@@ -189,7 +189,7 @@ export default function CostCalculator() {
           {/* Step 3: Registration Steps & Add-on Modules (Interactive Checklist) */}
           <div className="calc-step-card">
             <div className="calc-step-header">
-              <span className="step-badge">Step 3</span>
+              <span className="step-badge">STEP 03</span>
               <div>
                 <h3 className="step-title">Statutory &amp; Operational Setup Checklist</h3>
                 <p className="step-desc">
@@ -431,6 +431,161 @@ export default function CostCalculator() {
             <span>View Breakdown</span>
             <ChevronRight size={15} />
           </button>
+        </div>
+      </div>
+
+      {/* ===================================================================
+          OFFICIAL 1-PAGE PRINT / PDF QUOTATION DOSSIER (Visible ONLY on Print)
+          =================================================================== */}
+      <div className="calculator-print-dossier" aria-hidden="true">
+        {/* Letterhead Header */}
+        <div className="dossier-letterhead">
+          <div className="dossier-brand-col">
+            <div className="dossier-firm-name">QUMMAR WAHEED &amp; CO.</div>
+            <div className="dossier-firm-sub">CHARTERED ACCOUNTANTS</div>
+            <div className="dossier-firm-icap">Associate Chartered Accountants · ICAP Member Firm · SECP Registered</div>
+          </div>
+          <div className="dossier-meta-col">
+            <div className="dossier-doc-type">OFFICIAL SETUP ESTIMATE &amp; FEE SCHEDULE</div>
+            <div className="dossier-meta-line">
+              <span>Reference:</span>
+              <strong>QWCA-EST-{selectedEntity.id.toUpperCase()}-2025</strong>
+            </div>
+            <div className="dossier-meta-line">
+              <span>Date of Issue:</span>
+              <strong>{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
+            </div>
+            <div className="dossier-meta-line">
+              <span>Quotation Validity:</span>
+              <strong>30 Calendar Days</strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="dossier-divider" />
+
+        {/* Selected Scope Summary Strip */}
+        <div className="dossier-scope-strip">
+          <div className="dossier-scope-cell">
+            <span className="dossier-scope-label">Legal Business Entity</span>
+            <strong className="dossier-scope-val">{selectedEntity.name}</strong>
+          </div>
+          <div className="dossier-scope-cell">
+            <span className="dossier-scope-label">Authorized Capital Slab</span>
+            <strong className="dossier-scope-val">{selectedCapital.label}</strong>
+          </div>
+          <div className="dossier-scope-cell">
+            <span className="dossier-scope-label">Selected Add-on Modules</span>
+            <strong className="dossier-scope-val">{calculation.activeAddonsList.length} Active Services</strong>
+          </div>
+          <div className="dossier-scope-cell">
+            <span className="dossier-scope-label">Estimated Turnaround</span>
+            <strong className="dossier-scope-val">3 – 5 Business Days</strong>
+          </div>
+        </div>
+
+        {/* Itemized Fee Schedule Table (Active Items Only) */}
+        <div className="dossier-table-wrap">
+          <div className="dossier-table-heading">ITEMIZED SCHEDULE OF SELECTED STATUTORY &amp; ADVISORY SCOPE</div>
+          <table className="dossier-table">
+            <thead>
+              <tr>
+                <th style={{ width: '6%', textAlign: 'center' }}>Sr.</th>
+                <th style={{ width: '44%' }}>Scope of Service / Deliverable</th>
+                <th style={{ width: '22%' }}>Regulatory Body</th>
+                <th style={{ width: '14%', textAlign: 'right' }}>Govt Duty</th>
+                <th style={{ width: '14%', textAlign: 'right' }}>QWCA Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* 1. Base Corporate Formation Package */}
+              <tr>
+                <td style={{ textAlign: 'center', fontWeight: 600 }}>01</td>
+                <td>
+                  <strong>{selectedEntity.name} Formation</strong>
+                  <div className="dossier-item-desc">SECP name reservation, digital incorporation drafting, MOA &amp; AOA vetting</div>
+                </td>
+                <td>SECP eZfile Portal</td>
+                <td style={{ textAlign: 'right' }}>{formatPKR(selectedEntity.baseGovFee)}</td>
+                <td style={{ textAlign: 'right' }}>{formatPKR(selectedEntity.baseConsultingFee)}</td>
+              </tr>
+
+              {/* 2. Capital Duty */}
+              <tr>
+                <td style={{ textAlign: 'center', fontWeight: 600 }}>02</td>
+                <td>
+                  <strong>SECP Capital Duty &amp; Registration Fee</strong>
+                  <div className="dossier-item-desc">Statutory capital registration duty for {selectedCapital.label}</div>
+                </td>
+                <td>SECP Schedule VII</td>
+                <td style={{ textAlign: 'right' }}>{formatPKR(selectedCapital.secpCapitalFee)}</td>
+                <td style={{ textAlign: 'right' }}>Included</td>
+              </tr>
+
+              {/* 3. Selected Checklist Add-ons */}
+              {calculation.activeAddonsList.map((addon, index) => {
+                return (
+                  <tr key={addon.id}>
+                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{String(index + 3).padStart(2, '0')}</td>
+                    <td>
+                      <strong>{addon.name}</strong>
+                      <div className="dossier-item-desc">{addon.description}</div>
+                    </td>
+                    <td>{addon.category}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      {addon.govtFee === 0 ? 'Nil' : formatPKR(addon.govtFee)}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      {addon.consultingFee === 0 ? 'Free' : formatPKR(addon.consultingFee)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={3} style={{ textAlign: 'right', fontWeight: 600 }}>Government Statutory Challans Subtotal:</td>
+                <td colSpan={2} style={{ textAlign: 'right', fontWeight: 700 }}>{formatPKR(calculation.govtTotal)}</td>
+              </tr>
+              <tr>
+                <td colSpan={3} style={{ textAlign: 'right', fontWeight: 600 }}>QWCA Chartered Advisory &amp; Legal Fee Subtotal:</td>
+                <td colSpan={2} style={{ textAlign: 'right', fontWeight: 700 }}>{formatPKR(calculation.consultingTotal)}</td>
+              </tr>
+              <tr className="dossier-grand-total-row">
+                <td colSpan={3} style={{ textAlign: 'right', fontSize: '12pt', fontWeight: 800 }}>TOTAL ESTIMATED SETUP INVESTMENT:</td>
+                <td colSpan={2} style={{ textAlign: 'right', fontSize: '13pt', fontWeight: 900, color: '#A31D24' }}>
+                  {formatPKR(calculation.grandTotal)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {/* Notes & Chambers Sign-off */}
+        <div className="dossier-notes-footer">
+          <div className="dossier-notes">
+            <strong>Statutory Compliance Notes:</strong>
+            <ul>
+              <li>Government fees are statutory duties payable directly via official SECP 1Link PSID and FBR Iris challans.</li>
+              <li>Package includes complete subscriber verification, digital incorporation certificate, and corporate NTN registration.</li>
+              <li>Generated client-side via QWCA Cost Estimator. Subject to final corporate object clauses and capital structure.</li>
+            </ul>
+          </div>
+
+          <div className="dossier-signatures">
+            <div className="dossier-sig-block">
+              <div className="dossier-sig-line" />
+              <div className="dossier-sig-name">Qummar Waheed, ACA</div>
+              <div className="dossier-sig-role">Managing Partner &amp; Lead Consultant</div>
+              <div className="dossier-sig-firm">Qummar Waheed &amp; Co. Chartered Accountants</div>
+            </div>
+            <div className="dossier-contact-block">
+              <div><strong>Chambers:</strong> Executive Wing, Wapda City Plaza, Faisalabad</div>
+              <div><strong>International:</strong> Dubai, UAE · Shenzhen, China</div>
+              <div><strong>UAN / WhatsApp:</strong> +92 300 0000000 · contact@qwca.com.pk</div>
+              <div><strong>Web:</strong> www.qwca.com.pk</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -21,8 +21,8 @@ export const teamData: TeamMemberData[] = [
     pill: 'Firm Head',
     experience: '10+ Years Experience',
     qualification: 'Associate Chartered Accountant (ACA) · ICAP Member',
-    bio: 'Qummar leads the firm’s professional engagements, bringing over 10 years of specialized experience in statutory audit, direct and indirect taxation, SECP compliance, and corporate advisory. He brings seasoned expertise and steadfast commitment to professional integrity, transparent communication, and client success.',
-    image: '/assets/Lead CA.webp',
+    bio: 'Qummar leads the firm’s professional practice, bringing over 10 years of specialized experience in statutory audit, direct and indirect taxation, SECP corporate compliance, and cross-border advisory. He brings seasoned expertise and a steadfast commitment to professional integrity, transparent communication, and client success.',
+    image: '/assets/Qummar Waheed.webp',
     linkedin: 'https://www.linkedin.com/in/qummar-waheed-aca-ab3b3164/',
     featured: true
   },

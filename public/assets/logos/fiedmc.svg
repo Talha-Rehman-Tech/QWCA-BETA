@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="fiedmcBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E4A8E"/>
+      <stop offset="100%" stop-color="#07254A"/>
+    </linearGradient>
+    <linearGradient id="fiedmcGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#fiedmcBlue)"/>
+  <circle cx="120" cy="120" r="98" fill="none" stroke="url(#fiedmcGold)" stroke-width="2"/>
+
+  <!-- Industrial Gear Outline -->
+  <path d="M 120 54 L 126 54 L 128 62 L 136 65 L 142 60 L 147 65 L 143 73 L 148 79 L 156 79 L 158 87 L 152 92 L 154 100 L 162 103 L 162 111 L 154 114 L 152 122 L 158 127 L 156 135 L 148 135 L 143 141 L 147 149 L 142 154 L 136 149 L 128 152 L 126 160 L 114 160 L 112 152 L 104 149 L 98 154 L 93 149 L 97 141 L 92 135 L 84 135 L 82 127 L 88 122 L 86 114 L 78 111 L 78 103 L 86 100 L 88 92 L 82 87 L 84 79 L 92 79 L 97 73 L 93 65 L 98 60 L 104 65 L 112 62 L 114 54 Z" fill="none" stroke="url(#fiedmcGold)" stroke-width="3"/>
+
+  <!-- Factory & Chimney Icon in Center -->
+  <path d="M 100 134 L 100 102 L 112 114 L 112 102 L 124 114 L 124 92 L 140 92 L 140 134 Z" fill="#FFFFFF" opacity="0.95"/>
+  <rect x="128" y="78" width="8" height="14" fill="url(#fiedmcGold)"/>
+  <circle cx="132" cy="72" r="3" fill="#FFFFFF"/>
+  <circle cx="136" cy="65" r="4.5" fill="#FFFFFF" opacity="0.8"/>
+
+  <!-- FIEDMC Badge -->
+  <rect x="66" y="152" width="108" height="26" rx="6" fill="url(#fiedmcGold)"/>
+  <text x="120" y="170" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="900" fill="#07254A" text-anchor="middle" letter-spacing="2">FIEDMC</text>
+
+  <text x="120" y="194" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="800" fill="#FEF08A" text-anchor="middle" letter-spacing="1">M-3 INDUSTRIAL CITY · SEZ</text>
+  <text x="120" y="206" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="6.8" font-weight="600" fill="#93C5FD" text-anchor="middle" letter-spacing="0.8">FAISALABAD INDUSTRIAL ESTATE</text>
+</svg>

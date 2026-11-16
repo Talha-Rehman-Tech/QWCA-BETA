@@ -102,6 +102,16 @@ export default function Footer() {
                 <Mail size={15} strokeWidth={2} aria-hidden="true" />
                 <a href="mailto:info@qwca.pk">info@qwca.pk</a>
               </div>
+              <div style={{ marginTop: '10px', marginBottom: '14px' }}>
+                <Link
+                  href="/locations"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12.5px', color: '#ff8a8f', fontWeight: 600, textDecoration: 'none' }}
+                >
+                  <MapPin size={13} />
+                  <span>Global Offices: Pakistan · UAE · China</span>
+                  <ArrowRight size={12} />
+                </Link>
+              </div>
               <div className="footer-governance-links">
                 <button
                   type="button"

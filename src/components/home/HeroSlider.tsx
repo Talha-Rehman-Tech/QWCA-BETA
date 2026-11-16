@@ -40,7 +40,7 @@ const slides: Slide[] = [
     secondaryCtaText: 'Explore Services',
     secondaryCtaLink: '/services',
     photoUrl: '/assets/Qummar Waheed.webp',
-    photoAlt: 'Qummar Waheed, Managing Partner of QWCA',
+    photoAlt: 'Qummar Waheed, ACA - Managing Partner of QWCA',
     badgeCode: 'ACA',
     badgeTitle: 'Qummar Waheed, ACA',
     badgeSubtitle: 'Managing Partner · QWCA',
@@ -56,11 +56,12 @@ const slides: Slide[] = [
     primaryCtaLink: '/company-registration',
     secondaryCtaText: 'Estimate Setup Cost',
     secondaryCtaLink: '/cost-estimator',
-    photoUrl: '/assets/Lead CA.webp',
-    photoAlt: 'Corporate Practice Team at QWCA',
+    photoUrl: '/assets/Qummar Waheed.webp',
+    photoAlt: 'Qummar Waheed, ACA - Corporate Practice Lead',
     badgeCode: 'SECP',
-    badgeTitle: 'Corporate Practice',
-    badgeSubtitle: 'SECP eZfile Authorized Agents'
+    badgeTitle: 'Qummar Waheed, ACA',
+    badgeSubtitle: 'SECP Authorized Corporate Intermediary',
+    badgeLink: 'https://www.linkedin.com/in/qummar-waheed-aca-ab3b3164/'
   },
   {
     id: 3,
@@ -72,11 +73,12 @@ const slides: Slide[] = [
     primaryCtaLink: '/company-registration',
     secondaryCtaText: 'SEZ Tax Holiday Info',
     secondaryCtaLink: '/services/sez-advisory',
-    photoUrl: '/assets/Abdul Rehman.webp',
-    photoAlt: 'SEZ & Corporate Advisory Specialist',
+    photoUrl: '/assets/Qummar Waheed.webp',
+    photoAlt: 'Qummar Waheed, ACA - Managing Partner',
     badgeCode: 'SEZ',
-    badgeTitle: 'Special Economic Zones',
-    badgeSubtitle: 'CPEC & FIEDMC Advisory'
+    badgeTitle: 'Qummar Waheed, ACA',
+    badgeSubtitle: 'CPEC & SEZ Advisory Practice Lead',
+    badgeLink: 'https://www.linkedin.com/in/qummar-waheed-aca-ab3b3164/'
   }
 ];
 
@@ -162,7 +164,7 @@ export default function HeroSlider() {
     <section
       ref={heroRef}
       className="hero hero-slider-container"
-      id="home"
+      id="firm-overview"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

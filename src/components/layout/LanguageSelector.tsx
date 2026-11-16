@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Languages, ChevronDown, Check } from 'lucide-react';
 
-export type LanguageCode = 'en' | 'ur' | 'zh-CN';
+export type LanguageCode = 'en' | 'ur' | 'ar' | 'zh-CN';
 
 interface LanguageOption {
   code: LanguageCode;
@@ -24,6 +24,12 @@ const languages: LanguageOption[] = [
     label: 'Urdu',
     nativeLabel: 'اردو',
     flag: '🇵🇰',
+  },
+  {
+    code: 'ar',
+    label: 'Arabic',
+    nativeLabel: 'العربية',
+    flag: '🇸🇦',
   },
   {
     code: 'zh-CN',
@@ -60,7 +66,7 @@ export default function LanguageSelector({ variant = 'navbar' }: LanguageSelecto
   useEffect(() => {
     // Check cookie or localStorage
     const saved = localStorage.getItem('qwca_lang') as LanguageCode | null;
-    if (saved && (saved === 'en' || saved === 'ur' || saved === 'zh-CN')) {
+    if (saved && (saved === 'en' || saved === 'ur' || saved === 'ar' || saved === 'zh-CN')) {
       setCurrentLang(saved);
       applyLanguage(saved, false);
     }
@@ -86,7 +92,7 @@ export default function LanguageSelector({ variant = 'navbar' }: LanguageSelecto
         new window.google.translate.TranslateElement(
           {
             pageLanguage: 'en',
-            includedLanguages: 'en,ur,zh-CN',
+            includedLanguages: 'en,ur,ar,zh-CN',
             autoDisplay: false,
           },
           'google_translate_element'
@@ -120,20 +126,25 @@ export default function LanguageSelector({ variant = 'navbar' }: LanguageSelecto
     // 2. Set HTML attributes
     const html = document.documentElement;
     html.setAttribute('lang', code);
-    if (code === 'ur') {
+    if (code === 'ur' || code === 'ar') {
       html.setAttribute('dir', 'rtl');
-      document.body.classList.add('lang-ur');
-      document.body.classList.remove('lang-zh');
+      document.body.classList.add(code === 'ur' ? 'lang-ur' : 'lang-ar');
+      document.body.classList.remove('lang-zh', code === 'ur' ? 'lang-ar' : 'lang-ur');
     } else if (code === 'zh-CN') {
       html.setAttribute('dir', 'ltr');
       document.body.classList.add('lang-zh');
-      document.body.classList.remove('lang-ur');
+      document.body.classList.remove('lang-ur', 'lang-ar');
     } else {
       html.setAttribute('dir', 'ltr');
-      document.body.classList.remove('lang-ur', 'lang-zh');
+      document.body.classList.remove('lang-ur', 'lang-zh', 'lang-ar');
     }
 
-    // 3. Trigger Google Translate combo box if present
+    // 3. Dispatch custom event for real-time reactivity in components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('qwca_language_change', { detail: { lang: code } }));
+    }
+
+    // 4. Trigger Google Translate combo box if present
     const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
     if (select) {
       select.value = code;
@@ -243,9 +254,9 @@ export default function LanguageSelector({ variant = 'navbar' }: LanguageSelecto
       <div className="lang-selector-mobile" style={{ padding: '12px 16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#ADB5BD', marginBottom: '8px' }}>
           <Languages size={14} color="#A31D24" />
-          <span>Language / زبان / 语言</span>
+          <span>Language / زبان / العربية / 语言</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
           {languages.map((item) => (
             <button
               key={item.code}

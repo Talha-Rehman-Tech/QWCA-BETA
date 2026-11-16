@@ -176,21 +176,30 @@ export default function CompanyRegistrationPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '18px', marginBottom: '32px' }}>
                 <div style={{ background: 'var(--bg-subtle)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--line)' }}>
-                  <h4 style={{ fontSize: '15.5px', color: 'var(--navy-900)', marginBottom: '8px' }}>1. Embassy Attestation</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span className="step-badge">STEP 01</span>
+                    <h4 style={{ fontSize: '15.5px', color: 'var(--navy-900)', margin: 0 }}>Embassy Attestation</h4>
+                  </div>
                   <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
                     Foreign passport copies and parent company Board Resolutions must be notarized and attested by the Pakistan Embassy/Consulate in the investor’s home country.
                   </p>
                 </div>
 
                 <div style={{ background: 'var(--bg-subtle)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--line)' }}>
-                  <h4 style={{ fontSize: '15.5px', color: 'var(--navy-900)', marginBottom: '8px' }}>2. MOI Security Clearance</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span className="step-badge">STEP 02</span>
+                    <h4 style={{ fontSize: '15.5px', color: 'var(--navy-900)', margin: 0 }}>MOI Security Clearance</h4>
+                  </div>
                   <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
                     SECP facilitates security clearance with the Ministry of Interior. Provisional digital incorporation is granted so commercial setup can proceed without delays.
                   </p>
                 </div>
 
                 <div style={{ background: 'var(--bg-subtle)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--line)' }}>
-                  <h4 style={{ fontSize: '15.5px', color: 'var(--navy-900)', marginBottom: '8px' }}>3. Board of Investment Visas</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span className="step-badge">STEP 03</span>
+                    <h4 style={{ fontSize: '15.5px', color: 'var(--navy-900)', margin: 0 }}>Board of Investment Visas</h4>
+                  </div>
                   <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
                     Assistance with obtaining 1 to 2 year multiple-entry Business &amp; Work Visas for Chinese management and technical personnel through Board of Investment portals.
                   </p>

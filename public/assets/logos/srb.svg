@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="srbBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+    <linearGradient id="srbGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#srbBlue)"/>
+  <circle cx="120" cy="120" r="98" fill="none" stroke="url(#srbGold)" stroke-width="2"/>
+
+  <!-- Sindh Crescent & Star -->
+  <path d="M 120 48 A 12 12 0 1 1 120 72 A 9.5 9.5 0 1 0 120 50 Z" fill="url(#srbGold)"/>
+  <polygon points="130,57 132,61 137,61 133,64 135,68 130,65 126,68 128,64 124,61 129,61" fill="url(#srbGold)"/>
+
+  <!-- Ajrak Eight-Pointed Geometric Star Pattern (Sindhi Cultural Motif) -->
+  <g transform="translate(120, 114)">
+    <rect x="-18" y="-18" width="36" height="36" fill="none" stroke="url(#srbGold)" stroke-width="2"/>
+    <rect x="-18" y="-18" width="36" height="36" fill="none" stroke="url(#srbGold)" stroke-width="2" transform="rotate(45)"/>
+    <circle cx="0" cy="0" r="8" fill="url(#srbGold)"/>
+    <circle cx="0" cy="0" r="4" fill="#172554"/>
+  </g>
+
+  <!-- SRB Ribbon Banner -->
+  <rect x="74" y="152" width="92" height="26" rx="6" fill="url(#srbGold)"/>
+  <text x="120" y="170" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="900" fill="#172554" text-anchor="middle" letter-spacing="3">SRB</text>
+
+  <text x="120" y="194" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#FEF08A" text-anchor="middle" letter-spacing="1.2">SINDH REVENUE BOARD</text>
+  <text x="120" y="206" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7" font-weight="600" fill="#93C5FD" text-anchor="middle" letter-spacing="0.8">GOVERNMENT OF SINDH</text>
+</svg>

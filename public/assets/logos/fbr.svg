@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="fbrGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#015223"/>
+      <stop offset="100%" stop-color="#002D13"/>
+    </linearGradient>
+    <linearGradient id="fbrGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#A16207"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Circular Outer Shield -->
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#fbrGreen)"/>
+  <circle cx="120" cy="120" r="96" fill="none" stroke="url(#fbrGold)" stroke-width="2"/>
+
+  <!-- Crescent & Star -->
+  <path d="M 120 40 A 13 13 0 1 1 120 66 A 10.5 10.5 0 1 0 120 43 Z" fill="url(#fbrGold)"/>
+  <polygon points="132,50 134,55 139,55 135,58 137,63 132,60 127,63 129,58 125,55 130,55" fill="url(#fbrGold)"/>
+
+  <!-- National Shield / Crest in Center -->
+  <path d="M 88 78 L 152 78 C 152 118 120 138 120 144 C 120 138 88 118 88 78 Z" fill="#FFFFFF" stroke="url(#fbrGold)" stroke-width="2.5"/>
+  <line x1="88" y1="108" x2="152" y2="108" stroke="url(#fbrGold)" stroke-width="1.5"/>
+  <line x1="120" y1="78" x2="120" y2="142" stroke="url(#fbrGold)" stroke-width="1.5"/>
+  
+  <!-- 4 Quarters symbols: Cotton, Wheat, Tea, Jute -->
+  <circle cx="104" cy="93" r="4.5" fill="#015223"/>
+  <path d="M 136 86 L 136 100 M 132 90 L 140 96" stroke="#015223" stroke-width="1.5"/>
+  <path d="M 104 116 Q 104 126 110 126" stroke="#015223" stroke-width="1.5" fill="none"/>
+  <circle cx="136" cy="124" r="4.5" fill="#015223"/>
+
+  <!-- Floral Jasmine Wreath -->
+  <path d="M 62 108 Q 62 152 102 166 Q 84 148 80 120 Z" fill="url(#fbrGold)"/>
+  <path d="M 178 108 Q 178 152 138 166 Q 156 148 160 120 Z" fill="url(#fbrGold)"/>
+
+  <!-- Ribbon Banner -->
+  <path d="M 64 166 L 176 166 L 166 186 L 74 186 Z" fill="url(#fbrGold)" stroke="#A16207" stroke-width="1"/>
+  <text x="120" y="180" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="900" fill="#002D13" text-anchor="middle" letter-spacing="2">FBR</text>
+
+  <text x="120" y="204" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7.5" font-weight="800" fill="#FEF08A" text-anchor="middle" letter-spacing="1.2">FEDERAL BOARD OF REVENUE</text>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="praGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14532D"/>
+      <stop offset="100%" stop-color="#052E16"/>
+    </linearGradient>
+    <linearGradient id="praGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#praGreen)"/>
+  <circle cx="120" cy="120" r="98" fill="none" stroke="url(#praGold)" stroke-width="2"/>
+
+  <!-- Punjab Crescent & Five Rivers Motif -->
+  <path d="M 120 44 A 12 12 0 1 1 120 68 A 9.5 9.5 0 1 0 120 46 Z" fill="url(#praGold)"/>
+  <polygon points="130,53 132,57 137,57 133,60 135,64 130,61 126,64 128,60 124,57 129,57" fill="url(#praGold)"/>
+
+  <!-- Five River Waves representing Punjab (Panj-Aab) -->
+  <path d="M 78 92 Q 100 84 120 92 T 162 92" stroke="url(#praGold)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 72 104 Q 100 96 120 104 T 168 104" stroke="url(#praGold)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M 76 116 Q 100 108 120 116 T 164 116" stroke="url(#praGold)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Laurel Spikes -->
+  <path d="M 58 116 Q 58 156 94 172 Q 78 152 74 124 Z" fill="url(#praGold)"/>
+  <path d="M 182 116 Q 182 156 146 172 Q 162 152 166 124 Z" fill="url(#praGold)"/>
+
+  <!-- PRA Ribbon Banner -->
+  <path d="M 62 148 L 178 148 L 168 174 L 72 174 Z" fill="url(#praGold)"/>
+  <text x="120" y="167" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="900" fill="#052E16" text-anchor="middle" letter-spacing="3">PRA</text>
+
+  <text x="120" y="194" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="800" fill="#FEF08A" text-anchor="middle" letter-spacing="1.2">PUNJAB REVENUE AUTHORITY</text>
+  <text x="120" y="206" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7" font-weight="600" fill="#86EFAC" text-anchor="middle" letter-spacing="1">GOVERNMENT OF PUNJAB</text>
+</svg>

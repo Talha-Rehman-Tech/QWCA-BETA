@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="sbpGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#024D20"/>
+      <stop offset="100%" stop-color="#01240F"/>
+    </linearGradient>
+    <linearGradient id="sbpGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#A16207"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#sbpGreen)"/>
+  <circle cx="120" cy="120" r="98" fill="none" stroke="url(#sbpGold)" stroke-width="2"/>
+  <circle cx="120" cy="120" r="76" fill="none" stroke="url(#sbpGold)" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- Crescent and Star -->
+  <path d="M 120 74 A 20 20 0 1 1 120 114 A 16 16 0 1 0 120 78 Z" fill="url(#sbpGold)"/>
+  <polygon points="138,90 142,97 150,97 144,102 147,110 138,105 131,110 133,102 127,97 135,97" fill="url(#sbpGold)"/>
+
+  <!-- Wheat Sheaves at Base -->
+  <path d="M 82 142 Q 102 154 120 154 Q 138 154 158 142 Q 138 164 120 164 Q 102 164 82 142 Z" fill="url(#sbpGold)"/>
+  <line x1="120" y1="140" x2="120" y2="164" stroke="#01240F" stroke-width="2"/>
+
+  <!-- Outer Text Ring -->
+  <text x="120" y="48" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="10.5" font-weight="900" fill="url(#sbpGold)" text-anchor="middle" letter-spacing="2">STATE BANK OF PAKISTAN</text>
+
+  <!-- Acronym in Center Bottom -->
+  <text x="120" y="184" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="18" font-weight="900" fill="url(#sbpGold)" text-anchor="middle" letter-spacing="4">SBP</text>
+  <text x="120" y="200" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7.5" font-weight="700" fill="#FEF08A" text-anchor="middle" letter-spacing="1">CENTRAL BANK OF PAKISTAN</text>
+</svg>

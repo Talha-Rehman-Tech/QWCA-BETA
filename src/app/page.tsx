@@ -1,5 +1,7 @@
 import React from 'react';
+import WorkspaceSlider from '@/components/home/WorkspaceSlider';
 import HeroSlider from '@/components/home/HeroSlider';
+import TrustedPartnersScroller from '@/components/home/TrustedPartnersScroller';
 import AboutSnapshot from '@/components/home/AboutSnapshot';
 import ServicesGrid from '@/components/home/ServicesGrid';
 import TaxCalculatorCTA from '@/components/home/TaxCalculatorCTA';
@@ -9,14 +11,21 @@ import CostEstimatorCTA from '@/components/home/CostEstimatorCTA';
 import TeamPreview from '@/components/home/TeamPreview';
 import RecentPublications from '@/components/home/RecentPublications';
 import ContactSection from '@/components/home/ContactSection';
+import OfficeLocationsSection from '@/components/home/OfficeLocationsSection';
 
 export default function HomePage() {
   return (
     <main>
-      {/* 1. Hero Slider */}
+      {/* 1. Premier Corporate Workspace Slider (Office, Reception, Boardroom & Team Floor) */}
+      <WorkspaceSlider />
+
+      {/* 2. Practice Overview & Executive Advisory Hero Slider */}
       <HeroSlider />
 
-      {/* 2. About Us Snapshot */}
+      {/* 2.5. Trusted Regulatory & Institutional Partners Infinite Marquee */}
+      <TrustedPartnersScroller />
+
+      {/* 3. About Us Snapshot */}
       <AboutSnapshot />
 
       {/* 3. Services Grid (linking to /services/[slug]) */}
@@ -42,6 +51,9 @@ export default function HomePage() {
 
       {/* 10. Contact & Consultation Section */}
       <ContactSection />
+
+      {/* 11. Global Office Locations & Interactive Google Maps (Pakistan, UAE, China) */}
+      <OfficeLocationsSection />
     </main>
   );
 }

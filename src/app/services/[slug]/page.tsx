@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { servicesData } from '@/data/services';
 import ScrollRevealContainer from '@/components/layout/ScrollRevealContainer';
 import {
@@ -9,11 +10,18 @@ import {
   ShieldCheck,
   Briefcase,
   Globe,
+  Calculator,
+  TrendingUp,
   CheckCircle2,
-  HelpCircle,
   Building,
   ArrowRight,
-  PhoneCall
+  PhoneCall,
+  Award,
+  Clock,
+  ChevronRight,
+  ShieldAlert,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 interface Props {
@@ -53,185 +61,334 @@ export default async function ServiceDetailPage({ params }: Props) {
   const getIcon = (iconName: string) => {
     switch (iconName) {
       case 'FileText':
-        return <FileText size={32} />;
+        return <FileText size={28} />;
       case 'ShieldCheck':
-        return <ShieldCheck size={32} />;
+        return <ShieldCheck size={28} />;
       case 'Briefcase':
-        return <Briefcase size={32} />;
+        return <Briefcase size={28} />;
       case 'Globe':
-        return <Globe size={32} />;
+        return <Globe size={28} />;
+      case 'Calculator':
+        return <Calculator size={28} />;
+      case 'TrendingUp':
+        return <TrendingUp size={28} />;
       default:
-        return <FileText size={32} />;
+        return <FileText size={28} />;
     }
   };
 
+  const engagementPhases = [
+    {
+      step: '01',
+      title: 'Initial Diagnostic & Gap Analysis',
+      desc: 'Partner-led review of existing documentation, historical compliance, and statutory filings to identify risks and opportunities.'
+    },
+    {
+      step: '02',
+      title: 'Engagement Architecture',
+      desc: 'Formulation of tailored compliance roadmaps, tax optimization strategies, or audit work plans aligned with Pakistani regulations.'
+    },
+    {
+      step: '03',
+      title: 'Execution & Quality Vetting',
+      desc: 'Rigorous execution by qualified chartered accountants, incorporating ICAP quality benchmarks and internal four-eye reviews.'
+    },
+    {
+      step: '04',
+      title: 'Statutory Lodgement & Defense',
+      desc: 'Final submission on Iris/eZfile/SECP portals, client dossier delivery, and continuous representation before regulatory authorities.'
+    }
+  ];
+
   return (
-    <main className="section page-content-section">
+    <main className="section page-content-section service-detail-main">
       <div className="container">
-        {/* Service Header Banner */}
-        <div
-          style={{
-            background: 'var(--dark-slate)',
-            color: '#fff',
-            padding: '48px 36px',
-            borderRadius: 'var(--radius-xl)',
-            marginBottom: '40px'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-            <div
-              style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: 'var(--radius-md)',
-                background: 'rgba(163, 29, 36, 0.25)',
-                color: '#ff8a8f',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              {getIcon(service.icon)}
+        {/* Breadcrumb Navigation */}
+        <nav className="breadcrumb-nav" aria-label="Breadcrumb" style={{ marginBottom: '24px' }}>
+          <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', listStyle: 'none', padding: 0, margin: 0, fontSize: '13.5px', color: 'var(--text-muted)' }}>
+            <li>
+              <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.2s' }}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <ChevronRight size={14} />
+            </li>
+            <li>
+              <Link href="/services" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.2s' }}>
+                Services
+              </Link>
+            </li>
+            <li>
+              <ChevronRight size={14} />
+            </li>
+            <li style={{ color: 'var(--primary)', fontWeight: 600 }}>
+              {service.title}
+            </li>
+          </ol>
+        </nav>
+
+        {/* Executive Hero Banner */}
+        <div className="service-hero-banner">
+          <div className="service-hero-grid">
+            <div className="service-hero-content">
+              <div className="service-hero-badge-row">
+                <span className="service-hero-pill">{service.pill}</span>
+                <span className="service-hero-sub-pill">
+                  <Award size={13} />
+                  <span>Partner Led Advisory</span>
+                </span>
+              </div>
+
+              <div className="service-hero-title-wrap">
+                <div className="service-hero-icon-box">
+                  {getIcon(service.icon)}
+                </div>
+                <h1 className="service-hero-title">{service.title}</h1>
+              </div>
+
+              <p className="service-hero-tagline">{service.tagline}</p>
+
+              <div className="service-hero-meta-strip">
+                <div className="meta-strip-item">
+                  <CheckCircle2 size={16} className="meta-icon" />
+                  <span>ICAP &amp; SECP Regulated Standards</span>
+                </div>
+                <div className="meta-strip-item">
+                  <Clock size={16} className="meta-icon" />
+                  <span>Statutory Timeline SLA</span>
+                </div>
+                <div className="meta-strip-item">
+                  <ShieldCheck size={16} className="meta-icon" />
+                  <span>100% Confidential Engagement</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#ff8a8f', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Practice Area
-              </span>
-              <h1 style={{ fontSize: '36px', margin: 0, color: '#fff' }}>{service.title}</h1>
+
+            <div className="service-hero-image-wrap">
+              <Image
+                src={service.image}
+                alt={service.title}
+                fill
+                priority
+                sizes="(max-width: 992px) 100vw, 420px"
+                className="service-hero-image"
+              />
+              <div className="service-hero-image-overlay" />
             </div>
           </div>
-          <p style={{ fontSize: '18px', color: '#dee2e6', maxWidth: '780px', lineHeight: 1.5, margin: 0 }}>
-            {service.tagline}
-          </p>
         </div>
 
-        {/* Content Layout: Main Info + Sidebar */}
-        <ScrollRevealContainer selector=".card" stagger={0.1} y={30}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
-            {/* Main Left Column */}
-            <div>
-              <div className="card" style={{ marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '20px', color: 'var(--navy-900)', marginBottom: '14px' }}>Overview</h3>
-                <p style={{ fontSize: '15.5px', lineHeight: 1.7, color: 'var(--text-body)' }}>
+        {/* Main Content & Sidebar Layout */}
+        <ScrollRevealContainer selector=".service-reveal-item" stagger={0.08} y={25}>
+          <div className="service-detail-layout">
+            {/* Left Content Column */}
+            <div className="service-main-column">
+              {/* Overview Card */}
+              <section className="card service-reveal-item service-section-card">
+                <div className="service-card-section-header">
+                  <div className="section-icon-pill">
+                    <Sparkles size={18} />
+                  </div>
+                  <div>
+                    <h2 className="service-card-heading">Practice Overview</h2>
+                    <p className="service-card-subhead">Strategic context, legislative framework, and industry application</p>
+                  </div>
+                </div>
+                <p className="service-lead-text">
                   {service.fullDescription}
                 </p>
-              </div>
+              </section>
 
-              <div className="card" style={{ marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '20px', color: 'var(--navy-900)', marginBottom: '16px' }}>Detailed Scope of Work</h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {service.scope.map((item, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', fontSize: '15px' }}>
-                      <CheckCircle2 size={18} color="var(--primary)" style={{ flexShrink: 0, marginTop: '3px' }} />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {/* Scope of Work */}
+              <section className="card service-reveal-item service-section-card">
+                <div className="service-card-section-header">
+                  <div className="section-icon-pill">
+                    <Layers size={18} />
+                  </div>
+                  <div>
+                    <h2 className="service-card-heading">Detailed Scope of Work</h2>
+                    <p className="service-card-subhead">Core areas covered within this chartered practice discipline</p>
+                  </div>
+                </div>
 
-              <div className="card" style={{ marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '20px', color: 'var(--navy-900)', marginBottom: '16px' }}>Client Deliverables</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-                  {service.deliverables.map((item, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        padding: '14px 18px',
-                        background: 'var(--bg-subtle)',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--line)',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: 'var(--navy-900)'
-                      }}
-                    >
-                      {item}
+                <div className="service-scope-grid">
+                  {service.scope.map((item, idx) => (
+                    <div key={idx} className="service-scope-card">
+                      <div className="scope-check-circle">
+                        <CheckCircle2 size={16} />
+                      </div>
+                      <p className="scope-text">{item}</p>
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
+
+              {/* Engagement Methodology */}
+              <section className="card service-reveal-item service-section-card">
+                <div className="service-card-section-header">
+                  <div className="section-icon-pill">
+                    <Clock size={18} />
+                  </div>
+                  <div>
+                    <h2 className="service-card-heading">Engagement Methodology &amp; Process</h2>
+                    <p className="service-card-subhead">Our proven four-stage engagement framework for quality assurance</p>
+                  </div>
+                </div>
+
+                <div className="methodology-timeline">
+                  {engagementPhases.map((phase, idx) => (
+                    <div key={idx} className="timeline-step">
+                      <div className="timeline-badge-wrap">
+                        <span className="timeline-step-badge">{phase.step}</span>
+                        {idx < engagementPhases.length - 1 && <span className="timeline-connector-line" />}
+                      </div>
+                      <div className="timeline-content">
+                        <h3 className="timeline-step-title">{phase.title}</h3>
+                        <p className="timeline-step-desc">{phase.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Client Deliverables */}
+              <section className="card service-reveal-item service-section-card">
+                <div className="service-card-section-header">
+                  <div className="section-icon-pill">
+                    <Award size={18} />
+                  </div>
+                  <div>
+                    <h2 className="service-card-heading">Tangible Client Deliverables</h2>
+                    <p className="service-card-subhead">Formal work products, signed reports, and regulatory documentation</p>
+                  </div>
+                </div>
+
+                <div className="deliverables-grid">
+                  {service.deliverables.map((item, idx) => (
+                    <div key={idx} className="deliverable-item-card">
+                      <span className="deliverable-bullet">&bull;</span>
+                      <strong className="deliverable-text">{item}</strong>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
               {/* FAQs */}
               {service.faqs && service.faqs.length > 0 && (
-                <div className="card">
-                  <h3 style={{ fontSize: '20px', color: 'var(--navy-900)', marginBottom: '18px' }}>Frequently Asked Questions</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                    {service.faqs.map((faq, i) => (
-                      <div key={i} style={{ borderBottom: i < service.faqs.length - 1 ? '1px solid var(--line)' : 'none', paddingBottom: '14px' }}>
-                        <strong style={{ display: 'block', fontSize: '15px', color: 'var(--navy-900)', marginBottom: '6px' }}>
-                          {faq.question}
-                        </strong>
-                        <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-body)', lineHeight: 1.6 }}>
-                          {faq.answer}
-                        </p>
+                <section className="card service-reveal-item service-section-card">
+                  <div className="service-card-section-header">
+                    <div className="section-icon-pill">
+                      <ShieldAlert size={18} />
+                    </div>
+                    <div>
+                      <h2 className="service-card-heading">Frequently Asked Questions</h2>
+                      <p className="service-card-subhead">Common inquiries regarding regulatory compliance and procedure</p>
+                    </div>
+                  </div>
+
+                  <div className="service-faqs-list">
+                    {service.faqs.map((faq, idx) => (
+                      <div key={idx} className="service-faq-item">
+                        <h3 className="faq-question-text">{faq.question}</h3>
+                        <p className="faq-answer-text">{faq.answer}</p>
                       </div>
                     ))}
                   </div>
-                </div>
+                </section>
               )}
             </div>
 
-            {/* Right Sidebar */}
-            <div>
-              <div className="card" style={{ position: 'sticky', top: '100px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div>
-                  <h4 style={{ fontSize: '17px', color: 'var(--navy-900)', marginBottom: '12px' }}>Regulatory Authorities</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {service.regulatoryBodies.map((body, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          fontSize: '13.5px',
-                          color: 'var(--text-body)'
-                        }}
-                      >
-                        <Building size={15} color="var(--primary)" />
+            {/* Right Sticky Sidebar */}
+            <aside className="service-sidebar-column">
+              <div className="service-sticky-sidebar">
+                {/* Consultation Card */}
+                <div className="partner-consult-card">
+                  <span className="consult-eyebrow">ICAP Chartered Accountants</span>
+                  <h3 className="consult-heading">Consult a CA Partner</h3>
+                  <p className="consult-desc">
+                    Schedule a confidential advisory session with our managing partners regarding your corporate compliance.
+                  </p>
+
+                  <div className="consult-quick-points">
+                    <div className="consult-point">
+                      <CheckCircle2 size={14} className="consult-point-icon" />
+                      <span>Direct Partner-Level Oversight</span>
+                    </div>
+                    <div className="consult-point">
+                      <CheckCircle2 size={14} className="consult-point-icon" />
+                      <span>Full Non-Disclosure Agreement (NDA)</span>
+                    </div>
+                    <div className="consult-point">
+                      <CheckCircle2 size={14} className="consult-point-icon" />
+                      <span>Fast Turnaround on Urgent Filings</span>
+                    </div>
+                  </div>
+
+                  <Link href="/#contact" className="button consult-button">
+                    <span>Schedule Consultation</span>
+                    <ArrowRight size={15} />
+                  </Link>
+
+                  <a
+                    href="tel:+92418544444"
+                    className="consult-phone-link"
+                  >
+                    <PhoneCall size={15} />
+                    <span>Call Partner Desk: +92 41 8544444</span>
+                  </a>
+                </div>
+
+                {/* Regulatory Bodies Card */}
+                <div className="card sidebar-meta-card">
+                  <h4 className="sidebar-card-title">Governing Regulatory Bodies</h4>
+                  <div className="regulatory-badges-wrap">
+                    {service.regulatoryBodies.map((body, idx) => (
+                      <div key={idx} className="reg-badge-item">
+                        <Building size={14} className="reg-icon" />
                         <span>{body}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div style={{ borderTop: '1px solid var(--line)', paddingTop: '18px' }}>
-                  <h4 style={{ fontSize: '17px', color: 'var(--navy-900)', marginBottom: '12px' }}>Strategic Benefits</h4>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {service.keyBenefits.map((benefit, i) => (
-                      <li key={i} style={{ fontSize: '13.5px', color: 'var(--text-body)', display: 'flex', gap: '8px' }}>
-                        <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>•</span>
+                {/* Strategic Benefits */}
+                <div className="card sidebar-meta-card">
+                  <h4 className="sidebar-card-title">Key Strategic Advantages</h4>
+                  <ul className="sidebar-benefits-list">
+                    {service.keyBenefits.map((benefit, idx) => (
+                      <li key={idx} className="benefit-list-item">
+                        <span className="benefit-check-icon">&check;</span>
                         <span>{benefit}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div
-                  style={{
-                    background: 'var(--primary-light)',
-                    padding: '20px',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--primary-border)'
-                  }}
-                >
-                  <h4 style={{ fontSize: '16px', color: 'var(--primary)', margin: '0 0 8px' }}>
-                    Consult a Chartered Accountant
-                  </h4>
-                  <p style={{ fontSize: '13px', color: 'var(--text-body)', margin: '0 0 16px', lineHeight: 1.5 }}>
-                    Schedule a confidential discussion with our partners regarding your engagement.
-                  </p>
-                  <Link href="/#contact" className="button" style={{ width: '100%', justifyContent: 'center' }}>
-                    <span>Book Consultation</span>
-                    <ArrowRight size={15} />
-                  </Link>
+                {/* Other Services Link */}
+                <div className="sidebar-navigation-box">
+                  <span className="sidebar-nav-label">Explore More Practice Disciplines:</span>
+                  <div className="sidebar-other-services">
+                    {servicesData
+                      .filter((s) => s.slug !== service.slug)
+                      .slice(0, 4)
+                      .map((other) => (
+                        <Link
+                          key={other.slug}
+                          href={`/services/${other.slug}`}
+                          className="sidebar-other-link"
+                        >
+                          <span>{other.title}</span>
+                          <ChevronRight size={13} />
+                        </Link>
+                      ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            </aside>
           </div>
         </ScrollRevealContainer>
       </div>
     </main>
   );
 }
-

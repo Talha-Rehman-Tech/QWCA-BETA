@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="fcciMaroon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9F1239"/>
+      <stop offset="100%" stop-color="#4C0519"/>
+    </linearGradient>
+    <linearGradient id="fcciGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#fcciMaroon)"/>
+  <circle cx="120" cy="120" r="98" fill="none" stroke="url(#fcciGold)" stroke-width="2"/>
+
+  <!-- Ghanta Ghar (Clock Tower) Architectural Silhouette -->
+  <!-- Spire -->
+  <polygon points="120,48 116,66 124,66" fill="url(#fcciGold)"/>
+  <circle cx="120" cy="45" r="3" fill="url(#fcciGold)"/>
+  <!-- Clock Section -->
+  <rect x="110" y="66" width="20" height="24" fill="#FFFFFF" stroke="url(#fcciGold)" stroke-width="1.5"/>
+  <circle cx="120" cy="78" r="6" fill="none" stroke="#4C0519" stroke-width="1.5"/>
+  <line x1="120" y1="78" x2="120" y2="74" stroke="#4C0519" stroke-width="1.2"/>
+  <line x1="120" y1="78" x2="123" y2="78" stroke="#4C0519" stroke-width="1.2"/>
+  <!-- Tower Body -->
+  <rect x="108" y="90" width="24" height="34" fill="#FFFFFF"/>
+  <line x1="114" y1="94" x2="114" y2="118" stroke="#4C0519" stroke-width="1.5"/>
+  <line x1="120" y1="94" x2="120" y2="118" stroke="#4C0519" stroke-width="1.5"/>
+  <line x1="126" y1="94" x2="126" y2="118" stroke="#4C0519" stroke-width="1.5"/>
+  <!-- Base -->
+  <path d="M 98 124 L 142 124 L 148 136 L 92 136 Z" fill="url(#fcciGold)"/>
+
+  <!-- Symmetrical Industrial Gears -->
+  <circle cx="86" cy="116" r="10" fill="none" stroke="url(#fcciGold)" stroke-width="2.5" stroke-dasharray="4,2"/>
+  <circle cx="154" cy="116" r="10" fill="none" stroke="url(#fcciGold)" stroke-width="2.5" stroke-dasharray="4,2"/>
+
+  <!-- FCCI Badge -->
+  <rect x="70" y="152" width="100" height="26" rx="6" fill="url(#fcciGold)"/>
+  <text x="120" y="170" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="900" fill="#4C0519" text-anchor="middle" letter-spacing="3">FCCI</text>
+
+  <text x="120" y="194" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="800" fill="#FEF08A" text-anchor="middle" letter-spacing="1">FAISALABAD CHAMBER OF</text>
+  <text x="120" y="206" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7" font-weight="700" fill="#FCA5A5" text-anchor="middle" letter-spacing="0.8">COMMERCE &amp; INDUSTRY · 1975</text>
+</svg>

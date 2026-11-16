@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="boiGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#006633"/>
+      <stop offset="100%" stop-color="#00331A"/>
+    </linearGradient>
+    <linearGradient id="boiGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="114" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="120" cy="120" r="106" fill="url(#boiGreen)"/>
+  <circle cx="120" cy="120" r="98" fill="none" stroke="url(#boiGold)" stroke-width="2"/>
+
+  <!-- Globe / Inward Investment Grid Lines in background -->
+  <circle cx="120" cy="104" r="38" fill="#004522" stroke="url(#boiGold)" stroke-width="1.5"/>
+  <ellipse cx="120" cy="104" rx="20" ry="38" fill="none" stroke="url(#boiGold)" stroke-width="1" opacity="0.6"/>
+  <line x1="82" y1="104" x2="158" y2="104" stroke="url(#boiGold)" stroke-width="1" opacity="0.6"/>
+
+  <!-- Crescent & Star atop Globe -->
+  <path d="M 120 48 A 10 10 0 1 1 120 68 A 8 8 0 1 0 120 50 Z" fill="url(#boiGold)"/>
+  <polygon points="128,55 130,59 135,59 131,62 133,66 128,63 124,66 126,62 122,59 127,59" fill="url(#boiGold)"/>
+
+  <!-- Inward Arrow / Growth Vectors -->
+  <path d="M 98 126 L 120 148 L 142 126" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 104 118 L 120 134 L 136 118" stroke="url(#boiGold)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- BOI Acronym Banner -->
+  <rect x="74" y="156" width="92" height="26" rx="6" fill="url(#boiGold)"/>
+  <text x="120" y="174" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="900" fill="#00331A" text-anchor="middle" letter-spacing="3">BOI</text>
+
+  <text x="120" y="196" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="800" fill="#FEF08A" text-anchor="middle" letter-spacing="1.2">BOARD OF INVESTMENT</text>
+  <text x="120" y="208" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="7" font-weight="700" fill="#86EFAC" text-anchor="middle" letter-spacing="0.8">PRIME MINISTER’S OFFICE</text>
+</svg>
