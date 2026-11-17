@@ -82,8 +82,10 @@ export default function Footer() {
                 <li><Link href="/company-registration">Company Registration Portal</Link></li>
                 <li><Link href="/publications">Research &amp; Publications</Link></li>
                 <li><Link href="/team">Our Chartered Accountants</Link></li>
-                <li><Link href="/tax-calculator">Salary, Business &amp; Rental Tax Slabs</Link></li>
-                <li><Link href="/tax-calculator#calendar">FBR Statutory Compliance Calendar</Link></li>
+                <li><Link href="/tax-calculator/salaried">Salaried Tax Calculator</Link></li>
+                <li><Link href="/tax-calculator/business">Business &amp; Corporate Tax</Link></li>
+                <li><Link href="/tax-calculator/rental">Rental Income Tax</Link></li>
+                <li><Link href="/tax-calculator/property">Property &amp; Real Estate Tax</Link></li>
               </ul>
             </div>
 

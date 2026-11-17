@@ -16,14 +16,17 @@ import {
   TrendingUp,
   PhoneCall,
   Mail,
-  CalendarCheck
+  CalendarCheck,
+  User,
+  Home,
+  Landmark
 } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import Topbar from './Topbar';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<'services' | 'registration' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'services' | 'registration' | 'tax' | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
@@ -82,13 +85,13 @@ export default function Navbar() {
     setOpenDropdown(null);
   };
 
-  const handleDropdownToggle = (e: React.MouseEvent, name: 'services' | 'registration') => {
+  const handleDropdownToggle = (e: React.MouseEvent, name: 'services' | 'registration' | 'tax') => {
     e.preventDefault();
     e.stopPropagation();
     setOpenDropdown((prev) => (prev === name ? null : name));
   };
 
-  const handleMouseEnter = (name: 'services' | 'registration') => {
+  const handleMouseEnter = (name: 'services' | 'registration' | 'tax') => {
     if (typeof window !== 'undefined' && window.innerWidth > 1024) {
       setOpenDropdown(name);
     }
@@ -103,7 +106,7 @@ export default function Navbar() {
   // Active path helpers
   const isServicesActive = pathname.startsWith('/services');
   const isRegistrationActive = pathname === '/company-registration' || pathname === '/cost-estimator';
-  const isTaxCalculatorActive = pathname === '/tax-calculator';
+  const isTaxCalculatorActive = pathname.startsWith('/tax-calculator');
   const isTeamActive = pathname === '/team';
   const isPublicationsActive = pathname === '/publications';
 
@@ -328,13 +331,105 @@ export default function Navbar() {
               </div>
             </div>
 
-            <Link
-              href="/tax-calculator"
-              onClick={closeAll}
-              className={`nav-link-item ${isTaxCalculatorActive ? 'active' : ''}`}
+            {/* 3. Tax Calculator Dropdown */}
+            <div
+              className={`nav-dropdown-wrapper ${openDropdown === 'tax' ? 'is-open' : ''}`}
+              onMouseEnter={() => handleMouseEnter('tax')}
+              onMouseLeave={handleMouseLeave}
             >
-              <span>Tax Calculator</span>
-            </Link>
+              <button
+                type="button"
+                className={`nav-dropdown-trigger ${openDropdown === 'tax' ? 'open' : ''} ${isTaxCalculatorActive ? 'active' : ''}`}
+                onClick={(e) => handleDropdownToggle(e, 'tax')}
+                aria-expanded={openDropdown === 'tax'}
+              >
+                <span>Tax Calculator</span>
+                <ChevronDown
+                  size={14}
+                  className={`dropdown-chevron ${openDropdown === 'tax' ? 'rotated' : ''}`}
+                />
+              </button>
+
+              <div className={`nav-dropdown-menu ${openDropdown === 'tax' ? 'show' : ''}`} style={{ minWidth: '360px' }}>
+                <div className="dropdown-header">FBR Statutory Tax Computation</div>
+
+                <Link
+                  href="/tax-calculator/salaried"
+                  className="dropdown-item"
+                  onClick={closeAll}
+                >
+                  <div className="dropdown-icon-box primary-tint">
+                    <User size={16} />
+                  </div>
+                  <div className="dropdown-text-wrap">
+                    <div className="dropdown-item-title flex-title">
+                      <span>Salaried Tax Calculator</span>
+                      <span className="micro-badge live-badge">Sec 149</span>
+                    </div>
+                    <div className="dropdown-item-desc">
+                      Monthly take-home, withholding slabs &amp; net pay
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/tax-calculator/business"
+                  className="dropdown-item"
+                  onClick={closeAll}
+                >
+                  <div className="dropdown-icon-box primary-tint">
+                    <Building2 size={16} />
+                  </div>
+                  <div className="dropdown-text-wrap">
+                    <div className="dropdown-item-title flex-title">
+                      <span>Business &amp; Corporate Tax</span>
+                      <span className="micro-badge cpec-badge">Sec 4C</span>
+                    </div>
+                    <div className="dropdown-item-desc">
+                      AOP, Sole Proprietor, Corporate &amp; Super Tax
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/tax-calculator/rental"
+                  className="dropdown-item"
+                  onClick={closeAll}
+                >
+                  <div className="dropdown-icon-box primary-tint">
+                    <Home size={16} />
+                  </div>
+                  <div className="dropdown-text-wrap">
+                    <div className="dropdown-item-title flex-title">
+                      <span>Rental Income Tax</span>
+                      <span className="micro-badge live-badge">Sec 155</span>
+                    </div>
+                    <div className="dropdown-item-desc">
+                      Individual vs Corporate landlord withholding &amp; yield
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/tax-calculator/property"
+                  className="dropdown-item"
+                  onClick={closeAll}
+                >
+                  <div className="dropdown-icon-box primary-tint">
+                    <Landmark size={16} />
+                  </div>
+                  <div className="dropdown-text-wrap">
+                    <div className="dropdown-item-title flex-title">
+                      <span>Property &amp; Real Estate Tax</span>
+                      <span className="micro-badge live-badge" style={{ background: '#A31D24', color: '#fff' }}>236K / 236C / CGT</span>
+                    </div>
+                    <div className="dropdown-item-desc">
+                      Buying tax (236K), Selling tax (236C) &amp; CGT Sec 37
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
 
             <Link
               href="/team"
@@ -556,14 +651,90 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <Link
-                href="/tax-calculator"
-                onClick={closeAll}
-                className={`drawer-link ${isTaxCalculatorActive ? 'active' : ''}`}
-              >
-                <span>Tax Calculator</span>
-                <span className="drawer-pill-highlight">FY 2024-25</span>
-              </Link>
+              {/* Mobile Tax Calculator Accordion */}
+              <div className={`drawer-accordion ${openDropdown === 'tax' ? 'expanded' : ''}`}>
+                <button
+                  type="button"
+                  className={`drawer-accordion-btn ${openDropdown === 'tax' ? 'active' : ''} ${isTaxCalculatorActive ? 'highlight' : ''}`}
+                  onClick={(e) => handleDropdownToggle(e, 'tax')}
+                >
+                  <span>Tax Calculator</span>
+                  <ChevronDown
+                    size={16}
+                    className={`accordion-chevron ${openDropdown === 'tax' ? 'rotated' : ''}`}
+                  />
+                </button>
+
+                <div className={`drawer-accordion-content ${openDropdown === 'tax' ? 'show' : ''}`}>
+                  <Link
+                    href="/tax-calculator/salaried"
+                    className="drawer-subitem"
+                    onClick={closeAll}
+                  >
+                    <User size={15} className="drawer-subitem-icon" />
+                    <div>
+                      <div className="drawer-subitem-title flex-title">
+                        <span>Salaried Tax Calculator</span>
+                        <span className="micro-badge live-badge">Sec 149</span>
+                      </div>
+                      <div className="drawer-subitem-desc">
+                        Monthly take-home &amp; progressive salary slabs
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/tax-calculator/business"
+                    className="drawer-subitem"
+                    onClick={closeAll}
+                  >
+                    <Building2 size={15} className="drawer-subitem-icon" />
+                    <div>
+                      <div className="drawer-subitem-title flex-title">
+                        <span>Business &amp; Corporate Tax</span>
+                        <span className="micro-badge cpec-badge">Sec 4C</span>
+                      </div>
+                      <div className="drawer-subitem-desc">
+                        AOP, Sole Proprietor, Corporate &amp; Super Tax
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/tax-calculator/rental"
+                    className="drawer-subitem"
+                    onClick={closeAll}
+                  >
+                    <Home size={15} className="drawer-subitem-icon" />
+                    <div>
+                      <div className="drawer-subitem-title flex-title">
+                        <span>Rental Income Tax</span>
+                        <span className="micro-badge live-badge">Sec 155</span>
+                      </div>
+                      <div className="drawer-subitem-desc">
+                        Individual vs Corporate landlord withholding
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/tax-calculator/property"
+                    className="drawer-subitem"
+                    onClick={closeAll}
+                  >
+                    <Landmark size={15} className="drawer-subitem-icon" />
+                    <div>
+                      <div className="drawer-subitem-title flex-title">
+                        <span>Property &amp; Real Estate Tax</span>
+                        <span className="micro-badge live-badge" style={{ background: '#A31D24', color: '#fff' }}>236K / 236C / CGT</span>
+                      </div>
+                      <div className="drawer-subitem-desc">
+                        Buying tax (236K), Selling (236C) &amp; CGT Sec 37
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
 
               <Link
                 href="/team"

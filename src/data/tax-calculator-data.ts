@@ -344,3 +344,110 @@ export const RENTAL_SLABS = [
   { min: 2000000, max: Infinity, rate: 0.25, fixed: 155000, rangeText: 'Above Rs. 2,000,000', rateText: '25%', formula: 'Rs. 155,000 + 25% of gross rent exceeding Rs. 2,000,000' }
 ];
 
+// ==========================================================================
+// PROPERTY & REAL ESTATE TAX DATA (Sections 236K, 236C, 37 & Provincial)
+// ==========================================================================
+
+export interface PropertyPurchaseSlab {
+  min: number;
+  max: number;
+  filerRate: number;
+  nonFilerRate: number;
+  overseasRate: number;
+  label: string;
+}
+
+// 1. Purchase Tax (Section 236K) - Withholding on Buyer
+export const PROPERTY_PURCHASE_SLABS: PropertyPurchaseSlab[] = [
+  {
+    min: 0,
+    max: 50000000,
+    filerRate: 0.0125,
+    nonFilerRate: 0.105,
+    overseasRate: 0.0125,
+    label: 'Up to Rs. 50 Million',
+  },
+  {
+    min: 50000000,
+    max: 100000000,
+    filerRate: 0.0125,
+    nonFilerRate: 0.145,
+    overseasRate: 0.0125,
+    label: 'Rs. 50 Million to Rs. 100 Million',
+  },
+  {
+    min: 100000000,
+    max: Infinity,
+    filerRate: 0.0125,
+    nonFilerRate: 0.185,
+    overseasRate: 0.0125,
+    label: 'Above Rs. 100 Million',
+  },
+];
+
+// 2. Sale Tax & Advance Withholding (Section 236C) - Withholding on Seller
+export const PROPERTY_SALE_RATES = {
+  filer: 0.0275,
+  nonFiler: 0.115,
+  overseas: 0.0275,
+};
+
+// 3. Capital Gains Tax on Immovable Property (Section 37) - Pre-July 2024 Schedule
+export interface CGTHoldingBracket {
+  periodId: string;
+  label: string;
+  openPlotRate: number;
+  constructedRate: number;
+  flatRate: number;
+}
+
+export const CGT_HOLDING_SCHEDULE: CGTHoldingBracket[] = [
+  { periodId: 'up-to-1', label: 'Up to 1 year', openPlotRate: 0.15, constructedRate: 0.15, flatRate: 0.15 },
+  { periodId: '1-to-2', label: 'Over 1 to 2 years', openPlotRate: 0.125, constructedRate: 0.10, flatRate: 0.075 },
+  { periodId: '2-to-3', label: 'Over 2 to 3 years', openPlotRate: 0.10, constructedRate: 0.075, flatRate: 0 },
+  { periodId: '3-to-4', label: 'Over 3 to 4 years', openPlotRate: 0.075, constructedRate: 0.05, flatRate: 0 },
+  { periodId: '4-to-5', label: 'Over 4 to 5 years', openPlotRate: 0.05, constructedRate: 0, flatRate: 0 },
+  { periodId: '5-to-6', label: 'Over 5 to 6 years', openPlotRate: 0.025, constructedRate: 0, flatRate: 0 },
+  { periodId: 'over-6', label: 'Over 6 years', openPlotRate: 0, constructedRate: 0, flatRate: 0 },
+];
+
+// 4. Provincial Stamp Duty & Capital Value Tax (CVT)
+export interface ProvinceRateConfig {
+  id: string;
+  name: string;
+  stampDutyRate: number;
+  cvtRate: number;
+  notes: string;
+}
+
+export const PROVINCIAL_TAXES: Record<string, ProvinceRateConfig> = {
+  punjab: {
+    id: 'punjab',
+    name: 'Punjab',
+    stampDutyRate: 0.01,
+    cvtRate: 0.02,
+    notes: 'Stamp Duty 1% on DC Value; CVT 2% on recorded value.',
+  },
+  sindh: {
+    id: 'sindh',
+    name: 'Sindh',
+    stampDutyRate: 0.02,
+    cvtRate: 0.02,
+    notes: 'Stamp Duty 2% on FBR/DC value; CVT 2% applicable.',
+  },
+  ict: {
+    id: 'ict',
+    name: 'Islamabad (ICT)',
+    stampDutyRate: 0.015,
+    cvtRate: 0.02,
+    notes: 'ICT Stamp Duty 1.5%; CVT 2% federal territory.',
+  },
+  kpk: {
+    id: 'kpk',
+    name: 'Khyber Pakhtunkhwa (KPK)',
+    stampDutyRate: 0.02,
+    cvtRate: 0.02,
+    notes: 'KP Revenue Authority Stamp Duty 2%; CVT 2%.',
+  },
+};
+
