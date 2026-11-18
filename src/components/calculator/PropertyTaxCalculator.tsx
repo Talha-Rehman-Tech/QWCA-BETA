@@ -6,7 +6,6 @@ import {
   PROPERTY_PURCHASE_SLABS,
   PROPERTY_SALE_RATES,
   CGT_HOLDING_SCHEDULE,
-  PROVINCIAL_TAXES,
   PropertyPurchaseSlab,
   CGTHoldingBracket
 } from '@/data/tax-calculator-data';
@@ -37,8 +36,6 @@ export default function PropertyTaxCalculator() {
   // ================= 1. BUYING / PURCHASE TAX (SECTION 236K) STATE =================
   const [buyValue, setBuyValue] = useState<number>(15000000);
   const [buyTaxpayerStatus, setBuyTaxpayerStatus] = useState<'filer' | 'nonFiler' | 'overseas'>('filer');
-  const [buyProvince, setBuyProvince] = useState<string>('punjab');
-  const [includeProvincial, setIncludeProvincial] = useState<boolean>(true);
 
   // ================= 2. SELLING / ADVANCE TAX (SECTION 236C) STATE =================
   const [sellValue, setSellValue] = useState<number>(20000000);
@@ -80,27 +77,17 @@ export default function PropertyTaxCalculator() {
     }
 
     const sec236kTax = Math.round(buyValue * rate);
-
-    const provConfig = PROVINCIAL_TAXES[buyProvince] || PROVINCIAL_TAXES.punjab;
-    const stampDuty = includeProvincial ? Math.round(buyValue * provConfig.stampDutyRate) : 0;
-    const cvt = includeProvincial ? Math.round(buyValue * provConfig.cvtRate) : 0;
-    const provincialTotal = stampDuty + cvt;
-
-    const totalTaxes = sec236kTax + provincialTotal;
+    const totalTaxes = sec236kTax;
     const totalAcquisitionCost = buyValue + totalTaxes;
 
     return {
       slab,
       rate,
       sec236kTax,
-      provConfig,
-      stampDuty,
-      cvt,
-      provincialTotal,
       totalTaxes,
       totalAcquisitionCost
     };
-  }, [buyValue, buyTaxpayerStatus, buyProvince, includeProvincial]);
+  }, [buyValue, buyTaxpayerStatus]);
 
   // ================= SELLING TAX CALCULATIONS (SEC 236C) =================
   const saleCalc = useMemo(() => {
@@ -193,7 +180,7 @@ export default function PropertyTaxCalculator() {
           <span className="eyebrow">Dedicated Real Estate Transfer Tool</span>
           <h1>Property &amp; Real Estate Tax Calculator</h1>
           <p>
-            Official Pakistan property transfer calculator: Purchase Tax (Section 236K), Seller Advance Withholding (Section 236C), Capital Gains Tax (CGT Section 37), and Provincial Stamp Duty &amp; CVT.
+            Official Pakistan property tax calculator: Purchase Tax on Buyer (Section 236K), Advance Withholding on Seller (Section 236C), and Capital Gains Tax on Profit (CGT Section 37).
           </p>
         </div>
 
@@ -249,7 +236,7 @@ export default function PropertyTaxCalculator() {
               <span className="step-badge">Section 236K</span>
               <h3 className="calc-panel-title">Property Purchase Tax Calculator</h3>
               <p className="calc-panel-desc">
-                Advance withholding tax collected from the buyer at property transfer by the registrar, plus provincial stamp duty and CVT.
+                Advance withholding tax collected from the buyer at property transfer pursuant to Section 236K of the Income Tax Ordinance, 2001.
               </p>
             </div>
 
@@ -326,35 +313,6 @@ export default function PropertyTaxCalculator() {
                 </div>
               )}
             </div>
-
-            {/* Input 3: Province & Local Levies */}
-            <div className="calc-field-group">
-              <div className="calc-label-row">
-                <label className="calc-field-label">Provincial Jurisdiction</label>
-                <label className="calc-checkbox-inline">
-                  <input
-                    type="checkbox"
-                    checked={includeProvincial}
-                    onChange={(e) => setIncludeProvincial(e.target.checked)}
-                  />
-                  <span>Include Stamp Duty &amp; CVT</span>
-                </label>
-              </div>
-              <div className="calc-grid-options">
-                {Object.values(PROVINCIAL_TAXES).map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className={`calc-option-chip ${buyProvince === p.id ? 'active' : ''}`}
-                    onClick={() => setBuyProvince(p.id)}
-                  >
-                    <MapPin size={13} />
-                    <span>{p.name}</span>
-                    <span className="chip-rate-tag">{(p.stampDutyRate * 100).toFixed(1)}% Stamp</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Results Summary Panel */}
@@ -366,15 +324,15 @@ export default function PropertyTaxCalculator() {
                 </div>
                 <div>
                   <h4 className="summary-title">Purchase Tax Assessment</h4>
-                  <span className="summary-subtitle">Section 236K + Provincial Duties</span>
+                  <span className="summary-subtitle">Section 236K Advance Withholding</span>
                 </div>
               </div>
 
               <div className="summary-total-banner">
-                <span className="total-label">Total Acquisition Taxes</span>
+                <span className="total-label">FBR Purchase Tax (Sec 236K)</span>
                 <span className="total-value">{formatPKR(purchaseCalc.totalTaxes)}</span>
                 <span className="total-note">
-                  Effective Rate: {((purchaseCalc.totalTaxes / buyValue) * 100).toFixed(2)}% on purchase price
+                  Effective Rate: {((purchaseCalc.totalTaxes / buyValue) * 100).toFixed(2)}% on purchase consideration
                 </span>
               </div>
 
@@ -389,29 +347,15 @@ export default function PropertyTaxCalculator() {
                   <strong>{formatPKR(purchaseCalc.sec236kTax)}</strong>
                 </div>
 
-                {includeProvincial && (
-                  <>
-                    <div className="summary-line">
-                      <span>Provincial Stamp Duty ({(purchaseCalc.provConfig.stampDutyRate * 100).toFixed(1)}%):</span>
-                      <strong>{formatPKR(purchaseCalc.stampDuty)}</strong>
-                    </div>
-
-                    <div className="summary-line">
-                      <span>Capital Value Tax (CVT 2%):</span>
-                      <strong>{formatPKR(purchaseCalc.cvt)}</strong>
-                    </div>
-                  </>
-                )}
-
                 <div className="summary-divider" />
 
                 <div className="summary-line" style={{ fontSize: '15px' }}>
-                  <strong>Gross Property Consideration:</strong>
+                  <strong>Gross Property Value:</strong>
                   <span>{formatPKR(buyValue)}</span>
                 </div>
 
                 <div className="summary-line" style={{ fontSize: '15px', color: 'var(--primary)' }}>
-                  <strong>Total Outflow to Complete Transfer:</strong>
+                  <strong>Total Purchase Outflow:</strong>
                   <strong>{formatPKR(purchaseCalc.totalAcquisitionCost)}</strong>
                 </div>
               </div>
@@ -980,30 +924,6 @@ export default function PropertyTaxCalculator() {
               <span>
                 <strong>Acquisitions on or after 1 July 2024:</strong> Subject to a flat 15% rate on capital gains for filers regardless of holding duration, while non-filers are subject to progressive individual slab rates under Section 37(1A).
               </span>
-            </div>
-          </div>
-
-          {/* Section 4: Provincial Taxes (Image 2) */}
-          <div className="schedule-box-card" style={{ marginTop: '32px' }}>
-            <div className="schedule-box-head">
-              <span className="step-badge">4. Provincial Levies</span>
-              <h3 className="schedule-box-title">Provincial Revenue Taxes &amp; Transfer Charges</h3>
-              <p className="schedule-box-desc">
-                In addition to FBR federal withholding taxes, provincial revenue departments levy:
-              </p>
-            </div>
-
-            <div className="schedule-pill-grid">
-              <div className="schedule-rate-tile">
-                <span className="tile-label">Stamp Duty (Punjab / Federal)</span>
-                <span className="tile-val">1% – 3%</span>
-                <span className="tile-desc">Set at 1% of DC value in Punjab</span>
-              </div>
-              <div className="schedule-rate-tile">
-                <span className="tile-label">Capital Value Tax (CVT)</span>
-                <span className="tile-val">2.0%</span>
-                <span className="tile-desc">Charged provincially on recorded value</span>
-              </div>
             </div>
           </div>
         </div>

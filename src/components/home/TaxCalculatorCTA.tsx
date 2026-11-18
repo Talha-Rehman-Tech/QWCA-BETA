@@ -299,7 +299,7 @@ export default function TaxCalculatorCTA() {
               Property Tax Calculator
             </h3>
             <p style={{ fontSize: '14px', color: 'var(--text-body)', lineHeight: 1.55, marginBottom: '18px', flexGrow: 1 }}>
-              Official real estate transfer levies: Buyer purchase tax (236K), Seller advance tax (236C), Capital Gains Tax (Sec 37), and Provincial Stamp Duty.
+              Official real estate transfer taxes: Buyer purchase tax (236K), Seller advance tax (236C), and Capital Gains Tax (Sec 37).
             </p>
 
             <ul className="service-highlights" style={{ marginBottom: '22px' }}>

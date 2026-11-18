@@ -422,7 +422,7 @@ export default function BusinessTaxCalculator() {
               <div className="other-calc-icon"><Landmark size={20} /></div>
               <div className="other-calc-info">
                 <strong>Property &amp; Real Estate Tax</strong>
-                <span>Buyer tax (236K), Seller tax (236C), Capital Gains Tax (Sec 37) &amp; Stamp Duty</span>
+                <span>Buyer tax (236K), Seller tax (236C) &amp; Capital Gains Tax (Sec 37)</span>
               </div>
               <ArrowRight size={16} className="other-calc-arrow" />
             </Link>
