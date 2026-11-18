@@ -86,6 +86,7 @@ export default function Footer() {
                 <li><Link href="/tax-calculator/business">Business &amp; Corporate Tax</Link></li>
                 <li><Link href="/tax-calculator/rental">Rental Income Tax</Link></li>
                 <li><Link href="/tax-calculator/property">Property &amp; Real Estate Tax</Link></li>
+                <li><Link href="/admin" className="text-[#A31D24] font-semibold">⚙️ Tax &amp; Cost Customizer (Admin)</Link></li>
               </ul>
             </div>
 
@@ -205,6 +206,8 @@ export default function Footer() {
               <Link href="/cost-estimator" className="footer-bottom-link">Cost Calculator</Link>
               <span className="footer-sep">&bull;</span>
               <Link href="/#contact" className="footer-bottom-link">Contact</Link>
+              <span className="footer-sep">&bull;</span>
+              <Link href="/admin" className="footer-bottom-link font-medium hover:text-[#A31D24]">Admin Portal</Link>
             </div>
 
             <div className="footer-social-links" aria-label="Official Social Channels">
