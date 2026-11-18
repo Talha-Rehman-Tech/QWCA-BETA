@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 let isConnected = false;
 
 export async function connectDB(): Promise<boolean> {
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/qwca_database';
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/qwca_database';
 
   try {
     mongoose.set('strictQuery', false);

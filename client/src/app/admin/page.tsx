@@ -29,7 +29,6 @@ import {
   getCompanyCostConfigApi,
   saveCompanyCostConfigApi,
   resetCompanyCostConfigApi,
-  INITIAL_COMPANY_COST_CONFIG,
   ApiHealthResponse
 } from '@/lib/api';
 import {
@@ -41,6 +40,7 @@ import {
   PROPERTY_SALE_RATES,
   CGT_HOLDING_SCHEDULE
 } from '@/data/tax-calculator-data';
+import { INITIAL_COMPANY_COST_CONFIG } from '../../../../server/src/data/seedData';
 
 export default function AdminCustomizationDashboard() {
   const [activeMainTab, setActiveMainTab] = useState<'tax' | 'cost' | 'guide'>('tax');
@@ -1037,7 +1037,7 @@ export default function AdminCustomizationDashboard() {
                 How to run both Client &amp; Server locally:
               </strong>
               <pre style={{ margin: 0, fontSize: '13px', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '6px', overflowX: 'auto' }}>
-{`# 1. Start Client (Next.js) on http://localhost:3000
+                {`# 1. Start Client (Next.js) on http://localhost:3000
 npm run dev:client
 
 # 2. Start Server (Express + MongoDB) on http://localhost:5000
@@ -1101,3 +1101,4 @@ npm run dev:server`}
     </main>
   );
 }
+
