@@ -29,6 +29,7 @@ import {
   getCompanyCostConfigApi,
   saveCompanyCostConfigApi,
   resetCompanyCostConfigApi,
+  INITIAL_COMPANY_COST_CONFIG,
   ApiHealthResponse
 } from '@/lib/api';
 import {
@@ -40,7 +41,6 @@ import {
   PROPERTY_SALE_RATES,
   CGT_HOLDING_SCHEDULE
 } from '@/data/tax-calculator-data';
-import { INITIAL_COMPANY_COST_CONFIG } from '../../../../server/src/data/seedData';
 
 export default function AdminCustomizationDashboard() {
   const [activeMainTab, setActiveMainTab] = useState<'tax' | 'cost' | 'guide'>('tax');
