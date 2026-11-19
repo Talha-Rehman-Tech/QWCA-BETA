@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import { connectDB, isDbConnected } from './config/db.js';
 import taxSlabRoutes from './routes/taxSlabRoutes.js';
 import companyCostRoutes from './routes/companyCostRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import { ensureAdminSeeded } from './controllers/authController.js';
 
 dotenv.config();
 
@@ -34,6 +36,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/tax-slabs', taxSlabRoutes);
 app.use('/api/cost-estimation', companyCostRoutes);
 
@@ -45,10 +48,12 @@ app.use((req, res) => {
 // Start Server
 async function startServer() {
   await connectDB();
+  await ensureAdminSeeded();
   app.listen(PORT, () => {
     console.log(`=========================================`);
     console.log(`🚀 QWCA Express Backend running on port ${PORT}`);
     console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
+    console.log(`🔐 Admin Auth API: http://localhost:${PORT}/api/auth/login`);
     console.log(`📊 Tax Slabs API: http://localhost:${PORT}/api/tax-slabs`);
     console.log(`💼 Cost Estimator API: http://localhost:${PORT}/api/cost-estimation`);
     console.log(`🌐 Allowed Client Origin: ${CLIENT_URL}`);
