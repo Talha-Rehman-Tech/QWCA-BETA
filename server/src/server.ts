@@ -49,7 +49,7 @@ app.use((req, res) => {
 async function startServer() {
   await connectDB();
   await ensureAdminSeeded();
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`=========================================`);
     console.log(`🚀 QWCA Express Backend running on port ${PORT}`);
     console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
@@ -58,6 +58,16 @@ async function startServer() {
     console.log(`💼 Cost Estimator API: http://localhost:${PORT}/api/cost-estimation`);
     console.log(`🌐 Allowed Client Origin: ${CLIENT_URL}`);
     console.log(`=========================================`);
+  });
+
+  server.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ [Server Error] Port ${PORT} is already in use by another process.`);
+      console.error(`👉 Tip: Run 'npm run clean:port' to auto-terminate the blocking process, then restart.\n`);
+      process.exit(1);
+    } else {
+      console.error('\n❌ [Server Error]:', err);
+    }
   });
 }
 

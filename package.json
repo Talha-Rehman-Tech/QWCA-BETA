@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "npm run dev --prefix client",
     "dev:client": "npm run dev --prefix client",
-    "dev:server": "npm run dev --prefix server",
+    "clean:port": "powershell -Command \"try { Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } } catch {}; exit 0\"",
+    "dev:server": "npm run clean:port && npm run dev --prefix server",
     "build:client": "npm run build --prefix client",
     "build:server": "npm run build --prefix server",
     "build": "npm run build --prefix client",
