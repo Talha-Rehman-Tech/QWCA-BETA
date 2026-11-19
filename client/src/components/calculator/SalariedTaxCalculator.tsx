@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { SALARY_TAX_DATA } from '@/data/tax-calculator-data';
+import { getTaxYearsApi } from '@/lib/api';
 import {
   Calculator,
   User,
@@ -20,6 +21,47 @@ export default function SalariedTaxCalculator() {
   const [salAmount, setSalAmount] = useState<number>(100000);
   const [salTableYear, setSalTableYear] = useState<string>('2026-2027');
 
+  // Dynamic live tax data synchronized with MongoDB Backend
+  const [allYearsData, setAllYearsData] = useState<Record<string, any>>(SALARY_TAX_DATA);
+  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+
+  useEffect(() => {
+    async function syncWithBackend() {
+      try {
+        const records = await getTaxYearsApi();
+        if (records && records.length > 0) {
+          const mapped: Record<string, any> = { ...SALARY_TAX_DATA };
+          const years: string[] = [];
+
+          records.forEach((rec: any) => {
+            if (rec.year && rec.salarySlabs && rec.salarySlabs.length > 0) {
+              years.push(rec.year);
+              mapped[rec.year] = {
+                year: rec.year,
+                label: rec.label || `Tax Year ${rec.year}`,
+                title: rec.title || `Income Tax Slabs ${rec.year}`,
+                desc: rec.desc || '',
+                slabs: rec.salarySlabs,
+              };
+            }
+          });
+
+          if (years.length > 0) {
+            setAllYearsData(mapped);
+            setAvailableYears(years);
+            if (!years.includes(salYear)) {
+              setSalYear(years[0]);
+              setSalTableYear(years[0]);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Operating with baseline salary tax data');
+      }
+    }
+    syncWithBackend();
+  }, []);
+
   const formatPKR = (num: number) => {
     return 'Rs. ' + Math.round(num).toLocaleString('en-PK');
   };
@@ -34,7 +76,7 @@ export default function SalariedTaxCalculator() {
   const salaryCalc = useMemo(() => {
     const annualSalary = salPeriod === 'monthly' ? salAmount * 12 : salAmount;
     const monthlySalary = Math.round(annualSalary / 12);
-    const yearConfig = SALARY_TAX_DATA[salYear] || SALARY_TAX_DATA['2026-2027'];
+    const yearConfig = allYearsData[salYear] || allYearsData['2026-2027'] || SALARY_TAX_DATA['2026-2027'];
 
     let annualTax = 0;
     let activeSlabIndex = 0;
@@ -70,7 +112,7 @@ export default function SalariedTaxCalculator() {
       activeSlab,
       yearConfig
     };
-  }, [salAmount, salPeriod, salYear]);
+  }, [salAmount, salPeriod, salYear, allYearsData]);
 
   return (
     <section className="section tax-calc-section" id="salaried-calculator">
@@ -114,10 +156,11 @@ export default function SalariedTaxCalculator() {
                     setSalTableYear(e.target.value);
                   }}
                 >
-                  <option value="2026-2027">Tax Year 2026–2027 (Current / Upcoming)</option>
-                  <option value="2025-2026">Tax Year 2025–2026</option>
-                  <option value="2024-2025">Tax Year 2024–2025</option>
-                  <option value="2023-2024">Tax Year 2023–2024</option>
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>
+                      {allYearsData[yr]?.label || `Tax Year ${yr}`} {yr === '2026-2027' ? '(Current)' : ''}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -242,10 +285,10 @@ export default function SalariedTaxCalculator() {
           <div className="slabs-table-header">
             <div>
               <h3>FBR Salary Income Tax Slabs ({salTableYear})</h3>
-              <p>{SALARY_TAX_DATA[salTableYear]?.desc}</p>
+              <p>{allYearsData[salTableYear]?.desc || SALARY_TAX_DATA[salTableYear]?.desc}</p>
             </div>
             <div className="slabs-tabs" role="tablist">
-              {Object.keys(SALARY_TAX_DATA).map((y) => (
+              {availableYears.map((y) => (
                 <button
                   key={y}
                   type="button"
@@ -268,7 +311,7 @@ export default function SalariedTaxCalculator() {
                 </tr>
               </thead>
               <tbody>
-                {SALARY_TAX_DATA[salTableYear]?.slabs.map((slab, idx) => {
+                {(allYearsData[salTableYear]?.slabs || SALARY_TAX_DATA[salTableYear]?.slabs || []).map((slab: any, idx: number) => {
                   const isActive = salTableYear === salYear && idx === salaryCalc.activeSlabIndex;
                   return (
                     <tr key={idx} className={isActive ? 'active-slab-row' : ''}>

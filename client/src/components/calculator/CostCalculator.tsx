@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   entityTypes,
@@ -10,6 +10,7 @@ import {
   CapitalSlab,
   SetupAddon
 } from '@/data/calculator-data';
+import { getCompanyCostConfigApi } from '@/lib/api';
 import {
   Calculator,
   Check,
@@ -29,6 +30,12 @@ export default function CostCalculator() {
   const [selectedEntityId, setSelectedEntityId] = useState<string>('pvt-limited');
   const [selectedCapitalId, setSelectedCapitalId] = useState<string>('1m');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>('All');
+
+  // Dynamic live cost data synchronized with MongoDB Backend
+  const [liveEntityTypes, setLiveEntityTypes] = useState<EntityTypeOption[]>(entityTypes);
+  const [liveCapitalSlabs, setLiveCapitalSlabs] = useState<CapitalSlab[]>(capitalSlabs);
+  const [liveSetupAddons, setLiveSetupAddons] = useState<SetupAddon[]>(setupAddons);
+
   const [selectedAddons, setSelectedAddons] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     setupAddons.forEach((addon) => {
@@ -37,14 +44,108 @@ export default function CostCalculator() {
     return initial;
   });
 
+  useEffect(() => {
+    async function syncCostWithBackend() {
+      try {
+        const config = await getCompanyCostConfigApi();
+        if (config) {
+          // 1. Sync Entity Packages
+          if (config.entityTiers && config.entityTiers.length > 0) {
+            setLiveEntityTypes((prev) =>
+              prev.map((ent) => {
+                const match = config.entityTiers.find(
+                  (t: any) =>
+                    t.id === ent.id ||
+                    (ent.id === 'smc-private' && t.id === 'smc') ||
+                    (ent.id === 'pvt-limited' && t.id === 'pvt_ltd') ||
+                    (ent.id === 'foreign-subsidiary' && t.id === 'cpec_foreign')
+                );
+                if (match) {
+                  const totalFee = match.baseFee;
+                  const baseGov = Math.min(ent.baseGovFee, totalFee);
+                  const baseConsult = Math.max(0, totalFee - baseGov);
+                  return {
+                    ...ent,
+                    name: match.name || ent.name,
+                    description: match.desc || ent.description,
+                    badge: match.badge || ent.badge,
+                    baseGovFee: baseGov,
+                    baseConsultingFee: baseConsult,
+                  };
+                }
+                return ent;
+              })
+            );
+          }
+
+          // 2. Sync Capital Slabs
+          if (config.capitalTiers && config.capitalTiers.length > 0) {
+            setLiveCapitalSlabs((prev) =>
+              prev.map((cap) => {
+                const match = config.capitalTiers.find(
+                  (t: any) =>
+                    t.id === cap.id ||
+                    (cap.id === '100k' && t.id === 'cap_100k') ||
+                    (cap.id === '1m' && t.id === 'cap_1m') ||
+                    (cap.id === '5m' && t.id === 'cap_5m') ||
+                    (cap.id === '10m' && t.id === 'cap_10m')
+                );
+                if (match) {
+                  return {
+                    ...cap,
+                    label: match.label || cap.label,
+                    secpCapitalFee: match.fee,
+                  };
+                }
+                return cap;
+              })
+            );
+          }
+
+          // 3. Sync Service Add-ons
+          if (config.serviceAddons && config.serviceAddons.length > 0) {
+            setLiveSetupAddons((prev) =>
+              prev.map((addon) => {
+                const match = config.serviceAddons.find(
+                  (a: any) =>
+                    a.id === addon.id ||
+                    (addon.id === 'corporate-ntn' && a.id === 'fbr_ntn') ||
+                    (addon.id === 'sales-tax-strn' && a.id === 'sales_tax') ||
+                    (addon.id === 'chamber-membership' && a.id === 'chamber') ||
+                    (addon.id === 'weboc-import-export' && a.id === 'weboc') ||
+                    (addon.id === 'trademark-filing' && a.id === 'trademark') ||
+                    (addon.id === 'bank-account-resolution' && a.id === 'bank_resolution')
+                );
+                if (match) {
+                  const totalFee = match.fee;
+                  const govFee = Math.min(addon.govtFee, totalFee);
+                  const consultFee = Math.max(0, totalFee - govFee);
+                  return {
+                    ...addon,
+                    govtFee: govFee,
+                    consultingFee: consultFee,
+                  };
+                }
+                return addon;
+              })
+            );
+          }
+        }
+      } catch (err) {
+        console.warn('Operating with baseline company cost data');
+      }
+    }
+    syncCostWithBackend();
+  }, []);
+
   const selectedEntity = useMemo(
-    () => entityTypes.find((e) => e.id === selectedEntityId) || entityTypes[1],
-    [selectedEntityId]
+    () => liveEntityTypes.find((e) => e.id === selectedEntityId) || liveEntityTypes[1] || liveEntityTypes[0],
+    [selectedEntityId, liveEntityTypes]
   );
 
   const selectedCapital = useMemo(
-    () => capitalSlabs.find((c) => c.id === selectedCapitalId) || capitalSlabs[1],
-    [selectedCapitalId]
+    () => liveCapitalSlabs.find((c) => c.id === selectedCapitalId) || liveCapitalSlabs[1] || liveCapitalSlabs[0],
+    [selectedCapitalId, liveCapitalSlabs]
   );
 
   const toggleAddon = (id: string, required?: boolean) => {
@@ -58,9 +159,9 @@ export default function CostCalculator() {
   const categories = ['All', 'SECP & Incorporation', 'Taxation & FBR', 'Licensing & Foreign', 'IP & Operations'];
 
   const filteredAddons = useMemo(() => {
-    if (activeCategoryFilter === 'All') return setupAddons;
-    return setupAddons.filter((a) => a.category === activeCategoryFilter);
-  }, [activeCategoryFilter]);
+    if (activeCategoryFilter === 'All') return liveSetupAddons;
+    return liveSetupAddons.filter((a) => a.category === activeCategoryFilter);
+  }, [activeCategoryFilter, liveSetupAddons]);
 
   // Dynamic calculations via useMemo
   const calculation = useMemo(() => {
@@ -69,7 +170,7 @@ export default function CostCalculator() {
 
     const activeAddonsList: SetupAddon[] = [];
 
-    setupAddons.forEach((addon) => {
+    liveSetupAddons.forEach((addon) => {
       if (selectedAddons[addon.id]) {
         activeAddonsList.push(addon);
         govtTotal += addon.govtFee;
@@ -85,7 +186,7 @@ export default function CostCalculator() {
       grandTotal,
       activeAddonsList
     };
-  }, [selectedEntity, selectedCapital, selectedAddons]);
+  }, [selectedEntity, selectedCapital, selectedAddons, liveSetupAddons]);
 
   const formatPKR = (amount: number) => {
     return 'PKR ' + amount.toLocaleString('en-PK');
@@ -120,7 +221,7 @@ export default function CostCalculator() {
             </div>
 
             <div className="entity-selection-grid">
-              {entityTypes.map((entity) => {
+              {liveEntityTypes.map((entity) => {
                 const isSelected = selectedEntityId === entity.id;
                 return (
                   <div
@@ -169,7 +270,7 @@ export default function CostCalculator() {
             </div>
 
             <div className="capital-selection-grid">
-              {capitalSlabs.map((slab) => {
+              {liveCapitalSlabs.map((slab) => {
                 const isActive = selectedCapitalId === slab.id;
                 return (
                   <button

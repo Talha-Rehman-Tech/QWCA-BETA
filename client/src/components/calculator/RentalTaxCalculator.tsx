@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { RENTAL_SLABS } from '@/data/tax-calculator-data';
+import { getTaxYearsApi } from '@/lib/api';
 import {
   Home,
   Building2,
@@ -19,6 +20,38 @@ export default function RentalTaxCalculator() {
   const [rentOwnerType, setRentOwnerType] = useState<'individual' | 'company'>('individual');
   const [rentPeriod, setRentPeriod] = useState<'monthly' | 'annually'>('monthly');
   const [rentAmount, setRentAmount] = useState<number>(100000);
+
+  // Dynamic live tax data synchronized with MongoDB Backend
+  const [allYearsData, setAllYearsData] = useState<Record<string, any>>({});
+  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+
+  useEffect(() => {
+    async function syncRentalWithBackend() {
+      try {
+        const records = await getTaxYearsApi();
+        if (records && records.length > 0) {
+          const mapped: Record<string, any> = {};
+          const years: string[] = [];
+
+          records.forEach((rec: any) => {
+            if (rec.year) {
+              years.push(rec.year);
+              mapped[rec.year] = rec;
+            }
+          });
+
+          if (years.length > 0) {
+            setAllYearsData(mapped);
+            setAvailableYears(years);
+            if (!years.includes(rentYear)) setRentYear(years[0]);
+          }
+        }
+      } catch (err) {
+        console.warn('Operating with baseline rental tax data');
+      }
+    }
+    syncRentalWithBackend();
+  }, []);
 
   const formatPKR = (num: number) => {
     return 'Rs. ' + Math.round(num).toLocaleString('en-PK');
@@ -41,33 +74,31 @@ export default function RentalTaxCalculator() {
     let activeSlabText = '';
     let activeSlabDescText = '';
 
+    const currentYearRecord = allYearsData[rentYear];
+    const slabs = currentYearRecord?.rentalSlabs || RENTAL_SLABS;
+
     if (isCompany) {
       totalTax = Math.round(annualGrossRent * 0.15);
       slabIndex = 99;
       activeSlabText = 'Active Bracket: Corporate Company (15% Flat Rate)';
       activeSlabDescText = 'Section 155 requires 15% flat withholding on gross rent paid to corporate landlords from rupee one.';
     } else {
-      if (annualGrossRent <= 300000) {
-        totalTax = 0;
-        slabIndex = 0;
-        activeSlabText = 'Active Bracket: Up to Rs. 300,000 (0% Tax-Free)';
-        activeSlabDescText = 'Tax-free threshold under Section 155 for individuals and AOPs.';
-      } else if (annualGrossRent <= 600000) {
-        totalTax = Math.round((annualGrossRent - 300000) * 0.05);
-        slabIndex = 1;
-        activeSlabText = 'Active Bracket: Rs. 300,001 to Rs. 600,000 (5%)';
-        activeSlabDescText = '5% of the gross rental amount exceeding Rs. 300,000.';
-      } else if (annualGrossRent <= 2000000) {
-        totalTax = Math.round(15000 + (annualGrossRent - 600000) * 0.10);
-        slabIndex = 2;
-        activeSlabText = 'Active Bracket: Rs. 600,001 to Rs. 2,000,000 (10%)';
-        activeSlabDescText = 'Rs. 15,000 + 10% of the gross rental amount exceeding Rs. 600,000.';
-      } else {
-        totalTax = Math.round(155000 + (annualGrossRent - 2000000) * 0.25);
-        slabIndex = 3;
-        activeSlabText = 'Active Bracket: Above Rs. 2,000,000 (25%)';
-        activeSlabDescText = 'Rs. 155,000 + 25% of the gross rental amount exceeding Rs. 2,000,000.';
+      for (let i = 0; i < slabs.length; i++) {
+        if (annualGrossRent > slabs[i].min) {
+          slabIndex = i;
+        }
       }
+      const activeSlab = slabs[slabIndex] || slabs[0];
+      const taxable = annualGrossRent - activeSlab.min;
+
+      let baseTax = 0;
+      if (slabIndex === 1) baseTax = 0;
+      else if (slabIndex === 2) baseTax = 15000;
+      else if (slabIndex === 3) baseTax = 155000;
+
+      totalTax = baseTax + Math.round(taxable * activeSlab.rate);
+      activeSlabText = `Active Bracket: ${activeSlab.rangeText} (${activeSlab.rateText || (activeSlab.rate * 100) + '%'})`;
+      activeSlabDescText = activeSlab.formula || 'Progressive rental tax under Section 155';
     }
 
     const monthlyTax = Math.round(totalTax / 12);
@@ -86,9 +117,10 @@ export default function RentalTaxCalculator() {
       isCompany,
       slabIndex,
       activeSlabText,
-      activeSlabDescText
+      activeSlabDescText,
+      slabs
     };
-  }, [rentAmount, rentPeriod, rentOwnerType]);
+  }, [rentAmount, rentPeriod, rentOwnerType, rentYear, allYearsData]);
 
   return (
     <section className="section tax-calc-section" id="rental-calculator">
@@ -129,10 +161,11 @@ export default function RentalTaxCalculator() {
                   value={rentYear}
                   onChange={(e) => setRentYear(e.target.value)}
                 >
-                  <option value="2026-2027">Tax Year 2026–2027 (Current / Upcoming)</option>
-                  <option value="2025-2026">Tax Year 2025–2026</option>
-                  <option value="2024-2025">Tax Year 2024–2025</option>
-                  <option value="2023-2024">Tax Year 2023–2024</option>
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>
+                      {allYearsData[yr]?.label || `Tax Year ${yr}`} {yr === '2026-2027' ? '(Current)' : ''}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -289,7 +322,7 @@ export default function RentalTaxCalculator() {
                 </tr>
               </thead>
               <tbody>
-                {RENTAL_SLABS.map((rSlab, i) => {
+                {(rentalCalc.slabs || RENTAL_SLABS).map((rSlab: any, i: number) => {
                   const isActive = !rentalCalc.isCompany && rentalCalc.slabIndex === i;
                   return (
                     <tr key={i} className={isActive ? 'active-slab-row' : ''}>

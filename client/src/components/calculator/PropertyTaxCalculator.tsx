@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   PROPERTY_PURCHASE_SLABS,
@@ -9,6 +9,7 @@ import {
   PropertyPurchaseSlab,
   CGTHoldingBracket
 } from '@/data/tax-calculator-data';
+import { getTaxYearsApi } from '@/lib/api';
 import {
   Home,
   Building,
@@ -32,6 +33,64 @@ import {
 
 export default function PropertyTaxCalculator() {
   const [activeMode, setActiveMode] = useState<'buying' | 'selling' | 'cgt' | 'schedules'>('buying');
+  const [propertyYear, setPropertyYear] = useState<string>('2026-2027');
+  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+  const [allYearsData, setAllYearsData] = useState<Record<string, any>>({});
+
+  // Dynamic live tax data synchronized with MongoDB Backend
+  const [livePurchaseSlabs, setLivePurchaseSlabs] = useState<PropertyPurchaseSlab[]>(PROPERTY_PURCHASE_SLABS);
+  const [liveSaleRates, setLiveSaleRates] = useState<typeof PROPERTY_SALE_RATES>(PROPERTY_SALE_RATES);
+  const [liveCgtSchedule, setLiveCgtSchedule] = useState<CGTHoldingBracket[]>(CGT_HOLDING_SCHEDULE);
+
+  const applyYearData = (yearData: any) => {
+    if (!yearData) return;
+    if (yearData.propertyPurchaseSlabs && yearData.propertyPurchaseSlabs.length > 0) {
+      setLivePurchaseSlabs(yearData.propertyPurchaseSlabs);
+    }
+    if (yearData.propertySaleRates) {
+      setLiveSaleRates(yearData.propertySaleRates);
+    }
+    if (yearData.cgtHoldingSchedule && yearData.cgtHoldingSchedule.length > 0) {
+      setLiveCgtSchedule(yearData.cgtHoldingSchedule);
+    }
+  };
+
+  useEffect(() => {
+    async function syncPropertyWithBackend() {
+      try {
+        const records = await getTaxYearsApi();
+        if (records && records.length > 0) {
+          const mapped: Record<string, any> = {};
+          const years: string[] = [];
+
+          records.forEach((rec: any) => {
+            if (rec.year) {
+              years.push(rec.year);
+              mapped[rec.year] = rec;
+            }
+          });
+
+          if (years.length > 0) {
+            setAllYearsData(mapped);
+            setAvailableYears(years);
+            const activeYear = years.includes(propertyYear) ? propertyYear : years[0];
+            setPropertyYear(activeYear);
+            applyYearData(mapped[activeYear]);
+          }
+        }
+      } catch (err) {
+        console.warn('Operating with baseline property tax data');
+      }
+    }
+    syncPropertyWithBackend();
+  }, []);
+
+  const handleYearChange = (year: string) => {
+    setPropertyYear(year);
+    if (allYearsData[year]) {
+      applyYearData(allYearsData[year]);
+    }
+  };
 
   // ================= 1. BUYING / PURCHASE TAX (SECTION 236K) STATE =================
   const [buyValue, setBuyValue] = useState<number>(15000000);
@@ -62,8 +121,8 @@ export default function PropertyTaxCalculator() {
 
   // ================= BUYING TAX CALCULATIONS (SEC 236K) =================
   const purchaseCalc = useMemo(() => {
-    let slab: PropertyPurchaseSlab = PROPERTY_PURCHASE_SLABS[0];
-    for (const s of PROPERTY_PURCHASE_SLABS) {
+    let slab: PropertyPurchaseSlab = livePurchaseSlabs[0] || PROPERTY_PURCHASE_SLABS[0];
+    for (const s of livePurchaseSlabs) {
       if (buyValue > s.min) {
         slab = s;
       }
@@ -87,15 +146,15 @@ export default function PropertyTaxCalculator() {
       totalTaxes,
       totalAcquisitionCost
     };
-  }, [buyValue, buyTaxpayerStatus]);
+  }, [buyValue, buyTaxpayerStatus, livePurchaseSlabs]);
 
   // ================= SELLING TAX CALCULATIONS (SEC 236C) =================
   const saleCalc = useMemo(() => {
-    let rate = PROPERTY_SALE_RATES.filer;
+    let rate = liveSaleRates.filer;
     if (sellTaxpayerStatus === 'nonFiler') {
-      rate = PROPERTY_SALE_RATES.nonFiler;
+      rate = liveSaleRates.nonFiler;
     } else if (sellTaxpayerStatus === 'overseas') {
-      rate = PROPERTY_SALE_RATES.overseas;
+      rate = liveSaleRates.overseas;
     }
 
     const sec236cTax = Math.round(sellValue * rate);
@@ -105,7 +164,7 @@ export default function PropertyTaxCalculator() {
       sec236cTax,
       netProceeds: sellValue - sec236cTax
     };
-  }, [sellValue, sellTaxpayerStatus]);
+  }, [sellValue, sellTaxpayerStatus, liveSaleRates]);
 
   // ================= CGT CALCULATIONS (SECTION 37) =================
   const cgtCalc = useMemo(() => {
@@ -118,7 +177,7 @@ export default function PropertyTaxCalculator() {
       applicableRate = cgtTaxpayerStatus === 'filer' ? 0.15 : 0.30;
     } else {
       // Pre-1 July 2024 acquisition: Declining holding period schedule
-      const bracket = CGT_HOLDING_SCHEDULE.find((b) => b.periodId === cgtHoldingPeriod) || CGT_HOLDING_SCHEDULE[0];
+      const bracket = liveCgtSchedule.find((b) => b.periodId === cgtHoldingPeriod) || liveCgtSchedule[0] || CGT_HOLDING_SCHEDULE[0];
       if (cgtPropType === 'openPlot') {
         applicableRate = bracket.openPlotRate;
       } else if (cgtPropType === 'constructed') {
@@ -141,7 +200,7 @@ export default function PropertyTaxCalculator() {
 
     // Section 236C credit (seller advance tax paid at 2.75% or 11.5%)
     const paid236C = adjust236C
-      ? Math.round(cgtSalePrice * (cgtTaxpayerStatus === 'filer' ? PROPERTY_SALE_RATES.filer : PROPERTY_SALE_RATES.nonFiler))
+      ? Math.round(cgtSalePrice * (cgtTaxpayerStatus === 'filer' ? liveSaleRates.filer : liveSaleRates.nonFiler))
       : 0;
 
     const netCGTPayable = Math.max(0, grossCGT - paid236C);
@@ -163,7 +222,9 @@ export default function PropertyTaxCalculator() {
     cgtSalePrice,
     cgtHoldingPeriod,
     cgtTaxpayerStatus,
-    adjust236C
+    adjust236C,
+    liveCgtSchedule,
+    liveSaleRates
   ]);
 
   return (
@@ -182,6 +243,32 @@ export default function PropertyTaxCalculator() {
           <p>
             Official Pakistan property tax calculator: Purchase Tax on Buyer (Section 236K), Advance Withholding on Seller (Section 236C), and Capital Gains Tax on Profit (CGT Section 37).
           </p>
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '14px', background: '#ffffff', padding: '6px 14px', borderRadius: '8px', border: '1.5px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <label htmlFor="propYearSelect" style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
+              Tax Assessment Year:
+            </label>
+            <select
+              id="propYearSelect"
+              value={propertyYear}
+              onChange={(e) => handleYearChange(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                fontWeight: 800,
+                fontSize: '13.5px',
+                color: 'var(--primary, #A31D24)',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              {availableYears.map((yr) => (
+                <option key={yr} value={yr}>
+                  Tax Year {yr} {yr === '2026-2027' ? '(Active Finance Act)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Sub-navigation Segmented Mode Switcher */}
@@ -642,7 +729,7 @@ export default function PropertyTaxCalculator() {
               <div className="calc-field-group">
                 <label className="calc-field-label">Holding Period Duration</label>
                 <div className="calc-grid-options" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
-                  {CGT_HOLDING_SCHEDULE.map((b) => (
+                  {liveCgtSchedule.map((b) => (
                     <button
                       key={b.periodId}
                       type="button"
@@ -796,21 +883,13 @@ export default function PropertyTaxCalculator() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><strong>Up to Rs. 50 Million</strong></td>
-                    <td>1.25%</td>
-                    <td>10.5%</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Rs. 50 Million to Rs. 100 Million</strong></td>
-                    <td>1.25%</td>
-                    <td>14.5%</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Above Rs. 100 Million</strong></td>
-                    <td>1.25%</td>
-                    <td>18.5%</td>
-                  </tr>
+                  {livePurchaseSlabs.map((slab, sIdx) => (
+                    <tr key={sIdx}>
+                      <td><strong>{slab.label}</strong></td>
+                      <td>{(slab.filerRate * 100).toFixed(2)}%</td>
+                      <td>{(slab.nonFilerRate * 100).toFixed(1)}%</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -818,7 +897,7 @@ export default function PropertyTaxCalculator() {
             <div className="schedule-callout-note">
               <Sparkles size={16} className="text-primary flex-shrink-0" />
               <span>
-                <strong>Overseas Pakistanis:</strong> Non-residents holding a valid <strong>NICOP</strong> or <strong>Pakistan Origin Card (POC)</strong> pay the lower filer rate (<strong>1.25%</strong>) even if they have not filed a local tax return in Pakistan.
+                <strong>Overseas Pakistanis:</strong> Non-residents holding a valid <strong>NICOP</strong> or <strong>Pakistan Origin Card (POC)</strong> pay the lower filer rate (<strong>{(liveSaleRates.overseas * 100).toFixed(2)}%</strong>) even if they have not filed a local tax return in Pakistan.
               </span>
             </div>
           </div>
@@ -836,17 +915,17 @@ export default function PropertyTaxCalculator() {
             <div className="schedule-pill-grid">
               <div className="schedule-rate-tile">
                 <span className="tile-label">Active Taxpayer (Filer)</span>
-                <span className="tile-val">2.75%</span>
+                <span className="tile-val">{(liveSaleRates.filer * 100).toFixed(2)}%</span>
                 <span className="tile-desc">Adjustable against annual CGT</span>
               </div>
               <div className="schedule-rate-tile alert-tile">
                 <span className="tile-label">Non-Filer</span>
-                <span className="tile-val">11.5%</span>
+                <span className="tile-val">{(liveSaleRates.nonFiler * 100).toFixed(1)}%</span>
                 <span className="tile-desc">Punitive withholding rate</span>
               </div>
               <div className="schedule-rate-tile">
                 <span className="tile-label">Overseas Pakistani (NICOP/POC)</span>
-                <span className="tile-val">2.75%</span>
+                <span className="tile-val">{(liveSaleRates.overseas * 100).toFixed(2)}%</span>
                 <span className="tile-desc">Filer rate concession</span>
               </div>
             </div>
@@ -873,48 +952,14 @@ export default function PropertyTaxCalculator() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><strong>Up to 1 year</strong></td>
-                    <td>15%</td>
-                    <td>15%</td>
-                    <td>15%</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Over 1 to 2 years</strong></td>
-                    <td>12.5%</td>
-                    <td>10%</td>
-                    <td>7.5%</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Over 2 to 3 years</strong></td>
-                    <td>10%</td>
-                    <td>7.5%</td>
-                    <td><span className="status-badge-green">0% (Exempt)</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Over 3 to 4 years</strong></td>
-                    <td>7.5%</td>
-                    <td>5%</td>
-                    <td><span className="status-badge-green">—</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Over 4 to 5 years</strong></td>
-                    <td>5%</td>
-                    <td><span className="status-badge-green">0% (Exempt)</span></td>
-                    <td><span className="status-badge-green">—</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Over 5 to 6 years</strong></td>
-                    <td>2.5%</td>
-                    <td><span className="status-badge-green">—</span></td>
-                    <td><span className="status-badge-green">—</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Over 6 years</strong></td>
-                    <td><span className="status-badge-green">0% (Exempt)</span></td>
-                    <td><span className="status-badge-green">—</span></td>
-                    <td><span className="status-badge-green">—</span></td>
-                  </tr>
+                  {liveCgtSchedule.map((b, bIdx) => (
+                    <tr key={b.periodId || bIdx}>
+                      <td><strong>{b.label}</strong></td>
+                      <td>{b.openPlotRate === 0 ? <span className="status-badge-green">0% (Exempt)</span> : `${(b.openPlotRate * 100).toFixed(1)}%`}</td>
+                      <td>{b.constructedRate === 0 ? <span className="status-badge-green">0% (Exempt)</span> : `${(b.constructedRate * 100).toFixed(1)}%`}</td>
+                      <td>{b.flatRate === 0 ? <span className="status-badge-green">0% (Exempt)</span> : `${(b.flatRate * 100).toFixed(1)}%`}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

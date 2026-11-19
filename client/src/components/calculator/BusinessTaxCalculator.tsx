@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   NON_SALARIED_SLABS,
   SUPER_TAX_BRACKETS
 } from '@/data/tax-calculator-data';
+import { getTaxYearsApi } from '@/lib/api';
 import {
   Building2,
   User,
@@ -23,6 +24,41 @@ export default function BusinessTaxCalculator() {
   const [bizCategory, setBizCategory] = useState<string>('general');
   const [bizProfit, setBizProfit] = useState<number>(10000000);
   const [bizTableYear, setBizTableYear] = useState<string>('2026-2027');
+
+  // Dynamic live tax data synchronized with MongoDB Backend
+  const [allYearsData, setAllYearsData] = useState<Record<string, any>>({});
+  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+
+  useEffect(() => {
+    async function syncBizWithBackend() {
+      try {
+        const records = await getTaxYearsApi();
+        if (records && records.length > 0) {
+          const mapped: Record<string, any> = {};
+          const years: string[] = [];
+
+          records.forEach((rec: any) => {
+            if (rec.year) {
+              years.push(rec.year);
+              mapped[rec.year] = rec;
+            }
+          });
+
+          if (years.length > 0) {
+            setAllYearsData(mapped);
+            setAvailableYears(years);
+            if (!years.includes(bizYear)) {
+              setBizYear(years[0]);
+              setBizTableYear(years[0]);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Operating with baseline business tax data');
+      }
+    }
+    syncBizWithBackend();
+  }, []);
 
   const formatPKR = (num: number) => {
     return 'Rs. ' + Math.round(num).toLocaleString('en-PK');
@@ -46,10 +82,12 @@ export default function BusinessTaxCalculator() {
     let categoryTag = '';
     let activeSlabDesc = '';
 
+    const currentYearRecord = allYearsData[bizYear];
+
     if (isInd) {
       const isProfAop = bizCategory === 'prof_aop';
       categoryTag = isProfAop ? 'Professional Firm AOP (Max 40% Cap)' : 'Commercial Business / Sole Proprietor';
-      const yearSlabs = (NON_SALARIED_SLABS as any)[bizYear] || (NON_SALARIED_SLABS as any)['2026-2027'];
+      const yearSlabs = currentYearRecord?.nonSalariedSlabs || (NON_SALARIED_SLABS as any)[bizYear] || (NON_SALARIED_SLABS as any)['2026-2027'];
 
       for (let i = 0; i < yearSlabs.length; i++) {
         if (profit > yearSlabs[i].min) {
@@ -77,41 +115,44 @@ export default function BusinessTaxCalculator() {
       totalTax = baseTax + surcharge;
     } else {
       // Corporate
+      const dynamicCorpRates = currentYearRecord?.corporateRates;
       let corporateRate = 0.29;
+
       if (bizCategory === 'small') {
-        corporateRate = 0.20;
-        categoryTag = 'Small Company (20% Corporate Rate)';
+        corporateRate = dynamicCorpRates?.small ?? 0.20;
+        categoryTag = `Small Company (${(corporateRate * 100).toFixed(0)}% Reduced Rate)`;
       } else if (bizCategory === 'banking') {
-        corporateRate = 0.39;
-        categoryTag = 'Banking Company (39% Corporate Rate + 10% Super Tax)';
+        corporateRate = dynamicCorpRates?.banking ?? 0.39;
+        categoryTag = `Banking Company (${(corporateRate * 100).toFixed(0)}% Corporate Rate + Super Tax)`;
       } else if (bizCategory === 'modaraba') {
-        corporateRate = 0.25;
-        categoryTag = 'Modaraba (25% Corporate Rate)';
+        corporateRate = dynamicCorpRates?.modaraba ?? 0.25;
+        categoryTag = `Modaraba (${(corporateRate * 100).toFixed(0)}% Corporate Rate)`;
       } else if (bizCategory === 'sme_cat1') {
-        corporateRate = 0.075;
-        categoryTag = 'SME Manufacturing Category 1 (7.5% Normal Tax)';
+        corporateRate = dynamicCorpRates?.sme_cat1 ?? 0.075;
+        categoryTag = `SME Manufacturing Category 1 (${(corporateRate * 100).toFixed(1)}% Normal Tax)`;
       } else if (bizCategory === 'sme_cat2') {
-        corporateRate = 0.15;
-        categoryTag = 'SME Manufacturing Category 2 (15% Normal Tax)';
+        corporateRate = dynamicCorpRates?.sme_cat2 ?? 0.15;
+        categoryTag = `SME Manufacturing Category 2 (${(corporateRate * 100).toFixed(0)}% Normal Tax)`;
       } else {
-        corporateRate = 0.29;
-        categoryTag = 'All Other Companies (General Corporate Rate: 29%)';
+        corporateRate = dynamicCorpRates?.general ?? 0.29;
+        categoryTag = `All Other Companies (General Corporate Rate: ${(corporateRate * 100).toFixed(0)}%)`;
       }
 
       baseTax = Math.round(profit * corporateRate);
       rateText = `${(corporateRate * 100).toFixed(1)}%`;
 
       // Super Tax (Section 4C)
+      const superBrackets = currentYearRecord?.superTaxBrackets || SUPER_TAX_BRACKETS;
       if (bizCategory === 'banking') {
         superTax = Math.round(profit * 0.10);
       } else if (profit > 150000000) {
-        if (profit <= 200000000) superTax = Math.round(profit * 0.01);
-        else if (profit <= 250000000) superTax = Math.round(profit * 0.02);
-        else if (profit <= 300000000) superTax = Math.round(profit * 0.03);
-        else if (profit <= 350000000) superTax = Math.round(profit * 0.04);
-        else if (profit <= 400000000) superTax = Math.round(profit * 0.06);
-        else if (profit <= 500000000) superTax = Math.round(profit * 0.08);
-        else superTax = Math.round(profit * (bizYear === '2026-2027' ? 0.08 : 0.10));
+        let matchedRate = 0;
+        for (const bracket of superBrackets) {
+          if (profit > bracket.min) {
+            matchedRate = bracket.rate;
+          }
+        }
+        superTax = Math.round(profit * matchedRate);
       }
 
       totalTax = baseTax + superTax;
@@ -134,7 +175,7 @@ export default function BusinessTaxCalculator() {
       activeSlabIndex,
       activeSlabDesc
     };
-  }, [bizProfit, bizEntity, bizCategory, bizYear]);
+  }, [bizProfit, bizEntity, bizCategory, bizYear, allYearsData]);
 
   return (
     <section className="section tax-calc-section" id="business-calculator">
@@ -178,10 +219,11 @@ export default function BusinessTaxCalculator() {
                     setBizTableYear(e.target.value);
                   }}
                 >
-                  <option value="2026-2027">Tax Year 2026–2027 (Current / Upcoming)</option>
-                  <option value="2025-2026">Tax Year 2025–2026</option>
-                  <option value="2024-2025">Tax Year 2024–2025</option>
-                  <option value="2023-2024">Tax Year 2023–2024</option>
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>
+                      {allYearsData[yr]?.label || `Tax Year ${yr}`} {yr === '2026-2027' ? '(Current)' : ''}
+                    </option>
+                  ))}
                 </select>
               </div>
 
