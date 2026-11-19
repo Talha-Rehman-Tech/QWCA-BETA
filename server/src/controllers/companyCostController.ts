@@ -23,10 +23,23 @@ export async function getCompanyCostConfig(req: Request, res: Response): Promise
   }
 }
 
-export async function saveCompanyCostConfig(req: Request, res: Response): Promise<void> {
-  const payload = req.body;
+function stripMongoIds(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(stripMongoIds);
+  } else if (obj !== null && typeof obj === 'object') {
+    const clean: any = {};
+    for (const key of Object.keys(obj)) {
+      if (key === '_id' || key === '__v') continue;
+      clean[key] = stripMongoIds(obj[key]);
+    }
+    return clean;
+  }
+  return obj;
+}
 
+export async function saveCompanyCostConfig(req: Request, res: Response): Promise<void> {
   try {
+    const payload = stripMongoIds(req.body);
     payload.configId = 'default';
     payload.updatedAt = new Date();
 
@@ -34,7 +47,7 @@ export async function saveCompanyCostConfig(req: Request, res: Response): Promis
       const updated = await CompanyCost.findOneAndUpdate(
         { configId: 'default' },
         { $set: payload },
-        { upsert: true, new: true }
+        { upsert: true, new: true, setDefaultsOnInsert: true }
       ).lean();
       inMemoryCostConfig = updated;
       res.json({ success: true, message: 'Company cost configuration saved to MongoDB', data: updated });

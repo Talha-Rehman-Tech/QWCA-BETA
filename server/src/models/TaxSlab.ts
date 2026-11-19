@@ -85,34 +85,86 @@ export interface ITaxSlabConfig extends Document {
   updatedAt: Date;
 }
 
+const SalarySlabSubSchema = new Schema(
+  {
+    min: { type: Number, required: true },
+    max: { type: Number, required: true },
+    rate: { type: Number, required: true },
+    baseTax: { type: Number, default: 0 },
+    rangeText: { type: String, default: '' },
+    rateText: { type: String, default: '' },
+    payableText: { type: String, default: '' },
+    formulaDesc: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const NonSalariedSlabSubSchema = new Schema(
+  {
+    min: { type: Number, required: true },
+    max: { type: Number, required: true },
+    rate: { type: Number, required: true },
+    fixed: { type: Number, default: 0 },
+    rangeText: { type: String, default: '' },
+    desc: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const SuperTaxBracketSubSchema = new Schema(
+  {
+    min: { type: Number, required: true },
+    max: { type: Number, required: true },
+    text: { type: String, default: '' },
+    rateText: { type: String, default: '' },
+    rate: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
+const RentalSlabSubSchema = new Schema(
+  {
+    min: { type: Number, required: true },
+    max: { type: Number, required: true },
+    rate: { type: Number, required: true },
+    rateText: { type: String, default: '' },
+    rangeText: { type: String, default: '' },
+    formula: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const PropertyPurchaseSlabSubSchema = new Schema(
+  {
+    min: { type: Number, required: true },
+    max: { type: Number, required: true },
+    filerRate: { type: Number, default: 0.0125 },
+    nonFilerRate: { type: Number, default: 0.105 },
+    overseasRate: { type: Number, default: 0.0125 },
+    label: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const CGTHoldingBracketSubSchema = new Schema(
+  {
+    periodId: { type: String, required: true },
+    label: { type: String, required: true },
+    openPlotRate: { type: Number, default: 0 },
+    constructedRate: { type: Number, default: 0 },
+    flatRate: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
 const TaxSlabSchema = new Schema<ITaxSlabConfig>(
   {
     year: { type: String, required: true, unique: true, index: true },
     label: { type: String, required: true },
     title: { type: String, required: true },
     desc: { type: String, default: '' },
-    salarySlabs: [
-      {
-        min: { type: Number, required: true },
-        max: { type: Number, required: true },
-        rate: { type: Number, required: true },
-        baseTax: { type: Number, default: 0 },
-        rangeText: { type: String, default: '' },
-        rateText: { type: String, default: '' },
-        payableText: { type: String, default: '' },
-        formulaDesc: { type: String, default: '' },
-      },
-    ],
-    nonSalariedSlabs: [
-      {
-        min: { type: Number, required: true },
-        max: { type: Number, required: true },
-        rate: { type: Number, required: true },
-        fixed: { type: Number, default: 0 },
-        rangeText: { type: String, default: '' },
-        desc: { type: String, default: '' },
-      },
-    ],
+    salarySlabs: [SalarySlabSubSchema],
+    nonSalariedSlabs: [NonSalariedSlabSubSchema],
     corporateRates: {
       general: { type: Number, default: 0.29 },
       small: { type: Number, default: 0.20 },
@@ -121,49 +173,15 @@ const TaxSlabSchema = new Schema<ITaxSlabConfig>(
       sme_cat1: { type: Number, default: 0.075 },
       sme_cat2: { type: Number, default: 0.15 },
     },
-    superTaxBrackets: [
-      {
-        min: { type: Number, required: true },
-        max: { type: Number, required: true },
-        text: { type: String, default: '' },
-        rateText: { type: String, default: '' },
-        rate: { type: Number, required: true },
-      },
-    ],
-    rentalSlabs: [
-      {
-        min: { type: Number, required: true },
-        max: { type: Number, required: true },
-        rate: { type: Number, required: true },
-        rateText: { type: String, default: '' },
-        rangeText: { type: String, default: '' },
-        formula: { type: String, default: '' },
-      },
-    ],
-    propertyPurchaseSlabs: [
-      {
-        min: { type: Number, required: true },
-        max: { type: Number, required: true },
-        filerRate: { type: Number, default: 0.0125 },
-        nonFilerRate: { type: Number, default: 0.105 },
-        overseasRate: { type: Number, default: 0.0125 },
-        label: { type: String, default: '' },
-      },
-    ],
+    superTaxBrackets: [SuperTaxBracketSubSchema],
+    rentalSlabs: [RentalSlabSubSchema],
+    propertyPurchaseSlabs: [PropertyPurchaseSlabSubSchema],
     propertySaleRates: {
       filer: { type: Number, default: 0.0275 },
       nonFiler: { type: Number, default: 0.115 },
       overseas: { type: Number, default: 0.0275 },
     },
-    cgtHoldingSchedule: [
-      {
-        periodId: { type: String, required: true },
-        label: { type: String, required: true },
-        openPlotRate: { type: Number, default: 0 },
-        constructedRate: { type: Number, default: 0 },
-        flatRate: { type: Number, default: 0 },
-      },
-    ],
+    cgtHoldingSchedule: [CGTHoldingBracketSubSchema],
   },
   { timestamps: true }
 );

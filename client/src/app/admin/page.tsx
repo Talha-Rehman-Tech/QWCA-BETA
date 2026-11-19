@@ -269,6 +269,11 @@ export default function AdminCustomizationDashboard() {
     }
 
     const cloned = JSON.parse(JSON.stringify(currentTaxYearData));
+    delete cloned._id;
+    delete cloned.__v;
+    delete cloned.createdAt;
+    delete cloned.updatedAt;
+
     cloned.year = newYearInput;
     cloned.label = `Tax Year ${newYearInput}`;
     cloned.title = `Income Tax Slabs ${newYearInput}`;
@@ -288,7 +293,11 @@ export default function AdminCustomizationDashboard() {
     setIsSaving(true);
     setSaveNotification(null);
 
-    const result = await saveTaxYearApi(selectedYear, currentTaxYearData);
+    const payload = JSON.parse(JSON.stringify(currentTaxYearData));
+    delete payload._id;
+    delete payload.__v;
+
+    const result = await saveTaxYearApi(selectedYear, payload);
     setIsSaving(false);
 
     if (result.success) {
@@ -314,7 +323,11 @@ export default function AdminCustomizationDashboard() {
     setIsSaving(true);
     setSaveNotification(null);
 
-    const result = await saveCompanyCostConfigApi(companyCostData);
+    const payload = JSON.parse(JSON.stringify(companyCostData));
+    delete payload._id;
+    delete payload.__v;
+
+    const result = await saveCompanyCostConfigApi(payload);
     setIsSaving(false);
 
     if (result.success) {

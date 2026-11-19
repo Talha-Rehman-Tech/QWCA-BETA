@@ -49,11 +49,25 @@ export async function getTaxSlabByYear(req: Request, res: Response): Promise<voi
   }
 }
 
+function stripMongoIds(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(stripMongoIds);
+  } else if (obj !== null && typeof obj === 'object') {
+    const clean: any = {};
+    for (const key of Object.keys(obj)) {
+      if (key === '_id' || key === '__v') continue;
+      clean[key] = stripMongoIds(obj[key]);
+    }
+    return clean;
+  }
+  return obj;
+}
+
 export async function saveTaxSlabYear(req: Request, res: Response): Promise<void> {
   const { year } = req.params;
-  const payload = req.body;
 
   try {
+    const payload = stripMongoIds(req.body);
     payload.year = year;
     payload.updatedAt = new Date();
 
@@ -61,7 +75,7 @@ export async function saveTaxSlabYear(req: Request, res: Response): Promise<void
       const updated = await TaxSlab.findOneAndUpdate(
         { year },
         { $set: payload },
-        { upsert: true, new: true }
+        { upsert: true, new: true, setDefaultsOnInsert: true }
       ).lean();
 
       // Keep in-memory cache synchronized

@@ -35,39 +35,48 @@ export interface ICompanyCostConfig extends Document {
   updatedAt: Date;
 }
 
+const EntityTierSubSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    badge: { type: String, default: '' },
+    desc: { type: String, default: '' },
+    baseFee: { type: Number, required: true },
+    highlight: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
+
+const CapitalTierSubSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    label: { type: String, required: true },
+    fee: { type: Number, required: true },
+    rangeText: { type: String, default: '' },
+    secpNote: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const ServiceAddonSubSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    fee: { type: Number, required: true },
+    desc: { type: String, default: '' },
+    category: { type: String, default: 'compliance' },
+    optional: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
 const CompanyCostSchema = new Schema<ICompanyCostConfig>(
   {
     configId: { type: String, required: true, unique: true, default: 'default' },
     secpBaseFilingFee: { type: Number, default: 4500 },
-    entityTiers: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        badge: { type: String, default: '' },
-        desc: { type: String, default: '' },
-        baseFee: { type: Number, required: true },
-        highlight: { type: Boolean, default: false },
-      },
-    ],
-    capitalTiers: [
-      {
-        id: { type: String, required: true },
-        label: { type: String, required: true },
-        fee: { type: Number, required: true },
-        rangeText: { type: String, default: '' },
-        secpNote: { type: String, default: '' },
-      },
-    ],
-    serviceAddons: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        fee: { type: Number, required: true },
-        desc: { type: String, default: '' },
-        category: { type: String, default: 'compliance' },
-        optional: { type: Boolean, default: true },
-      },
-    ],
+    entityTiers: [EntityTierSubSchema],
+    capitalTiers: [CapitalTierSubSchema],
+    serviceAddons: [ServiceAddonSubSchema],
   },
   { timestamps: true }
 );
