@@ -6,6 +6,8 @@ export interface IEntityTier {
   badge: string;
   desc: string;
   baseFee: number;
+  baseGovFee?: number;
+  baseConsultingFee?: number;
   highlight?: boolean;
 }
 
@@ -21,9 +23,23 @@ export interface IServiceAddon {
   id: string;
   name: string;
   fee: number;
+  govtFee: number;
+  consultingFee: number;
   desc: string;
   category: string;
-  optional: boolean;
+  required?: boolean;
+  defaultChecked?: boolean;
+  optional?: boolean;
+}
+
+export interface ICustomCostItem {
+  id: string;
+  title: string;
+  fee: number;
+  govtFee?: number;
+  consultingFee?: number;
+  desc?: string;
+  category?: string;
 }
 
 export interface ICompanyCostConfig extends Document {
@@ -32,6 +48,7 @@ export interface ICompanyCostConfig extends Document {
   entityTiers: IEntityTier[];
   capitalTiers: ICapitalTier[];
   serviceAddons: IServiceAddon[];
+  customCostItems?: ICustomCostItem[];
   updatedAt: Date;
 }
 
@@ -42,6 +59,8 @@ const EntityTierSubSchema = new Schema(
     badge: { type: String, default: '' },
     desc: { type: String, default: '' },
     baseFee: { type: Number, required: true },
+    baseGovFee: { type: Number, default: 0 },
+    baseConsultingFee: { type: Number, default: 0 },
     highlight: { type: Boolean, default: false },
   },
   { _id: false }
@@ -63,9 +82,26 @@ const ServiceAddonSubSchema = new Schema(
     id: { type: String, required: true },
     name: { type: String, required: true },
     fee: { type: Number, required: true },
+    govtFee: { type: Number, default: 0 },
+    consultingFee: { type: Number, default: 0 },
     desc: { type: String, default: '' },
-    category: { type: String, default: 'compliance' },
+    category: { type: String, default: 'SECP & Incorporation' },
+    required: { type: Boolean, default: false },
+    defaultChecked: { type: Boolean, default: false },
     optional: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
+const CustomCostItemSubSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    title: { type: String, required: true },
+    fee: { type: Number, required: true },
+    govtFee: { type: Number, default: 0 },
+    consultingFee: { type: Number, default: 0 },
+    desc: { type: String, default: '' },
+    category: { type: String, default: 'Custom Services' },
   },
   { _id: false }
 );
@@ -77,6 +113,7 @@ const CompanyCostSchema = new Schema<ICompanyCostConfig>(
     entityTiers: [EntityTierSubSchema],
     capitalTiers: [CapitalTierSubSchema],
     serviceAddons: [ServiceAddonSubSchema],
+    customCostItems: [CustomCostItemSubSchema],
   },
   { timestamps: true }
 );

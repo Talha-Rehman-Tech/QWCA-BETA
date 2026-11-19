@@ -50,6 +50,7 @@ export interface IPropertyPurchaseSlab {
   min: number;
   max: number;
   filerRate: number;
+  lateFilerRate: number;
   nonFilerRate: number;
   overseasRate: number;
   label: string;
@@ -57,6 +58,7 @@ export interface IPropertyPurchaseSlab {
 
 export interface IPropertySaleRates {
   filer: number;
+  lateFiler: number;
   nonFiler: number;
   overseas: number;
 }
@@ -67,6 +69,31 @@ export interface ICGTHoldingBracket {
   openPlotRate: number;
   constructedRate: number;
   flatRate: number;
+  lateFilerRate?: number;
+}
+
+export interface ICustomTaxRateItem {
+  label: string;
+  value: string | number;
+  note?: string;
+}
+
+export interface ICustomTaxSection {
+  id: string;
+  title: string;
+  category: string;
+  description?: string;
+  rates: ICustomTaxRateItem[];
+}
+
+export interface ILateFilerRules {
+  individualSurcharge: number;
+  aopSurcharge: number;
+  corporateSurcharge: number;
+  property236kRate: number;
+  property236cRate: number;
+  cgtFlatRate: number;
+  description: string;
 }
 
 export interface ITaxSlabConfig extends Document {
@@ -82,6 +109,8 @@ export interface ITaxSlabConfig extends Document {
   propertyPurchaseSlabs: IPropertyPurchaseSlab[];
   propertySaleRates: IPropertySaleRates;
   cgtHoldingSchedule: ICGTHoldingBracket[];
+  customSections?: ICustomTaxSection[];
+  lateFilerRules?: ILateFilerRules;
   updatedAt: Date;
 }
 
@@ -139,6 +168,7 @@ const PropertyPurchaseSlabSubSchema = new Schema(
     min: { type: Number, required: true },
     max: { type: Number, required: true },
     filerRate: { type: Number, default: 0.0125 },
+    lateFilerRate: { type: Number, default: 0.055 },
     nonFilerRate: { type: Number, default: 0.105 },
     overseasRate: { type: Number, default: 0.0125 },
     label: { type: String, default: '' },
@@ -153,6 +183,40 @@ const CGTHoldingBracketSubSchema = new Schema(
     openPlotRate: { type: Number, default: 0 },
     constructedRate: { type: Number, default: 0 },
     flatRate: { type: Number, default: 0 },
+    lateFilerRate: { type: Number, default: 0.20 },
+  },
+  { _id: false }
+);
+
+const CustomTaxRateItemSubSchema = new Schema(
+  {
+    label: { type: String, required: true },
+    value: { type: Schema.Types.Mixed, required: true },
+    note: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const CustomTaxSectionSubSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    title: { type: String, required: true },
+    category: { type: String, default: 'General' },
+    description: { type: String, default: '' },
+    rates: [CustomTaxRateItemSubSchema],
+  },
+  { _id: false }
+);
+
+const LateFilerRulesSubSchema = new Schema(
+  {
+    individualSurcharge: { type: Number, default: 1000 },
+    aopSurcharge: { type: Number, default: 10000 },
+    corporateSurcharge: { type: Number, default: 20000 },
+    property236kRate: { type: Number, default: 0.055 },
+    property236cRate: { type: Number, default: 0.045 },
+    cgtFlatRate: { type: Number, default: 0.20 },
+    description: { type: String, default: 'Statutory surcharge and adjusted withholding rates under Finance Act for late tax return filers.' },
   },
   { _id: false }
 );
@@ -178,10 +242,13 @@ const TaxSlabSchema = new Schema<ITaxSlabConfig>(
     propertyPurchaseSlabs: [PropertyPurchaseSlabSubSchema],
     propertySaleRates: {
       filer: { type: Number, default: 0.0275 },
+      lateFiler: { type: Number, default: 0.045 },
       nonFiler: { type: Number, default: 0.115 },
       overseas: { type: Number, default: 0.0275 },
     },
     cgtHoldingSchedule: [CGTHoldingBracketSubSchema],
+    customSections: [CustomTaxSectionSubSchema],
+    lateFilerRules: { type: LateFilerRulesSubSchema, default: () => ({}) },
   },
   { timestamps: true }
 );

@@ -58,12 +58,13 @@ export default function CostCalculator() {
                     t.id === ent.id ||
                     (ent.id === 'smc-private' && t.id === 'smc') ||
                     (ent.id === 'pvt-limited' && t.id === 'pvt_ltd') ||
-                    (ent.id === 'foreign-subsidiary' && t.id === 'cpec_foreign')
+                    (ent.id === 'foreign-subsidiary' && t.id === 'cpec_foreign') ||
+                    (ent.id === 'public-unlisted' && t.id === 'public_unlisted')
                 );
                 if (match) {
                   const totalFee = match.baseFee;
-                  const baseGov = Math.min(ent.baseGovFee, totalFee);
-                  const baseConsult = Math.max(0, totalFee - baseGov);
+                  const baseGov = match.baseGovFee !== undefined ? match.baseGovFee : Math.min(ent.baseGovFee, totalFee);
+                  const baseConsult = match.baseConsultingFee !== undefined ? match.baseConsultingFee : Math.max(0, totalFee - baseGov);
                   return {
                     ...ent,
                     name: match.name || ent.name,
@@ -109,19 +110,25 @@ export default function CostCalculator() {
                 const match = config.serviceAddons.find(
                   (a: any) =>
                     a.id === addon.id ||
+                    (addon.id === 'secp-incorporation' && a.id === 'secp_incorp') ||
+                    (addon.id === 'moa-aoa-drafting' && a.id === 'moa_aoa') ||
                     (addon.id === 'corporate-ntn' && a.id === 'fbr_ntn') ||
                     (addon.id === 'sales-tax-strn' && a.id === 'sales_tax') ||
                     (addon.id === 'chamber-membership' && a.id === 'chamber') ||
                     (addon.id === 'weboc-import-export' && a.id === 'weboc') ||
                     (addon.id === 'trademark-filing' && a.id === 'trademark') ||
-                    (addon.id === 'bank-account-resolution' && a.id === 'bank_resolution')
+                    (addon.id === 'bank-account-resolution' && a.id === 'bank_resolution') ||
+                    (addon.id === 'foreign-director-clearance' && a.id === 'foreign_clearance')
                 );
                 if (match) {
                   const totalFee = match.fee;
-                  const govFee = Math.min(addon.govtFee, totalFee);
-                  const consultFee = Math.max(0, totalFee - govFee);
+                  const govFee = match.govtFee !== undefined ? match.govtFee : Math.min(addon.govtFee, totalFee);
+                  const consultFee = match.consultingFee !== undefined ? match.consultingFee : Math.max(0, totalFee - govFee);
                   return {
                     ...addon,
+                    name: match.name || addon.name,
+                    description: match.desc || addon.description,
+                    category: match.category || addon.category,
                     govtFee: govFee,
                     consultingFee: consultFee,
                   };

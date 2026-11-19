@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   ArrowRight,
   Home,
-  Landmark
+  Landmark,
+  Clock
 } from 'lucide-react';
 
 export default function BusinessTaxCalculator() {
@@ -23,11 +24,12 @@ export default function BusinessTaxCalculator() {
   const [bizEntity, setBizEntity] = useState<'individual' | 'corporate'>('corporate');
   const [bizCategory, setBizCategory] = useState<string>('general');
   const [bizProfit, setBizProfit] = useState<number>(10000000);
+  const [bizTaxpayerStatus, setBizTaxpayerStatus] = useState<'filer' | 'lateFiler'>('filer');
   const [bizTableYear, setBizTableYear] = useState<string>('2026-2027');
 
   // Dynamic live tax data synchronized with MongoDB Backend
   const [allYearsData, setAllYearsData] = useState<Record<string, any>>({});
-  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025', '2023-2024']);
 
   useEffect(() => {
     async function syncBizWithBackend() {
@@ -159,6 +161,18 @@ export default function BusinessTaxCalculator() {
       activeSlabDesc = `${categoryTag} with statutory corporate compliance.`;
     }
 
+    let lateFilerPenalty = 0;
+    if (bizTaxpayerStatus === 'lateFiler') {
+      if (isInd) {
+        lateFilerPenalty = bizCategory === 'prof_aop'
+          ? (currentYearRecord?.lateFilerRules?.aopSurcharge ?? 10000)
+          : (currentYearRecord?.lateFilerRules?.individualSurcharge ?? 1000);
+      } else {
+        lateFilerPenalty = currentYearRecord?.lateFilerRules?.corporateSurcharge ?? 20000;
+      }
+    }
+    totalTax = totalTax + lateFilerPenalty;
+
     const pat = Math.max(0, profit - totalTax);
     const effectiveRate = profit > 0 ? (totalTax / profit) * 100 : 0;
 
@@ -167,6 +181,7 @@ export default function BusinessTaxCalculator() {
       isInd,
       baseTax,
       superTax,
+      lateFilerPenalty,
       totalTax,
       pat,
       effectiveRate,
@@ -175,7 +190,7 @@ export default function BusinessTaxCalculator() {
       activeSlabIndex,
       activeSlabDesc
     };
-  }, [bizProfit, bizEntity, bizCategory, bizYear, allYearsData]);
+  }, [bizProfit, bizEntity, bizCategory, bizTaxpayerStatus, bizYear, allYearsData]);
 
   return (
     <section className="section tax-calc-section" id="business-calculator">
@@ -284,6 +299,31 @@ export default function BusinessTaxCalculator() {
                 </select>
               </div>
 
+              {/* Taxpayer Filing Status (Active vs Late Filer) */}
+              <div className="form-group">
+                <label>FBR Tax Filing Status</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className={`sme-regime-pill ${bizTaxpayerStatus === 'filer' ? 'active' : ''}`}
+                    onClick={() => setBizTaxpayerStatus('filer')}
+                    style={{ flex: 1, padding: '7px 12px', fontSize: '12.5px' }}
+                  >
+                    <CheckCircle2 size={14} />
+                    <span>Active Filer</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`sme-regime-pill ${bizTaxpayerStatus === 'lateFiler' ? 'active' : ''}`}
+                    onClick={() => setBizTaxpayerStatus('lateFiler')}
+                    style={{ flex: 1, padding: '7px 12px', fontSize: '12.5px' }}
+                  >
+                    <Clock size={14} />
+                    <span>Late Filer (Post Due-Date)</span>
+                  </button>
+                </div>
+              </div>
+
               {/* FBR Non-Salaried & AOP Key Provisions Callout */}
               {bizEntity === 'individual' && (
                 <div className="biz-rules-callout">
@@ -358,6 +398,13 @@ export default function BusinessTaxCalculator() {
               <span className="biz-entity-pill-value">{businessCalc.categoryTag}</span>
             </div>
 
+            {businessCalc.lateFilerPenalty > 0 && (
+              <div style={{ background: '#fffbeb', border: '1px solid #f59e0b', color: '#b45309', padding: '8px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, margin: '10px 0 14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Clock size={14} />
+                <span>Late Filer Mode: Includes {formatPKR(businessCalc.lateFilerPenalty)} statutory ATL restoration surcharge.</span>
+              </div>
+            )}
+
             <div className="result-highlight-box">
               <div className="res-item primary-res">
                 <span className="res-label">Profit After Tax (PAT)</span>
@@ -367,7 +414,9 @@ export default function BusinessTaxCalculator() {
               <div className="res-item highlight-tax">
                 <span className="res-label">Total Tax Liability</span>
                 <span className="res-value tax-amt">{formatPKR(businessCalc.totalTax)}</span>
-                <span className="res-sub">Base Tax + Super Tax (Sec 4C)</span>
+                <span className="res-sub">
+                  Base Tax + Super Tax {businessCalc.lateFilerPenalty > 0 ? '+ Late Surcharge' : ''}
+                </span>
               </div>
             </div>
 

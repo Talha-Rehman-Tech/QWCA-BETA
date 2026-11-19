@@ -12,18 +12,20 @@ import {
   ArrowRight,
   Building2,
   Home,
-  Landmark
+  Landmark,
+  Clock
 } from 'lucide-react';
 
 export default function SalariedTaxCalculator() {
   const [salYear, setSalYear] = useState<string>('2026-2027');
   const [salPeriod, setSalPeriod] = useState<'monthly' | 'annually'>('monthly');
   const [salAmount, setSalAmount] = useState<number>(100000);
+  const [salTaxpayerStatus, setSalTaxpayerStatus] = useState<'filer' | 'lateFiler'>('filer');
   const [salTableYear, setSalTableYear] = useState<string>('2026-2027');
 
   // Dynamic live tax data synchronized with MongoDB Backend
   const [allYearsData, setAllYearsData] = useState<Record<string, any>>(SALARY_TAX_DATA);
-  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+  const [availableYears, setAvailableYears] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025', '2023-2024']);
 
   useEffect(() => {
     async function syncWithBackend() {
@@ -195,6 +197,31 @@ export default function SalariedTaxCalculator() {
                 </div>
               </div>
 
+              {/* Tax Filing Status */}
+              <div className="form-group">
+                <label>Tax Filing Status</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className={`preset-pill ${salTaxpayerStatus === 'filer' ? 'active' : ''}`}
+                    onClick={() => setSalTaxpayerStatus('filer')}
+                    style={{ flex: 1, padding: '7px 12px', fontSize: '12.5px', justifyContent: 'center', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    <CheckCircle2 size={14} />
+                    <span>Active Filer</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`preset-pill ${salTaxpayerStatus === 'lateFiler' ? 'active' : ''}`}
+                    onClick={() => setSalTaxpayerStatus('lateFiler')}
+                    style={{ flex: 1, padding: '7px 12px', fontSize: '12.5px', justifyContent: 'center', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    <Clock size={14} />
+                    <span>Late Filer</span>
+                  </button>
+                </div>
+              </div>
+
               <div className="salary-presets" aria-label="Quick salary presets">
                 <span className="presets-label">Quick select presets:</span>
                 <div className="presets-row">
@@ -229,6 +256,13 @@ export default function SalariedTaxCalculator() {
               <span className="result-badge">Tax Year {salYear}</span>
               <h3>Calculation Summary</h3>
             </div>
+
+            {salTaxpayerStatus === 'lateFiler' && (
+              <div style={{ background: '#fffbeb', border: '1px solid #f59e0b', color: '#b45309', padding: '8px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, margin: '8px 0 12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Clock size={14} />
+                <span>Late Filer Mode: Statutory ATL restoration surcharge of Rs. 1,000 applies under Section 182(2).</span>
+              </div>
+            )}
 
             <div className="result-highlight-box">
               <div className="res-item primary-res">

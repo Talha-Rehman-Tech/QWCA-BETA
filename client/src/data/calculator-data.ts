@@ -30,24 +30,24 @@ export const entityTypes: EntityTypeOption[] = [
     name: 'Single Member Company (SMC-Private)',
     description: 'Ideal for solo entrepreneurs and single business owners desiring full limited liability protection.',
     baseGovFee: 4000,
-    baseConsultingFee: 18000,
+    baseConsultingFee: 22000,
     badge: 'Solo Founders'
   },
   {
     id: 'pvt-limited',
     name: 'Private Limited Company (Pvt. Ltd.)',
-    description: 'The standard choice for startups, partnerships, and joint ventures with 2 to 50 shareholders.',
+    description: 'The standard choice for startups, partnerships, and small-to-medium businesses with 2 or more shareholders.',
     baseGovFee: 5500,
-    baseConsultingFee: 22000,
+    baseConsultingFee: 19500,
     badge: 'Most Recommended'
   },
   {
     id: 'foreign-subsidiary',
-    name: 'Foreign Subsidiary / Chinese Company',
-    description: 'Cross-border incorporation with foreign directors, Ministry of Interior clearance, and SBP compliance.',
-    baseGovFee: 35000,
-    baseConsultingFee: 75000,
-    badge: 'Cross-Border / CPEC'
+    name: 'Foreign Owned / CPEC Enterprise',
+    description: 'Full assistance for foreign nationals, Chinese enterprises, and BOI-compliant multinational subsidiaries.',
+    baseGovFee: 15000,
+    baseConsultingFee: 54000,
+    badge: 'International Investors'
   },
   {
     id: 'public-unlisted',
@@ -60,10 +60,10 @@ export const entityTypes: EntityTypeOption[] = [
 ];
 
 export const capitalSlabs: CapitalSlab[] = [
-  { id: '100k', label: 'PKR 100,000 (Base Tier)', secpCapitalFee: 1500 },
-  { id: '1m', label: 'PKR 1,000,000 (Recommended Tier)', secpCapitalFee: 4500 },
-  { id: '5m', label: 'PKR 5,000,000 (Industrial / Commercial Tier)', secpCapitalFee: 12500 },
-  { id: '10m', label: 'PKR 10,000,000 (Large Enterprise Tier)', secpCapitalFee: 25000 }
+  { id: '100k', label: 'PKR 100,000 (Base Tier)', secpCapitalFee: 4500 },
+  { id: '1m', label: 'PKR 1,000,000 (1 Million)', secpCapitalFee: 9500 },
+  { id: '5m', label: 'PKR 5,000,000 (5 Million)', secpCapitalFee: 24000 },
+  { id: '10m', label: 'PKR 10,000,000 (10 Million)', secpCapitalFee: 42000 }
 ];
 
 export const setupAddons: SetupAddon[] = [
@@ -92,7 +92,7 @@ export const setupAddons: SetupAddon[] = [
     category: 'Taxation & FBR',
     description: 'Enrollment with Federal Board of Revenue, Principal Officer assignment, and Active Taxpayer status.',
     govtFee: 0,
-    consultingFee: 6000,
+    consultingFee: 3500,
     defaultChecked: true
   },
   {
@@ -101,15 +101,15 @@ export const setupAddons: SetupAddon[] = [
     category: 'Taxation & FBR',
     description: 'Mandatory sales tax registration for manufacturers, importers, distributors, and registered service providers.',
     govtFee: 0,
-    consultingFee: 10000,
+    consultingFee: 7500,
     defaultChecked: false
   },
   {
     id: 'chamber-membership',
-    name: 'Chamber of Commerce Membership (FCCID / LCCI)',
+    name: 'Chamber of Commerce Membership (FCCI / LCCI)',
     category: 'Licensing & Foreign',
     description: 'Corporate membership in relevant Chamber of Commerce, necessary for commercial trade and export/import.',
-    govtFee: 22000,
+    govtFee: 10000,
     consultingFee: 8000,
     defaultChecked: false
   },
@@ -118,8 +118,8 @@ export const setupAddons: SetupAddon[] = [
     name: 'WeBOC Import / Export User ID Registration',
     category: 'Licensing & Foreign',
     description: 'Customs computerised clearance system registration for cross-border shipping, freight, and trade.',
-    govtFee: 1500,
-    consultingFee: 9000,
+    govtFee: 2000,
+    consultingFee: 10000,
     defaultChecked: false
   },
   {
@@ -128,7 +128,7 @@ export const setupAddons: SetupAddon[] = [
     category: 'IP & Operations',
     description: 'Official search and preliminary trademark filing under applicable class to safeguard corporate brand equity.',
     govtFee: 3000,
-    consultingFee: 9000,
+    consultingFee: 19000,
     defaultChecked: false
   },
   {
@@ -137,7 +137,7 @@ export const setupAddons: SetupAddon[] = [
     category: 'IP & Operations',
     description: 'Specialized board resolutions, Form 29 verification, and bank compliance assistance for corporate account opening.',
     govtFee: 0,
-    consultingFee: 5000,
+    consultingFee: 2500,
     defaultChecked: true
   },
   {
@@ -150,4 +150,3 @@ export const setupAddons: SetupAddon[] = [
     defaultChecked: false
   }
 ];
-

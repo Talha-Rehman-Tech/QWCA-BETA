@@ -9,16 +9,18 @@ let inMemoryTaxYears: any[] = JSON.parse(JSON.stringify(INITIAL_TAX_YEARS));
 export async function getAllTaxYears(req: Request, res: Response): Promise<void> {
   try {
     if (isDbConnected()) {
-      let records = await TaxSlab.find().sort({ year: -1 }).lean();
+      let records = await TaxSlab.find().lean();
       if (!records || records.length === 0) {
         // Seed database
         await TaxSlab.insertMany(INITIAL_TAX_YEARS);
-        records = await TaxSlab.find().sort({ year: -1 }).lean();
+        records = await TaxSlab.find().lean();
       }
+      records.sort((a: any, b: any) => b.year.localeCompare(a.year, undefined, { numeric: true }));
       res.json({ success: true, source: 'mongodb', data: records });
       return;
     }
 
+    inMemoryTaxYears.sort((a: any, b: any) => b.year.localeCompare(a.year, undefined, { numeric: true }));
     res.json({ success: true, source: 'in-memory', data: inMemoryTaxYears });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message, data: inMemoryTaxYears });

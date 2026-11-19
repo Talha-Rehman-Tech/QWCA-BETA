@@ -94,11 +94,11 @@ export default function PropertyTaxCalculator() {
 
   // ================= 1. BUYING / PURCHASE TAX (SECTION 236K) STATE =================
   const [buyValue, setBuyValue] = useState<number>(15000000);
-  const [buyTaxpayerStatus, setBuyTaxpayerStatus] = useState<'filer' | 'nonFiler' | 'overseas'>('filer');
+  const [buyTaxpayerStatus, setBuyTaxpayerStatus] = useState<'filer' | 'lateFiler' | 'nonFiler' | 'overseas'>('filer');
 
   // ================= 2. SELLING / ADVANCE TAX (SECTION 236C) STATE =================
   const [sellValue, setSellValue] = useState<number>(20000000);
-  const [sellTaxpayerStatus, setSellTaxpayerStatus] = useState<'filer' | 'nonFiler' | 'overseas'>('filer');
+  const [sellTaxpayerStatus, setSellTaxpayerStatus] = useState<'filer' | 'lateFiler' | 'nonFiler' | 'overseas'>('filer');
 
   // ================= 3. CAPITAL GAINS TAX (CGT - SECTION 37) STATE =================
   const [cgtPropType, setCgtPropType] = useState<'openPlot' | 'constructed' | 'flat'>('openPlot');
@@ -106,7 +106,7 @@ export default function PropertyTaxCalculator() {
   const [cgtPurchaseCost, setCgtPurchaseCost] = useState<number>(12000000);
   const [cgtSalePrice, setCgtSalePrice] = useState<number>(20000000);
   const [cgtHoldingPeriod, setCgtHoldingPeriod] = useState<string>('1-to-2');
-  const [cgtTaxpayerStatus, setCgtTaxpayerStatus] = useState<'filer' | 'nonFiler'>('filer');
+  const [cgtTaxpayerStatus, setCgtTaxpayerStatus] = useState<'filer' | 'lateFiler' | 'nonFiler'>('filer');
   const [adjust236C, setAdjust236C] = useState<boolean>(true);
 
   const formatPKR = (num: number) => {
@@ -129,7 +129,9 @@ export default function PropertyTaxCalculator() {
     }
 
     let rate = slab.filerRate;
-    if (buyTaxpayerStatus === 'nonFiler') {
+    if (buyTaxpayerStatus === 'lateFiler') {
+      rate = slab.lateFilerRate || 0.055;
+    } else if (buyTaxpayerStatus === 'nonFiler') {
       rate = slab.nonFilerRate;
     } else if (buyTaxpayerStatus === 'overseas') {
       rate = slab.overseasRate;
@@ -151,7 +153,9 @@ export default function PropertyTaxCalculator() {
   // ================= SELLING TAX CALCULATIONS (SEC 236C) =================
   const saleCalc = useMemo(() => {
     let rate = liveSaleRates.filer;
-    if (sellTaxpayerStatus === 'nonFiler') {
+    if (sellTaxpayerStatus === 'lateFiler') {
+      rate = liveSaleRates.lateFiler || 0.045;
+    } else if (sellTaxpayerStatus === 'nonFiler') {
       rate = liveSaleRates.nonFiler;
     } else if (sellTaxpayerStatus === 'overseas') {
       rate = liveSaleRates.overseas;
@@ -173,8 +177,10 @@ export default function PropertyTaxCalculator() {
     let isExempt = false;
 
     if (cgtAcquisitionRegime === 'postJuly24') {
-      // Finance Act 2024 new regime: Flat 15% for filers on capital gain
-      applicableRate = cgtTaxpayerStatus === 'filer' ? 0.15 : 0.30;
+      // Finance Act 2024 new regime: Flat 15% for filers, 20% for late filers, 30% for non-filers
+      if (cgtTaxpayerStatus === 'filer') applicableRate = 0.15;
+      else if (cgtTaxpayerStatus === 'lateFiler') applicableRate = 0.20;
+      else applicableRate = 0.30;
     } else {
       // Pre-1 July 2024 acquisition: Declining holding period schedule
       const bracket = liveCgtSchedule.find((b) => b.periodId === cgtHoldingPeriod) || liveCgtSchedule[0] || CGT_HOLDING_SCHEDULE[0];
@@ -186,8 +192,9 @@ export default function PropertyTaxCalculator() {
         applicableRate = bracket.flatRate;
       }
 
-      if (cgtTaxpayerStatus === 'nonFiler' && applicableRate > 0) {
-        // Penalized non-filer rate
+      if (cgtTaxpayerStatus === 'lateFiler' && applicableRate > 0) {
+        applicableRate = bracket.lateFilerRate || Math.min(0.25, Number((applicableRate * 1.35).toFixed(3)));
+      } else if (cgtTaxpayerStatus === 'nonFiler' && applicableRate > 0) {
         applicableRate = Math.min(0.45, applicableRate * 2);
       }
 
@@ -198,9 +205,13 @@ export default function PropertyTaxCalculator() {
 
     const grossCGT = Math.round(capitalGain * applicableRate);
 
-    // Section 236C credit (seller advance tax paid at 2.75% or 11.5%)
+    // Section 236C credit (seller advance tax paid)
+    let sellerRate = liveSaleRates.filer;
+    if (cgtTaxpayerStatus === 'lateFiler') sellerRate = liveSaleRates.lateFiler || 0.045;
+    else if (cgtTaxpayerStatus === 'nonFiler') sellerRate = liveSaleRates.nonFiler;
+
     const paid236C = adjust236C
-      ? Math.round(cgtSalePrice * (cgtTaxpayerStatus === 'filer' ? liveSaleRates.filer : liveSaleRates.nonFiler))
+      ? Math.round(cgtSalePrice * sellerRate)
       : 0;
 
     const netCGTPayable = Math.max(0, grossCGT - paid236C);
@@ -375,6 +386,15 @@ export default function PropertyTaxCalculator() {
 
                 <button
                   type="button"
+                  className={`calc-segment-btn ${buyTaxpayerStatus === 'lateFiler' ? 'active' : ''}`}
+                  onClick={() => setBuyTaxpayerStatus('lateFiler')}
+                >
+                  <Clock size={15} />
+                  <span>Late Filer ({((purchaseCalc.slab.lateFilerRate || 0.055) * 100).toFixed(1)}%)</span>
+                </button>
+
+                <button
+                  type="button"
                   className={`calc-segment-btn ${buyTaxpayerStatus === 'nonFiler' ? 'active' : ''}`}
                   onClick={() => setBuyTaxpayerStatus('nonFiler')}
                 >
@@ -391,6 +411,14 @@ export default function PropertyTaxCalculator() {
                   <span>Overseas (NICOP / POC)</span>
                 </button>
               </div>
+              {buyTaxpayerStatus === 'lateFiler' && (
+                <div className="calc-info-alert">
+                  <Clock size={14} className="text-primary flex-shrink-0" />
+                  <span>
+                    <strong>Late Filer Category:</strong> Taxpayers who filed returns after the statutory due date are assessed intermediate advance withholding under Finance Act provisions.
+                  </span>
+                </div>
+              )}
               {buyTaxpayerStatus === 'overseas' && (
                 <div className="calc-info-alert">
                   <Info size={14} className="text-primary flex-shrink-0" />
@@ -521,6 +549,15 @@ export default function PropertyTaxCalculator() {
                 >
                   <CheckCircle2 size={15} />
                   <span>Active Filer (2.75%)</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`calc-segment-btn ${sellTaxpayerStatus === 'lateFiler' ? 'active' : ''}`}
+                  onClick={() => setSellTaxpayerStatus('lateFiler')}
+                >
+                  <Clock size={15} />
+                  <span>Late Filer ({((liveSaleRates.lateFiler || 0.045) * 100).toFixed(2)}%)</span>
                 </button>
 
                 <button
@@ -774,6 +811,14 @@ export default function PropertyTaxCalculator() {
                 </button>
                 <button
                   type="button"
+                  className={`calc-segment-btn ${cgtTaxpayerStatus === 'lateFiler' ? 'active' : ''}`}
+                  onClick={() => setCgtTaxpayerStatus('lateFiler')}
+                >
+                  <Clock size={15} />
+                  <span>Late Filer</span>
+                </button>
+                <button
+                  type="button"
                   className={`calc-segment-btn ${cgtTaxpayerStatus === 'nonFiler' ? 'active' : ''}`}
                   onClick={() => setCgtTaxpayerStatus('nonFiler')}
                 >
@@ -879,6 +924,7 @@ export default function PropertyTaxCalculator() {
                   <tr>
                     <th>Property Value Bracket</th>
                     <th>Active Taxpayer (Filer) Rate</th>
+                    <th>Late Filer Rate</th>
                     <th>Non-Filer Rate</th>
                   </tr>
                 </thead>
@@ -887,6 +933,7 @@ export default function PropertyTaxCalculator() {
                     <tr key={sIdx}>
                       <td><strong>{slab.label}</strong></td>
                       <td>{(slab.filerRate * 100).toFixed(2)}%</td>
+                      <td><span style={{ color: '#d97706', fontWeight: 700 }}>{((slab.lateFilerRate || 0.055) * 100).toFixed(1)}%</span></td>
                       <td>{(slab.nonFilerRate * 100).toFixed(1)}%</td>
                     </tr>
                   ))}
@@ -917,6 +964,11 @@ export default function PropertyTaxCalculator() {
                 <span className="tile-label">Active Taxpayer (Filer)</span>
                 <span className="tile-val">{(liveSaleRates.filer * 100).toFixed(2)}%</span>
                 <span className="tile-desc">Adjustable against annual CGT</span>
+              </div>
+              <div className="schedule-rate-tile" style={{ borderColor: '#f59e0b', background: '#fffbeb' }}>
+                <span className="tile-label" style={{ color: '#b45309' }}>Late Filer</span>
+                <span className="tile-val" style={{ color: '#b45309' }}>{((liveSaleRates.lateFiler || 0.045) * 100).toFixed(2)}%</span>
+                <span className="tile-desc">Late ATL return filing rate</span>
               </div>
               <div className="schedule-rate-tile alert-tile">
                 <span className="tile-label">Non-Filer</span>

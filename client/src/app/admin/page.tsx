@@ -28,7 +28,15 @@ import {
   EyeOff,
   ShieldAlert,
   Check,
-  LogIn
+  LogIn,
+  Clock,
+  Settings,
+  HelpCircle,
+  FileText,
+  Sliders,
+  Tag,
+  Percent,
+  DollarSign
 } from 'lucide-react';
 import {
   loginAdminApi,
@@ -39,6 +47,7 @@ import {
   checkServerHealth,
   getTaxYearsApi,
   saveTaxYearApi,
+  deleteTaxYearApi,
   resetTaxSlabsApi,
   getCompanyCostConfigApi,
   saveCompanyCostConfigApi,
@@ -79,7 +88,7 @@ export default function AdminCustomizationDashboard() {
 
   // ==================== NAVIGATION TABS ====================
   const [activeMainTab, setActiveMainTab] = useState<'tax' | 'cost' | 'guide'>('tax');
-  const [activeTaxSubTab, setActiveTaxSubTab] = useState<'salary' | 'business' | 'rental' | 'property'>('salary');
+  const [activeTaxSubTab, setActiveTaxSubTab] = useState<'salary' | 'business' | 'rental' | 'property' | 'custom' | 'lateFiler'>('salary');
 
   // Server & DB Status
   const [serverOnline, setServerOnline] = useState<boolean>(false);
@@ -88,7 +97,7 @@ export default function AdminCustomizationDashboard() {
   const [saveNotification, setSaveNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // ==================== 1. TAX SLABS STATE ====================
-  const [taxYearsList, setTaxYearsList] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025']);
+  const [taxYearsList, setTaxYearsList] = useState<string[]>(['2026-2027', '2025-2026', '2024-2025', '2023-2024']);
   const [selectedYear, setSelectedYear] = useState<string>('2026-2027');
 
   // Active Tax Year Data
@@ -112,6 +121,26 @@ export default function AdminCustomizationDashboard() {
     propertyPurchaseSlabs: PROPERTY_PURCHASE_SLABS,
     propertySaleRates: PROPERTY_SALE_RATES,
     cgtHoldingSchedule: CGT_HOLDING_SCHEDULE,
+    customSections: [
+      {
+        sectionId: 'SEC-7E',
+        title: 'Section 7E Tax on Deemed Income from Inactive Properties',
+        category: 'property',
+        description: 'Imposes 1% effective tax on fair market value of capital assets exceeding PKR 25 Million.',
+        effectiveRate: 0.01,
+        fixedAmount: 0,
+        applicableTo: 'All Residents (Excluding 1 Self-Occupied Residence)',
+        status: 'active',
+      },
+    ],
+    lateFilerRules: {
+      atlSurchargeIndividual: 1000,
+      atlSurchargeAOP: 10000,
+      atlSurchargeCompany: 20000,
+      propertyPurchaseLateRate: 0.055,
+      propertySaleLateRate: 0.045,
+      description: 'Under Finance Act 2024 and Section 182(2), late filers on ATL bear graduated surcharge penalties and higher withholding rates until ATL status is fully regularized.',
+    },
   });
 
   // New Year modal input
@@ -125,7 +154,6 @@ export default function AdminCustomizationDashboard() {
   useEffect(() => {
     async function initDashboard() {
       try {
-        // 1. Verify existing session
         const authRes = await verifyAdminSessionApi();
         if (authRes.success && authRes.admin) {
           setIsAuthenticated(true);
@@ -139,7 +167,6 @@ export default function AdminCustomizationDashboard() {
         setIsAuthChecking(false);
       }
 
-      // 2. Health & data fetch
       const health = await checkServerHealth();
       setServerOnline(health.online);
       if (health.data) setServerInfo(health.data);
@@ -147,7 +174,10 @@ export default function AdminCustomizationDashboard() {
       if (health.online) {
         const taxYears = await getTaxYearsApi();
         if (taxYears && taxYears.length > 0) {
-          setTaxYearsList(taxYears.map((y: any) => y.year));
+          const sorted = taxYears
+            .map((y: any) => y.year)
+            .sort((a: string, b: string) => b.localeCompare(a, undefined, { numeric: true }));
+          setTaxYearsList(sorted);
           const current = taxYears.find((y: any) => y.year === selectedYear) || taxYears[0];
           setCurrentTaxYearData(current);
           setSelectedYear(current.year);
@@ -257,6 +287,7 @@ export default function AdminCustomizationDashboard() {
         title: SALARY_TAX_DATA[year].title,
         desc: SALARY_TAX_DATA[year].desc,
         salarySlabs: SALARY_TAX_DATA[year].slabs,
+        nonSalariedSlabs: NON_SALARIED_SLABS[year] || NON_SALARIED_SLABS['2026-2027'] || [],
       }));
     }
   };
@@ -264,7 +295,7 @@ export default function AdminCustomizationDashboard() {
   // Add New Tax Year
   const handleCreateNewYear = () => {
     if (!newYearInput || taxYearsList.includes(newYearInput)) {
-      alert('Please enter a valid, unique Tax Year (e.g. 2027-2028).');
+      alert('Please enter a valid, unique Tax Year (e.g. 2027-2028 or 2023-2024).');
       return;
     }
 
@@ -278,7 +309,10 @@ export default function AdminCustomizationDashboard() {
     cloned.label = `Tax Year ${newYearInput}`;
     cloned.title = `Income Tax Slabs ${newYearInput}`;
 
-    setTaxYearsList([newYearInput, ...taxYearsList]);
+    const updatedList = [newYearInput, ...taxYearsList].sort((a, b) =>
+      b.localeCompare(a, undefined, { numeric: true })
+    );
+    setTaxYearsList(updatedList);
     setSelectedYear(newYearInput);
     setCurrentTaxYearData(cloned);
     setShowNewYearModal(false);
@@ -286,6 +320,37 @@ export default function AdminCustomizationDashboard() {
       type: 'success',
       message: `Tax Year ${newYearInput} created! Remember to click "Save Tax Year Slabs" to persist to database.`,
     });
+  };
+
+  // Delete Current Tax Year
+  const handleDeleteTaxYear = async () => {
+    if (taxYearsList.length <= 1) {
+      alert('At least one Tax Year must remain in the system.');
+      return;
+    }
+    if (!confirm(`Are you sure you want to permanently delete Tax Year ${selectedYear} from MongoDB?`)) {
+      return;
+    }
+    setIsSaving(true);
+    const res = await deleteTaxYearApi(selectedYear);
+    setIsSaving(false);
+    if (res.success) {
+      const remaining = taxYearsList.filter((y) => y !== selectedYear);
+      setTaxYearsList(remaining);
+      const nextYear = remaining[0];
+      setSelectedYear(nextYear);
+      handleYearChange(nextYear);
+      setSaveNotification({
+        type: 'success',
+        message: `Tax Year ${selectedYear} successfully removed from database.`,
+      });
+    } else {
+      setSaveNotification({
+        type: 'error',
+        message: res.message || 'Failed to delete tax year.',
+      });
+    }
+    setTimeout(() => setSaveNotification(null), 5000);
   };
 
   // Save Current Tax Year Slabs
@@ -373,15 +438,16 @@ export default function AdminCustomizationDashboard() {
     }
   };
 
-  // Salary Slab table row editor helpers
+  // ==================== SALARY SLAB HANDLERS ====================
   const handleSalarySlabChange = (index: number, field: string, value: any) => {
-    const updatedSlabs = [...currentTaxYearData.salarySlabs];
+    const updatedSlabs = [...(currentTaxYearData.salarySlabs || [])];
     updatedSlabs[index] = { ...updatedSlabs[index], [field]: value };
     setCurrentTaxYearData({ ...currentTaxYearData, salarySlabs: updatedSlabs });
   };
 
   const handleAddSalarySlab = () => {
-    const last = currentTaxYearData.salarySlabs[currentTaxYearData.salarySlabs.length - 1];
+    const slabs = currentTaxYearData.salarySlabs || [];
+    const last = slabs[slabs.length - 1];
     const newMin = last ? last.max : 0;
     const newMax = newMin + 1000000;
     const newSlab = {
@@ -391,22 +457,209 @@ export default function AdminCustomizationDashboard() {
       baseTax: last ? last.baseTax + 200000 : 0,
       rangeText: `Rs. ${newMin.toLocaleString()} to Rs. ${newMax.toLocaleString()}`,
       rateText: '35%',
-      payableText: `Tax formula for new slab`,
+      payableText: 'Tax formula for new slab',
       formulaDesc: `Rate applicable on excess above ${newMin.toLocaleString()}`,
     };
     setCurrentTaxYearData({
       ...currentTaxYearData,
-      salarySlabs: [...currentTaxYearData.salarySlabs, newSlab],
+      salarySlabs: [...slabs, newSlab],
     });
   };
 
   const handleRemoveSalarySlab = (index: number) => {
-    if (currentTaxYearData.salarySlabs.length <= 1) {
+    const slabs = currentTaxYearData.salarySlabs || [];
+    if (slabs.length <= 1) {
       alert('You must have at least one salary slab.');
       return;
     }
-    const updatedSlabs = currentTaxYearData.salarySlabs.filter((_: any, i: number) => i !== index);
+    const updatedSlabs = slabs.filter((_: any, i: number) => i !== index);
     setCurrentTaxYearData({ ...currentTaxYearData, salarySlabs: updatedSlabs });
+  };
+
+  // ==================== NON-SALARIED SLAB HANDLERS ====================
+  const handleNonSalariedSlabChange = (index: number, field: string, value: any) => {
+    const updatedSlabs = [...(currentTaxYearData.nonSalariedSlabs || [])];
+    updatedSlabs[index] = { ...updatedSlabs[index], [field]: value };
+    setCurrentTaxYearData({ ...currentTaxYearData, nonSalariedSlabs: updatedSlabs });
+  };
+
+  const handleAddNonSalariedSlab = () => {
+    const slabs = currentTaxYearData.nonSalariedSlabs || [];
+    const last = slabs[slabs.length - 1];
+    const newMin = last ? last.max : 0;
+    const newMax = newMin + 1000000;
+    const newSlab = {
+      min: newMin,
+      max: newMax,
+      rate: 0.35,
+      baseTax: last ? last.baseTax + 250000 : 0,
+      rangeText: `Rs. ${newMin.toLocaleString()} to Rs. ${newMax.toLocaleString()}`,
+      rateText: '35%',
+      payableText: 'Tax formula for new non-salaried slab',
+      formulaDesc: `Rate applicable on excess above ${newMin.toLocaleString()}`,
+    };
+    setCurrentTaxYearData({
+      ...currentTaxYearData,
+      nonSalariedSlabs: [...slabs, newSlab],
+    });
+  };
+
+  const handleRemoveNonSalariedSlab = (index: number) => {
+    const slabs = currentTaxYearData.nonSalariedSlabs || [];
+    if (slabs.length <= 1) {
+      alert('You must have at least one non-salaried slab.');
+      return;
+    }
+    const updatedSlabs = slabs.filter((_: any, i: number) => i !== index);
+    setCurrentTaxYearData({ ...currentTaxYearData, nonSalariedSlabs: updatedSlabs });
+  };
+
+  // ==================== CUSTOM SECTIONS HANDLERS ====================
+  const handleCustomSectionChange = (index: number, field: string, value: any) => {
+    const sections = [...(currentTaxYearData.customSections || [])];
+    sections[index] = { ...sections[index], [field]: value };
+    setCurrentTaxYearData({ ...currentTaxYearData, customSections: sections });
+  };
+
+  const handleAddCustomSection = () => {
+    const sections = currentTaxYearData.customSections || [];
+    const newSec = {
+      sectionId: `SEC-${Date.now().toString().slice(-4)}`,
+      title: 'New Statutory Provision / WHT Clause',
+      category: 'general',
+      description: 'Custom regulatory rule or withholding section under Income Tax Ordinance, 2001.',
+      effectiveRate: 0.02,
+      fixedAmount: 0,
+      applicableTo: 'All Taxpayers',
+      status: 'active',
+    };
+    setCurrentTaxYearData({
+      ...currentTaxYearData,
+      customSections: [...sections, newSec],
+    });
+  };
+
+  const handleRemoveCustomSection = (index: number) => {
+    const sections = currentTaxYearData.customSections || [];
+    const updated = sections.filter((_: any, i: number) => i !== index);
+    setCurrentTaxYearData({ ...currentTaxYearData, customSections: updated });
+  };
+
+  // ==================== LATE FILER RULES HANDLER ====================
+  const handleLateFilerRuleChange = (field: string, value: any) => {
+    const updated = {
+      ...(currentTaxYearData.lateFilerRules || {}),
+      [field]: value,
+    };
+    setCurrentTaxYearData({ ...currentTaxYearData, lateFilerRules: updated });
+  };
+
+  // ==================== CGT HOLDING SCHEDULE HANDLER ====================
+  const handleCGTBracketChange = (index: number, field: string, value: any) => {
+    const updated = [...(currentTaxYearData.cgtHoldingSchedule || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setCurrentTaxYearData({ ...currentTaxYearData, cgtHoldingSchedule: updated });
+  };
+
+  // ==================== COMPANY COST CONFIG HANDLERS ====================
+  // Entity Tiers
+  const handleEntityTierChange = (index: number, field: string, value: any) => {
+    const updated = [...(companyCostData.entityTiers || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    if (field === 'baseGovFee' || field === 'baseConsultingFee') {
+      const gov = field === 'baseGovFee' ? Number(value) : (updated[index].baseGovFee || 0);
+      const con = field === 'baseConsultingFee' ? Number(value) : (updated[index].baseConsultingFee || 0);
+      updated[index].baseFee = gov + con;
+    }
+    setCompanyCostData({ ...companyCostData, entityTiers: updated });
+  };
+
+  const handleAddEntityTier = () => {
+    const tiers = companyCostData.entityTiers || [];
+    const newTier = {
+      id: `custom-entity-${Date.now()}`,
+      name: 'Special Enterprise Structure',
+      badge: 'Custom',
+      baseGovFee: 5000,
+      baseConsultingFee: 30000,
+      baseFee: 35000,
+      turnaround: '3 to 5 Days',
+      description: 'Special legal framework customized for domestic or cross-border venture.',
+    };
+    setCompanyCostData({ ...companyCostData, entityTiers: [...tiers, newTier] });
+  };
+
+  const handleRemoveEntityTier = (index: number) => {
+    const tiers = companyCostData.entityTiers || [];
+    if (tiers.length <= 1) {
+      alert('You must have at least one legal entity structure.');
+      return;
+    }
+    setCompanyCostData({ ...companyCostData, entityTiers: tiers.filter((_: any, i: number) => i !== index) });
+  };
+
+  // Capital Tiers
+  const handleCapitalTierChange = (index: number, field: string, value: any) => {
+    const updated = [...(companyCostData.capitalTiers || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setCompanyCostData({ ...companyCostData, capitalTiers: updated });
+  };
+
+  const handleAddCapitalTier = () => {
+    const tiers = companyCostData.capitalTiers || [];
+    const newCap = {
+      id: `cap-${Date.now()}`,
+      label: 'PKR 10M to PKR 25M Authorized Capital',
+      fee: 45000,
+      govtFee: 35000,
+    };
+    setCompanyCostData({ ...companyCostData, capitalTiers: [...tiers, newCap] });
+  };
+
+  const handleRemoveCapitalTier = (index: number) => {
+    const tiers = companyCostData.capitalTiers || [];
+    if (tiers.length <= 1) {
+      alert('You must have at least one capital tier.');
+      return;
+    }
+    setCompanyCostData({ ...companyCostData, capitalTiers: tiers.filter((_: any, i: number) => i !== index) });
+  };
+
+  // Service Addons
+  const handleServiceAddonChange = (index: number, field: string, value: any) => {
+    const updated = [...(companyCostData.serviceAddons || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    if (field === 'govtFee' || field === 'consultingFee') {
+      const gov = field === 'govtFee' ? Number(value) : (updated[index].govtFee || 0);
+      const con = field === 'consultingFee' ? Number(value) : (updated[index].consultingFee || 0);
+      updated[index].fee = gov + con;
+    }
+    setCompanyCostData({ ...companyCostData, serviceAddons: updated });
+  };
+
+  const handleAddServiceAddon = () => {
+    const addons = companyCostData.serviceAddons || [];
+    const newAddon = {
+      id: `addon-${Date.now()}`,
+      name: 'Custom Regulatory / Advisory Service',
+      description: 'Statutory or operational compliance authorization.',
+      fee: 20000,
+      govtFee: 5000,
+      consultingFee: 15000,
+      required: false,
+      defaultChecked: false,
+      category: 'advisory',
+    };
+    setCompanyCostData({ ...companyCostData, serviceAddons: [...addons, newAddon] });
+  };
+
+  const handleRemoveServiceAddon = (index: number) => {
+    const addons = companyCostData.serviceAddons || [];
+    if (addons.length <= 1) {
+      alert('You must have at least one add-on service.');
+      return;
+    }
+    setCompanyCostData({ ...companyCostData, serviceAddons: addons.filter((_: any, i: number) => i !== index) });
   };
 
   // ==================== 1. LOADING SCREEN ====================
@@ -534,7 +787,6 @@ export default function AdminCustomizationDashboard() {
             )}
 
             <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-              {/* Identifier Field */}
               <div>
                 <label
                   style={{
@@ -575,13 +827,11 @@ export default function AdminCustomizationDashboard() {
                       color: '#ffffff',
                       fontSize: '14.5px',
                       outline: 'none',
-                      transition: 'border 0.2s',
                     }}
                   />
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
                 <label
                   style={{
@@ -645,7 +895,6 @@ export default function AdminCustomizationDashboard() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoggingIn}
@@ -664,7 +913,6 @@ export default function AdminCustomizationDashboard() {
                   justifyContent: 'center',
                   gap: '8px',
                   boxShadow: '0 4px 14px rgba(163, 29, 36, 0.4)',
-                  transition: 'background 0.2s, transform 0.1s',
                 }}
               >
                 {isLoggingIn ? (
@@ -678,7 +926,6 @@ export default function AdminCustomizationDashboard() {
               </button>
             </form>
 
-            {/* Helper Card for Administrator */}
             <div
               style={{
                 marginTop: '24px',
@@ -715,7 +962,6 @@ export default function AdminCustomizationDashboard() {
               </div>
             </div>
 
-            {/* Return Link */}
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
               <Link
                 href="/"
@@ -726,7 +972,6 @@ export default function AdminCustomizationDashboard() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  transition: 'color 0.2s',
                 }}
               >
                 &larr; Return to Public Website
@@ -755,13 +1000,12 @@ export default function AdminCustomizationDashboard() {
               Customization &amp; Rate Governance Dashboard
             </h1>
             <p style={{ fontSize: '14px', color: '#64748b', margin: '4px 0 0' }}>
-              Directly calibrate FBR Annual Tax Slabs, Corporate Tax Rates, and SECP Incorporation Fee Schedules.
+              Directly calibrate FBR Annual Tax Slabs, Corporate Tax Rates, Late Filer Penalties, and SECP Incorporation Fee Schedules.
             </p>
           </div>
 
           {/* Admin Profile & Connection Status Controls */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-            {/* Authenticated User Badge & Logout */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 style={{
@@ -789,7 +1033,6 @@ export default function AdminCustomizationDashboard() {
                 <span>{adminUser?.name || 'Managing Partner'}</span>
               </div>
 
-              {/* Change Password Button */}
               <button
                 type="button"
                 onClick={() => setShowChangePassModal(true)}
@@ -812,7 +1055,6 @@ export default function AdminCustomizationDashboard() {
                 <span>Password</span>
               </button>
 
-              {/* Logout Button */}
               <button
                 type="button"
                 onClick={handleLogout}
@@ -836,7 +1078,6 @@ export default function AdminCustomizationDashboard() {
               </button>
             </div>
 
-            {/* Connection Status Pill */}
             <div
               style={{
                 display: 'inline-flex',
@@ -883,7 +1124,7 @@ export default function AdminCustomizationDashboard() {
         )}
 
         {/* Main Tab Controls */}
-        <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid #e2e8f0', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid #e2e8f0', marginBottom: '24px', overflowX: 'auto' }}>
           <button
             type="button"
             onClick={() => setActiveMainTab('tax')}
@@ -900,10 +1141,11 @@ export default function AdminCustomizationDashboard() {
               color: activeMainTab === 'tax' ? 'var(--primary, #A31D24)' : '#64748b',
               cursor: 'pointer',
               marginBottom: '-2px',
+              whiteSpace: 'nowrap',
             }}
           >
             <Calculator size={18} />
-            <span>Annual Tax Slabs Manager</span>
+            <span>Annual Tax Slabs &amp; Governance</span>
           </button>
 
           <button
@@ -922,10 +1164,11 @@ export default function AdminCustomizationDashboard() {
               color: activeMainTab === 'cost' ? 'var(--primary, #A31D24)' : '#64748b',
               cursor: 'pointer',
               marginBottom: '-2px',
+              whiteSpace: 'nowrap',
             }}
           >
             <Building2 size={18} />
-            <span>Company Cost Estimator Manager</span>
+            <span>Company Cost Estimator Manager (9 Sections)</span>
           </button>
 
           <button
@@ -944,10 +1187,11 @@ export default function AdminCustomizationDashboard() {
               color: activeMainTab === 'guide' ? 'var(--primary, #A31D24)' : '#64748b',
               cursor: 'pointer',
               marginBottom: '-2px',
+              whiteSpace: 'nowrap',
             }}
           >
             <Server size={18} />
-            <span>Backend &amp; DB Status</span>
+            <span>Backend &amp; DB Architecture Status</span>
           </button>
         </div>
 
@@ -971,9 +1215,9 @@ export default function AdminCustomizationDashboard() {
                 marginBottom: '20px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <Calendar size={18} color="var(--primary, #A31D24)" />
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>Select Tax Year to Edit:</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>Active Tax Year:</span>
                 <select
                   value={selectedYear}
                   onChange={(e) => handleYearChange(e.target.value)}
@@ -1011,10 +1255,36 @@ export default function AdminCustomizationDashboard() {
                     fontWeight: 700,
                     cursor: 'pointer',
                   }}
+                  title="Add previous or upcoming tax year (e.g. 2023-2024, 2027-2028)"
                 >
                   <Plus size={15} />
-                  <span>Add New Tax Year</span>
+                  <span>Add Tax Year</span>
                 </button>
+
+                {taxYearsList.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteTaxYear}
+                    disabled={isSaving}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #fecaca',
+                      background: '#fff1f2',
+                      color: '#e11d48',
+                      fontSize: '12.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                    title="Delete current tax year"
+                  >
+                    <Trash2 size={14} />
+                    <span>Delete {selectedYear}</span>
+                  </button>
+                )}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1038,7 +1308,7 @@ export default function AdminCustomizationDashboard() {
                   title="Reset to default FBR rates"
                 >
                   <RotateCcw size={14} />
-                  <span>Reset to Baseline</span>
+                  <span>Reset Slabs</span>
                 </button>
 
                 <button
@@ -1061,13 +1331,13 @@ export default function AdminCustomizationDashboard() {
                   }}
                 >
                   <Save size={16} />
-                  <span>{isSaving ? 'Saving to Database...' : `Save Tax Slabs (${selectedYear})`}</span>
+                  <span>{isSaving ? 'Saving to DB...' : `Save Slabs (${selectedYear})`}</span>
                 </button>
               </div>
             </div>
 
-            {/* Sub-Tabs: Salary, Business, Rental, Property */}
-            <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', background: '#e2e8f0', padding: '4px', borderRadius: '8px', width: 'fit-content' }}>
+            {/* Sub-Tabs: Salary, Business, Rental, Property, Custom, Late Filer */}
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', background: '#e2e8f0', padding: '4px', borderRadius: '8px', width: 'fit-content', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => setActiveTaxSubTab('salary')}
@@ -1134,20 +1404,54 @@ export default function AdminCustomizationDashboard() {
                   boxShadow: activeTaxSubTab === 'property' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
                 }}
               >
-                4. Property Tax (FBR Federal)
+                4. Property (236K, 236C, CGT 37)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTaxSubTab('custom')}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: activeTaxSubTab === 'custom' ? '#ffffff' : 'transparent',
+                  color: activeTaxSubTab === 'custom' ? 'var(--primary, #A31D24)' : '#64748b',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  boxShadow: activeTaxSubTab === 'custom' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                }}
+              >
+                5. Custom Statutory Sections
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTaxSubTab('lateFiler')}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: activeTaxSubTab === 'lateFiler' ? '#ffffff' : 'transparent',
+                  color: activeTaxSubTab === 'lateFiler' ? 'var(--primary, #A31D24)' : '#64748b',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  boxShadow: activeTaxSubTab === 'lateFiler' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                }}
+              >
+                6. Late Filer Governance
               </button>
             </div>
 
             {/* Sub-Tab 1: Salaried Table Editor */}
             {activeTaxSubTab === 'salary' && (
               <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
                       Salaried Income Tax Slabs ({selectedYear})
                     </h3>
                     <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
-                      Edit threshold levels, percentage tax rates, fixed base taxes, and textual descriptions.
+                      First Schedule Division I, Part I. Threshold levels, percentage tax rates, fixed base taxes, and textual formulas.
                     </p>
                   </div>
                   <button
@@ -1168,7 +1472,7 @@ export default function AdminCustomizationDashboard() {
                     }}
                   >
                     <Plus size={14} />
-                    <span>Add Tier / Slab</span>
+                    <span>Add Salary Slab</span>
                   </button>
                 </div>
 
@@ -1259,69 +1563,194 @@ export default function AdminCustomizationDashboard() {
 
             {/* Sub-Tab 2: Business & Corporate Rates */}
             {activeTaxSubTab === 'business' && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-                {/* Corporate Tax Rates Card */}
-                <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
-                    Corporate Income Tax Rates ({selectedYear})
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
-                    Statutory corporate income tax rates under First Schedule Division II.
-                  </p>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {Object.entries(currentTaxYearData.corporateRates || {}).map(([key, val]: [string, any]) => (
-                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155', textTransform: 'capitalize' }}>
-                          {key.replace('_', ' ')} Company:
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {/* Non-Salaried Business Slabs (Sole Proprietors & AOPs) */}
+                <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                          Non-Salaried Business Slabs (Sole Proprietors &amp; AOPs) — ({selectedYear})
+                        </h3>
+                        <span style={{ fontSize: '11px', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                          First Schedule Div I
                         </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <input
-                            type="number"
-                            step="0.005"
-                            value={val}
-                            onChange={(e) => {
-                              const updated = { ...currentTaxYearData.corporateRates, [key]: Number(e.target.value) };
-                              setCurrentTaxYearData({ ...currentTaxYearData, corporateRates: updated });
-                            }}
-                            style={{ width: '80px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', textAlign: 'right' }}
-                          />
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#64748b' }}>({(val * 100).toFixed(1)}%)</span>
-                        </div>
                       </div>
-                    ))}
+                      <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
+                        Applicable to commercial enterprises, individual business owners, and partnership firms (AOPs).
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddNonSalariedSlab}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 14px',
+                        borderRadius: '6px',
+                        border: '1px solid var(--primary, #A31D24)',
+                        background: 'var(--primary, #A31D24)',
+                        color: '#fff',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Plus size={14} />
+                      <span>Add Non-Salaried Slab</span>
+                    </button>
+                  </div>
+
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                      <thead style={{ background: '#f8fafc', color: '#475569', fontWeight: 800, borderBottom: '1px solid #e2e8f0' }}>
+                        <tr>
+                          <th style={{ padding: '10px 14px' }}>#</th>
+                          <th style={{ padding: '10px 14px' }}>Min (Rs.)</th>
+                          <th style={{ padding: '10px 14px' }}>Max (Rs.)</th>
+                          <th style={{ padding: '10px 14px' }}>Rate (%)</th>
+                          <th style={{ padding: '10px 14px' }}>Base Fixed (Rs.)</th>
+                          <th style={{ padding: '10px 14px' }}>Range Label</th>
+                          <th style={{ padding: '10px 14px' }}>Rate Display</th>
+                          <th style={{ padding: '10px 14px' }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentTaxYearData.nonSalariedSlabs?.map((slab: any, idx: number) => (
+                          <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '10px 14px', fontWeight: 700, color: '#94a3b8' }}>{idx + 1}</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <input
+                                type="number"
+                                value={slab.min}
+                                onChange={(e) => handleNonSalariedSlabChange(idx, 'min', Number(e.target.value))}
+                                style={{ width: '110px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <input
+                                type="number"
+                                value={slab.max}
+                                onChange={(e) => handleNonSalariedSlabChange(idx, 'max', Number(e.target.value))}
+                                style={{ width: '120px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <input
+                                type="number"
+                                step="0.005"
+                                value={slab.rate}
+                                onChange={(e) => handleNonSalariedSlabChange(idx, 'rate', Number(e.target.value))}
+                                style={{ width: '75px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <input
+                                type="number"
+                                value={slab.baseTax}
+                                onChange={(e) => handleNonSalariedSlabChange(idx, 'baseTax', Number(e.target.value))}
+                                style={{ width: '100px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <input
+                                type="text"
+                                value={slab.rangeText}
+                                onChange={(e) => handleNonSalariedSlabChange(idx, 'rangeText', e.target.value)}
+                                style={{ width: '180px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <input
+                                type="text"
+                                value={slab.rateText}
+                                onChange={(e) => handleNonSalariedSlabChange(idx, 'rateText', e.target.value)}
+                                style={{ width: '80px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                            </td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveNonSalariedSlab(idx)}
+                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                                title="Delete Slab"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
-                {/* Super Tax Card */}
-                <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
-                    Super Tax on High Earning Persons (Section 4C)
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
-                    Graduated rates for high net worth individuals, AOPs, and corporations.
-                  </p>
+                {/* Grid: Corporate Rates & Super Tax */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                  {/* Corporate Tax Rates Card */}
+                  <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
+                      Corporate Income Tax Rates ({selectedYear})
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
+                      Statutory corporate income tax rates under First Schedule Division II.
+                    </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {currentTaxYearData.superTaxBrackets?.map((bracket: any, bIdx: number) => (
-                      <div key={bIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
-                        <span style={{ color: '#475569', fontWeight: 600 }}>{bracket.text}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={bracket.rate}
-                            onChange={(e) => {
-                              const updated = [...currentTaxYearData.superTaxBrackets];
-                              updated[bIdx] = { ...updated[bIdx], rate: Number(e.target.value), rateText: `${(Number(e.target.value) * 100).toFixed(0)}%` };
-                              setCurrentTaxYearData({ ...currentTaxYearData, superTaxBrackets: updated });
-                            }}
-                            style={{ width: '65px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', textAlign: 'right' }}
-                          />
-                          <span style={{ fontWeight: 700, color: 'var(--primary, #A31D24)' }}>{bracket.rateText}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {Object.entries(currentTaxYearData.corporateRates || {}).map(([key, val]: [string, any]) => (
+                        <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155', textTransform: 'capitalize' }}>
+                            {key.replace('_', ' ')} Company:
+                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <input
+                              type="number"
+                              step="0.005"
+                              value={val}
+                              onChange={(e) => {
+                                const updated = { ...currentTaxYearData.corporateRates, [key]: Number(e.target.value) };
+                                setCurrentTaxYearData({ ...currentTaxYearData, corporateRates: updated });
+                              }}
+                              style={{ width: '80px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', textAlign: 'right' }}
+                            />
+                            <span style={{ fontSize: '13px', fontWeight: 700, color: '#64748b' }}>({(val * 100).toFixed(1)}%)</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Super Tax Card */}
+                  <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
+                      Super Tax on High Earning Persons (Section 4C)
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
+                      Graduated rates for high net worth individuals, AOPs, and corporations.
+                    </p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {currentTaxYearData.superTaxBrackets?.map((bracket: any, bIdx: number) => (
+                        <div key={bIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+                          <span style={{ color: '#475569', fontWeight: 600 }}>{bracket.text}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={bracket.rate}
+                              onChange={(e) => {
+                                const updated = [...currentTaxYearData.superTaxBrackets];
+                                updated[bIdx] = { ...updated[bIdx], rate: Number(e.target.value), rateText: `${(Number(e.target.value) * 100).toFixed(0)}%` };
+                                setCurrentTaxYearData({ ...currentTaxYearData, superTaxBrackets: updated });
+                              }}
+                              style={{ width: '65px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', textAlign: 'right' }}
+                            />
+                            <span style={{ fontWeight: 700, color: 'var(--primary, #A31D24)' }}>{bracket.rateText}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1367,86 +1796,478 @@ export default function AdminCustomizationDashboard() {
 
             {/* Sub-Tab 4: Property Tax */}
             {activeTaxSubTab === 'property' && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-                {/* Buying Rates Card */}
-                <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
-                    Property Purchase Tax (Sec 236K)
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
-                    Advance tax collected from buyer at transfer time.
-                  </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                  {/* Buying Rates Card (Section 236K) */}
+                  <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <div>
+                        <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
+                          Property Purchase Tax (Sec 236K)
+                        </h3>
+                        <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+                          Advance tax collected from purchaser at registration/transfer.
+                        </p>
+                      </div>
+                      <span style={{ fontSize: '11px', background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                        Finance Act 2024
+                      </span>
+                    </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {currentTaxYearData.propertyPurchaseSlabs?.map((pSlab: any, pIdx: number) => (
-                      <div key={pIdx} style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '6px' }}>
-                        <strong style={{ fontSize: '13px', color: '#0f172a' }}>{pSlab.label}</strong>
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
-                          <label style={{ fontSize: '12px', color: '#475569' }}>
-                            Filer:
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+                      {currentTaxYearData.propertyPurchaseSlabs?.map((pSlab: any, pIdx: number) => (
+                        <div key={pIdx} style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '6px', border: '1px solid #f1f5f9' }}>
+                          <strong style={{ fontSize: '13px', color: '#0f172a' }}>{pSlab.label}</strong>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '8px' }}>
+                            <label style={{ fontSize: '11.5px', color: '#15803d', fontWeight: 700 }}>
+                              Filer:
+                              <input
+                                type="number"
+                                step="0.0025"
+                                value={pSlab.filerRate}
+                                onChange={(e) => {
+                                  const updated = [...currentTaxYearData.propertyPurchaseSlabs];
+                                  updated[pIdx] = { ...updated[pIdx], filerRate: Number(e.target.value) };
+                                  setCurrentTaxYearData({ ...currentTaxYearData, propertyPurchaseSlabs: updated });
+                                }}
+                                style={{ width: '100%', padding: '4px 6px', marginTop: '2px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                              />
+                            </label>
+                            <label style={{ fontSize: '11.5px', color: '#d97706', fontWeight: 700 }}>
+                              Late Filer:
+                              <input
+                                type="number"
+                                step="0.0025"
+                                value={pSlab.lateFilerRate ?? 0.055}
+                                onChange={(e) => {
+                                  const updated = [...currentTaxYearData.propertyPurchaseSlabs];
+                                  updated[pIdx] = { ...updated[pIdx], lateFilerRate: Number(e.target.value) };
+                                  setCurrentTaxYearData({ ...currentTaxYearData, propertyPurchaseSlabs: updated });
+                                }}
+                                style={{ width: '100%', padding: '4px 6px', marginTop: '2px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                              />
+                            </label>
+                            <label style={{ fontSize: '11.5px', color: '#b91c1c', fontWeight: 700 }}>
+                              Non-Filer:
+                              <input
+                                type="number"
+                                step="0.005"
+                                value={pSlab.nonFilerRate}
+                                onChange={(e) => {
+                                  const updated = [...currentTaxYearData.propertyPurchaseSlabs];
+                                  updated[pIdx] = { ...updated[pIdx], nonFilerRate: Number(e.target.value) };
+                                  setCurrentTaxYearData({ ...currentTaxYearData, propertyPurchaseSlabs: updated });
+                                }}
+                                style={{ width: '100%', padding: '4px 6px', marginTop: '2px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Selling Rates Card (Section 236C) */}
+                  <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <div>
+                        <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
+                          Property Sale Advance Tax (Sec 236C)
+                        </h3>
+                        <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+                          Adjustable advance income tax deducted from seller at property alienation.
+                        </p>
+                      </div>
+                      <span style={{ fontSize: '11px', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                        Seller WHT
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+                      {Object.entries(currentTaxYearData.propertySaleRates || {}).map(([key, val]: [string, any]) => (
+                        <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#f8fafc', borderRadius: '6px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#334155', textTransform: 'capitalize' }}>
+                            {key === 'lateFiler' ? 'Late Filer:' : key === 'filer' ? 'Active Filer:' : key === 'nonFiler' ? 'Non-Filer:' : 'Overseas (NICOP/POC):'}
+                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <input
                               type="number"
                               step="0.0025"
-                              value={pSlab.filerRate}
+                              value={val}
                               onChange={(e) => {
-                                const updated = [...currentTaxYearData.propertyPurchaseSlabs];
-                                updated[pIdx] = { ...updated[pIdx], filerRate: Number(e.target.value) };
-                                setCurrentTaxYearData({ ...currentTaxYearData, propertyPurchaseSlabs: updated });
+                                const updated = { ...currentTaxYearData.propertySaleRates, [key]: Number(e.target.value) };
+                                setCurrentTaxYearData({ ...currentTaxYearData, propertySaleRates: updated });
                               }}
-                              style={{ width: '65px', padding: '3px 6px', marginLeft: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '80px', padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', textAlign: 'right', fontWeight: 700 }}
                             />
-                          </label>
-                          <label style={{ fontSize: '12px', color: '#b91c1c' }}>
-                            Non-Filer:
-                            <input
-                              type="number"
-                              step="0.005"
-                              value={pSlab.nonFilerRate}
-                              onChange={(e) => {
-                                const updated = [...currentTaxYearData.propertyPurchaseSlabs];
-                                updated[pIdx] = { ...updated[pIdx], nonFilerRate: Number(e.target.value) };
-                                setCurrentTaxYearData({ ...currentTaxYearData, propertyPurchaseSlabs: updated });
-                              }}
-                              style={{ width: '65px', padding: '3px 6px', marginLeft: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-                            />
-                          </label>
+                            <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary, #A31D24)' }}>({(val * 100).toFixed(2)}%)</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Selling Rates Card */}
-                <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px', color: '#0f172a' }}>
-                    Property Sale Advance Tax (Sec 236C)
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
-                    Adjustable advance income tax collected from seller.
-                  </p>
+                {/* CGT Holding Schedule (Section 37) Card */}
+                <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      Capital Gains Tax (CGT) Holding Period Schedule (Section 37)
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
+                      Statutory CGT rates graduated across holding periods for open plots, constructed property, and flats.
+                    </p>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                      <thead style={{ background: '#f8fafc', color: '#475569', fontWeight: 800, borderBottom: '1px solid #e2e8f0' }}>
+                        <tr>
+                          <th style={{ padding: '10px 14px' }}>Holding Period</th>
+                          <th style={{ padding: '10px 14px' }}>Active Filer Rate (%)</th>
+                          <th style={{ padding: '10px 14px' }}>Late Filer Rate (%)</th>
+                          <th style={{ padding: '10px 14px' }}>Non-Filer Rate (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentTaxYearData.cgtHoldingSchedule?.map((bracket: any, bIdx: number) => (
+                          <tr key={bIdx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '10px 14px', fontWeight: 700, color: '#0f172a' }}>{bracket.period}</td>
+                            <td style={{ padding: '8px 14px' }}>
+                              <input
+                                type="number"
+                                step="0.005"
+                                value={bracket.filerRate}
+                                onChange={(e) => handleCGTBracketChange(bIdx, 'filerRate', Number(e.target.value))}
+                                style={{ width: '80px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                              <span style={{ marginLeft: '6px', color: '#15803d', fontWeight: 700 }}>({(bracket.filerRate * 100).toFixed(1)}%)</span>
+                            </td>
+                            <td style={{ padding: '8px 14px' }}>
+                              <input
+                                type="number"
+                                step="0.005"
+                                value={bracket.lateFilerRate ?? 0.20}
+                                onChange={(e) => handleCGTBracketChange(bIdx, 'lateFilerRate', Number(e.target.value))}
+                                style={{ width: '80px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                              <span style={{ marginLeft: '6px', color: '#d97706', fontWeight: 700 }}>({((bracket.lateFilerRate ?? 0.20) * 100).toFixed(1)}%)</span>
+                            </td>
+                            <td style={{ padding: '8px 14px' }}>
+                              <input
+                                type="number"
+                                step="0.005"
+                                value={bracket.nonFilerRate}
+                                onChange={(e) => handleCGTBracketChange(bIdx, 'nonFilerRate', Number(e.target.value))}
+                                style={{ width: '80px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                              />
+                              <span style={{ marginLeft: '6px', color: '#b91c1c', fontWeight: 700 }}>({(bracket.nonFilerRate * 100).toFixed(1)}%)</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {Object.entries(currentTaxYearData.propertySaleRates || {}).map(([key, val]: [string, any]) => (
-                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155', textTransform: 'capitalize' }}>
-                          {key}:
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* Sub-Tab 5: Custom Statutory Sections */}
+            {activeTaxSubTab === 'custom' && (
+              <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      Custom Statutory Sections &amp; WHT Provisions ({selectedYear})
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
+                      Define custom statutory provisions, deemed income rules (e.g. Section 7E), and special industry withholding clauses.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomSection}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: '6px',
+                      border: '1px solid var(--primary, #A31D24)',
+                      background: 'var(--primary, #A31D24)',
+                      color: '#fff',
+                      fontSize: '12.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={14} />
+                    <span>Add Custom Section</span>
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {(!currentTaxYearData.customSections || currentTaxYearData.customSections.length === 0) && (
+                    <div style={{ textAlign: 'center', padding: '40px 20px', background: '#f8fafc', borderRadius: '8px', color: '#64748b' }}>
+                      <FileText size={32} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
+                      <p style={{ margin: 0, fontWeight: 700 }}>No custom statutory sections defined for {selectedYear}.</p>
+                      <button
+                        type="button"
+                        onClick={handleAddCustomSection}
+                        style={{ marginTop: '10px', background: 'none', border: 'none', color: 'var(--primary, #A31D24)', fontWeight: 800, cursor: 'pointer' }}
+                      >
+                        + Click here to add your first custom section
+                      </button>
+                    </div>
+                  )}
+
+                  {currentTaxYearData.customSections?.map((cSec: any, cIdx: number) => (
+                    <div
+                      key={cIdx}
+                      style={{
+                        background: '#f8fafc',
+                        border: '1.5px solid #e2e8f0',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ fontSize: '11.5px', background: '#1A1D20', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontWeight: 800 }}>
+                            {cSec.sectionId || `SEC-${cIdx + 1}`}
+                          </span>
+                          <input
+                            type="text"
+                            value={cSec.title}
+                            onChange={(e) => handleCustomSectionChange(cIdx, 'title', e.target.value)}
+                            placeholder="Section Title / Statutory Clause"
+                            style={{ fontSize: '14.5px', fontWeight: 800, color: '#0f172a', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '4px 10px', minWidth: '260px' }}
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <select
+                            value={cSec.status || 'active'}
+                            onChange={(e) => handleCustomSectionChange(cIdx, 'status', e.target.value)}
+                            style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              border: '1px solid #cbd5e1',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              background: cSec.status === 'inactive' ? '#fef2f2' : '#f0fdf4',
+                              color: cSec.status === 'inactive' ? '#b91c1c' : '#15803d',
+                            }}
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCustomSection(cIdx)}
+                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                            title="Delete Custom Section"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                            Category:
+                          </label>
+                          <select
+                            value={cSec.category || 'general'}
+                            onChange={(e) => handleCustomSectionChange(cIdx, 'category', e.target.value)}
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                          >
+                            <option value="general">General Statutory</option>
+                            <option value="property">Property &amp; Real Estate</option>
+                            <option value="business">Business / AOP</option>
+                            <option value="corporate">Corporate / Company</option>
+                            <option value="salary">Salaried Class</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                            Effective Rate (%):
+                          </label>
+                          <input
+                            type="number"
+                            step="0.005"
+                            value={cSec.effectiveRate ?? 0}
+                            onChange={(e) => handleCustomSectionChange(cIdx, 'effectiveRate', Number(e.target.value))}
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                            Fixed Amount (Rs.):
+                          </label>
+                          <input
+                            type="number"
+                            value={cSec.fixedAmount ?? 0}
+                            onChange={(e) => handleCustomSectionChange(cIdx, 'fixedAmount', Number(e.target.value))}
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                            Applicable To:
+                          </label>
+                          <input
+                            type="text"
+                            value={cSec.applicableTo || ''}
+                            onChange={(e) => handleCustomSectionChange(cIdx, 'applicableTo', e.target.value)}
+                            placeholder="e.g. Assets > 25M, Filers, Importers"
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                          Statutory Description &amp; Legal Reference:
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={cSec.description || ''}
+                          onChange={(e) => handleCustomSectionChange(cIdx, 'description', e.target.value)}
+                          placeholder="FBR statutory rationale, exemptions, and relevant sub-sections..."
+                          style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', resize: 'vertical' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sub-Tab 6: Late Filer Governance */}
+            {activeTaxSubTab === 'lateFiler' && (
+              <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                        Late Filer Governance &amp; Section 182(2) Penalties ({selectedYear})
+                      </h3>
+                      <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                        FBR ATL Rules
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
+                      Statutory surcharges under Section 182(2) required to appear on Active Taxpayer List (ATL) after due date, plus differential withholding rates.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '18px', marginBottom: '20px' }}>
+                  {/* Surcharges Card */}
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: '0 0 12px' }}>
+                      Section 182(2) Late Surcharge (PKR)
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                          Individual / Sole Proprietor:
+                        </label>
+                        <input
+                          type="number"
+                          value={currentTaxYearData.lateFilerRules?.atlSurchargeIndividual ?? 1000}
+                          onChange={(e) => handleLateFilerRuleChange('atlSurchargeIndividual', Number(e.target.value))}
+                          style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                          Association of Persons (AOP / Partnership):
+                        </label>
+                        <input
+                          type="number"
+                          value={currentTaxYearData.lateFilerRules?.atlSurchargeAOP ?? 10000}
+                          onChange={(e) => handleLateFilerRuleChange('atlSurchargeAOP', Number(e.target.value))}
+                          style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                          Corporate / Company (Pvt / Public):
+                        </label>
+                        <input
+                          type="number"
+                          value={currentTaxYearData.lateFilerRules?.atlSurchargeCompany ?? 20000}
+                          onChange={(e) => handleLateFilerRuleChange('atlSurchargeCompany', Number(e.target.value))}
+                          style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Late Property Tax Card */}
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: '0 0 12px' }}>
+                      Property Withholding Late Surcharges
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                          Sec 236K Property Purchase Late Baseline Rate (%):
+                        </label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <input
                             type="number"
                             step="0.0025"
-                            value={val}
-                            onChange={(e) => {
-                              const updated = { ...currentTaxYearData.propertySaleRates, [key]: Number(e.target.value) };
-                              setCurrentTaxYearData({ ...currentTaxYearData, propertySaleRates: updated });
-                            }}
-                            style={{ width: '80px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', textAlign: 'right' }}
+                            value={currentTaxYearData.lateFilerRules?.propertyPurchaseLateRate ?? 0.055}
+                            onChange={(e) => handleLateFilerRuleChange('propertyPurchaseLateRate', Number(e.target.value))}
+                            style={{ width: '90px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
                           />
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#64748b' }}>({(val * 100).toFixed(2)}%)</span>
+                          <span style={{ fontSize: '13px', color: '#d97706', fontWeight: 700 }}>
+                            ({((currentTaxYearData.lateFilerRules?.propertyPurchaseLateRate ?? 0.055) * 100).toFixed(2)}%)
+                          </span>
                         </div>
                       </div>
-                    ))}
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '3px' }}>
+                          Sec 236C Property Sale Late Baseline Rate (%):
+                        </label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input
+                            type="number"
+                            step="0.0025"
+                            value={currentTaxYearData.lateFilerRules?.propertySaleLateRate ?? 0.045}
+                            onChange={(e) => handleLateFilerRuleChange('propertySaleLateRate', Number(e.target.value))}
+                            style={{ width: '90px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                          />
+                          <span style={{ fontSize: '13px', color: '#d97706', fontWeight: 700 }}>
+                            ({((currentTaxYearData.lateFilerRules?.propertySaleLateRate ?? 0.045) * 100).toFixed(2)}%)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>
+                    Statutory Explanation &amp; Compliance Notes:
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={currentTaxYearData.lateFilerRules?.description || ''}
+                    onChange={(e) => handleLateFilerRuleChange('description', e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', resize: 'vertical' }}
+                  />
                 </div>
               </div>
             )}
@@ -1475,10 +2296,10 @@ export default function AdminCustomizationDashboard() {
             >
               <div>
                 <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                  SECP Incorporation &amp; Advisory Fees Config
+                  SECP Incorporation &amp; Advisory Fees Config (4 Entity Types, 4 Capital Tiers, 9 Add-ons)
                 </h3>
                 <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
-                  Adjust statutory filing costs, advisory service packages, and optional licensing fees.
+                  Adjust statutory filing fees, professional advisory charges, and customize all 9 registration steps matching official pricing.
                 </p>
               </div>
 
@@ -1526,64 +2347,165 @@ export default function AdminCustomizationDashboard() {
                   }}
                 >
                   <Save size={16} />
-                  <span>{isSaving ? 'Saving...' : 'Save Company Setup Fees'}</span>
+                  <span>{isSaving ? 'Saving to DB...' : 'Save Company Setup Fees'}</span>
                 </button>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-              {/* Entity Base Packages */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* 1. Entity Base Packages */}
               <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, margin: '0 0 12px', color: '#0f172a' }}>
-                  Business Entity Legal Packages (PKR)
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      1. Business Entity Legal Packages (4 Structures)
+                    </h4>
+                    <p style={{ fontSize: '12.5px', color: '#64748b', margin: '2px 0 0' }}>
+                      Base consultation &amp; legal documentation fees per corporate structure.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddEntityTier}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid var(--primary, #A31D24)',
+                      background: 'var(--primary, #A31D24)',
+                      color: '#fff',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={13} />
+                    <span>Add Legal Entity</span>
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                   {companyCostData.entityTiers?.map((entity: any, eIdx: number) => (
-                    <div key={entity.id} style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>{entity.name}</strong>
-                        <span style={{ fontSize: '11px', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                          {entity.badge}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '12px', color: '#64748b' }}>Base Package: PKR</span>
+                    <div key={entity.id || eIdx} style={{ background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                         <input
-                          type="number"
-                          value={entity.baseFee}
-                          onChange={(e) => {
-                            const updated = [...companyCostData.entityTiers];
-                            updated[eIdx] = { ...updated[eIdx], baseFee: Number(e.target.value) };
-                            setCompanyCostData({ ...companyCostData, entityTiers: updated });
-                          }}
-                          style={{ width: '110px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                          type="text"
+                          value={entity.name}
+                          onChange={(e) => handleEntityTierChange(eIdx, 'name', e.target.value)}
+                          style={{ fontWeight: 800, fontSize: '13.5px', color: '#0f172a', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '3px 6px', width: '180px' }}
                         />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <input
+                            type="text"
+                            value={entity.badge || ''}
+                            onChange={(e) => handleEntityTierChange(eIdx, 'badge', e.target.value)}
+                            placeholder="Badge"
+                            style={{ fontSize: '11px', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '2px 5px', width: '80px' }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveEntityTier(eIdx)}
+                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px' }}
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748b' }}>Govt Official Fee:</label>
+                          <input
+                            type="number"
+                            value={entity.baseGovFee ?? 3500}
+                            onChange={(e) => handleEntityTierChange(eIdx, 'baseGovFee', Number(e.target.value))}
+                            style={{ width: '100%', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', fontWeight: 700 }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748b' }}>QWCA Legal Fee:</label>
+                          <input
+                            type="number"
+                            value={entity.baseConsultingFee ?? (entity.baseFee - 3500)}
+                            onChange={(e) => handleEntityTierChange(eIdx, 'baseConsultingFee', Number(e.target.value))}
+                            style={{ width: '100%', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', fontWeight: 700 }}
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #e2e8f0' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>Total Base Package:</span>
+                        <span style={{ fontSize: '13.5px', fontWeight: 900, color: 'var(--primary, #A31D24)' }}>
+                          PKR {(entity.baseFee || (entity.baseGovFee || 0) + (entity.baseConsultingFee || 0)).toLocaleString()}
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Authorized Capital Tiers */}
+              {/* 2. Authorized Capital Tiers */}
               <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, margin: '0 0 12px', color: '#0f172a' }}>
-                  SECP Authorized Capital Tiers (PKR)
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      2. SECP Authorized Capital Tiers (4 Tiers)
+                    </h4>
+                    <p style={{ fontSize: '12.5px', color: '#64748b', margin: '2px 0 0' }}>
+                      Statutory capital registration fee scale charged by SECP.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddCapitalTier}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid var(--primary, #A31D24)',
+                      background: 'var(--primary, #A31D24)',
+                      color: '#fff',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={13} />
+                    <span>Add Capital Tier</span>
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
                   {companyCostData.capitalTiers?.map((cap: any, cIdx: number) => (
-                    <div key={cap.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
-                      <span style={{ color: '#334155', fontWeight: 600 }}>{cap.label}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ color: '#94a3b8' }}>PKR</span>
+                    <div key={cap.id || cIdx} style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <input
+                          type="text"
+                          value={cap.label}
+                          onChange={(e) => handleCapitalTierChange(cIdx, 'label', e.target.value)}
+                          style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '3px 6px', width: '170px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCapitalTier(cIdx)}
+                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px' }}
+                          title="Delete"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                        <span style={{ fontSize: '11.5px', color: '#64748b' }}>Fee (PKR):</span>
                         <input
                           type="number"
                           value={cap.fee}
-                          onChange={(e) => {
-                            const updated = [...companyCostData.capitalTiers];
-                            updated[cIdx] = { ...updated[cIdx], fee: Number(e.target.value) };
-                            setCompanyCostData({ ...companyCostData, capitalTiers: updated });
-                          }}
-                          style={{ width: '90px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', textAlign: 'right', fontWeight: 700 }}
+                          onChange={(e) => handleCapitalTierChange(cIdx, 'fee', Number(e.target.value))}
+                          style={{ width: '90px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', textAlign: 'right', fontWeight: 800 }}
                         />
                       </div>
                     </div>
@@ -1591,30 +2513,117 @@ export default function AdminCustomizationDashboard() {
                 </div>
               </div>
 
-              {/* Service Add-ons */}
+              {/* 3. Service & Setup Add-ons (All 9 Add-ons) */}
               <div style={{ background: '#ffffff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '20px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, margin: '0 0 12px', color: '#0f172a' }}>
-                  Tax, Chamber &amp; Licensing Add-ons (PKR)
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {companyCostData.serviceAddons?.map((addon: any, aIdx: number) => (
-                    <div key={addon.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
-                      <span style={{ color: '#334155', fontWeight: 600, maxWidth: '200px' }}>{addon.name}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ color: '#94a3b8' }}>PKR</span>
-                        <input
-                          type="number"
-                          value={addon.fee}
-                          onChange={(e) => {
-                            const updated = [...companyCostData.serviceAddons];
-                            updated[aIdx] = { ...updated[aIdx], fee: Number(e.target.value) };
-                            setCompanyCostData({ ...companyCostData, serviceAddons: updated });
-                          }}
-                          style={{ width: '90px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', textAlign: 'right', fontWeight: 700 }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                      3. Regulatory, Tax &amp; Licensing Add-ons (9 Sections)
+                    </h4>
+                    <p style={{ fontSize: '12.5px', color: '#64748b', margin: '2px 0 0' }}>
+                      SECP, FBR, Bank, Chamber, WebOC, PSEB, and Secretarial compliance components.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddServiceAddon}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid var(--primary, #A31D24)',
+                      background: 'var(--primary, #A31D24)',
+                      color: '#fff',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={13} />
+                    <span>Add Service Add-on</span>
+                  </button>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                    <thead style={{ background: '#f8fafc', color: '#475569', fontWeight: 800, borderBottom: '1px solid #e2e8f0' }}>
+                      <tr>
+                        <th style={{ padding: '10px 12px' }}>#</th>
+                        <th style={{ padding: '10px 12px' }}>Service / Regulatory Clause</th>
+                        <th style={{ padding: '10px 12px' }}>Govt Fee (PKR)</th>
+                        <th style={{ padding: '10px 12px' }}>QWCA Fee (PKR)</th>
+                        <th style={{ padding: '10px 12px' }}>Total (PKR)</th>
+                        <th style={{ padding: '10px 12px' }}>Required?</th>
+                        <th style={{ padding: '10px 12px' }}>Default Checked?</th>
+                        <th style={{ padding: '10px 12px' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {companyCostData.serviceAddons?.map((addon: any, aIdx: number) => (
+                        <tr key={addon.id || aIdx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '10px 12px', fontWeight: 700, color: '#94a3b8' }}>{aIdx + 1}</td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input
+                              type="text"
+                              value={addon.name}
+                              onChange={(e) => handleServiceAddonChange(aIdx, 'name', e.target.value)}
+                              style={{ width: '230px', padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px', fontWeight: 700 }}
+                            />
+                            <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
+                              Category: {addon.category || 'statutory'}
+                            </div>
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input
+                              type="number"
+                              value={addon.govtFee ?? 0}
+                              onChange={(e) => handleServiceAddonChange(aIdx, 'govtFee', Number(e.target.value))}
+                              style={{ width: '85px', padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                            />
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input
+                              type="number"
+                              value={addon.consultingFee ?? addon.fee}
+                              onChange={(e) => handleServiceAddonChange(aIdx, 'consultingFee', Number(e.target.value))}
+                              style={{ width: '85px', padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12.5px' }}
+                            />
+                          </td>
+                          <td style={{ padding: '8px 12px', fontWeight: 800, color: 'var(--primary, #A31D24)' }}>
+                            PKR {(addon.fee || (addon.govtFee || 0) + (addon.consultingFee || 0)).toLocaleString()}
+                          </td>
+                          <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={Boolean(addon.required)}
+                              onChange={(e) => handleServiceAddonChange(aIdx, 'required', e.target.checked)}
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </td>
+                          <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={Boolean(addon.defaultChecked)}
+                              onChange={(e) => handleServiceAddonChange(aIdx, 'defaultChecked', e.target.checked)}
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveServiceAddon(aIdx)}
+                              style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                              title="Delete Addon"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -1714,7 +2723,7 @@ npm run dev:client`}
                 Add New Tax Year
               </h3>
               <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
-                Enter the fiscal year identifier (e.g. 2027-2028). Baseline slabs will be cloned for you to customize.
+                Enter the fiscal year identifier (e.g. 2027-2028 or 2022-2023). Baseline slabs will be cloned for you to customize.
               </p>
               <input
                 type="text"

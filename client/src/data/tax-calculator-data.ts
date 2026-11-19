@@ -352,6 +352,7 @@ export interface PropertyPurchaseSlab {
   min: number;
   max: number;
   filerRate: number;
+  lateFilerRate: number;
   nonFilerRate: number;
   overseasRate: number;
   label: string;
@@ -363,6 +364,7 @@ export const PROPERTY_PURCHASE_SLABS: PropertyPurchaseSlab[] = [
     min: 0,
     max: 50000000,
     filerRate: 0.0125,
+    lateFilerRate: 0.055,
     nonFilerRate: 0.105,
     overseasRate: 0.0125,
     label: 'Up to Rs. 50 Million',
@@ -371,6 +373,7 @@ export const PROPERTY_PURCHASE_SLABS: PropertyPurchaseSlab[] = [
     min: 50000000,
     max: 100000000,
     filerRate: 0.0125,
+    lateFilerRate: 0.065,
     nonFilerRate: 0.145,
     overseasRate: 0.0125,
     label: 'Rs. 50 Million to Rs. 100 Million',
@@ -379,6 +382,7 @@ export const PROPERTY_PURCHASE_SLABS: PropertyPurchaseSlab[] = [
     min: 100000000,
     max: Infinity,
     filerRate: 0.0125,
+    lateFilerRate: 0.075,
     nonFilerRate: 0.185,
     overseasRate: 0.0125,
     label: 'Above Rs. 100 Million',
@@ -388,6 +392,7 @@ export const PROPERTY_PURCHASE_SLABS: PropertyPurchaseSlab[] = [
 // 2. Sale Tax & Advance Withholding (Section 236C) - Withholding on Seller
 export const PROPERTY_SALE_RATES = {
   filer: 0.0275,
+  lateFiler: 0.045,
   nonFiler: 0.115,
   overseas: 0.0275,
 };
@@ -399,16 +404,17 @@ export interface CGTHoldingBracket {
   openPlotRate: number;
   constructedRate: number;
   flatRate: number;
+  lateFilerRate?: number;
 }
 
 export const CGT_HOLDING_SCHEDULE: CGTHoldingBracket[] = [
-  { periodId: 'up-to-1', label: 'Up to 1 year', openPlotRate: 0.15, constructedRate: 0.15, flatRate: 0.15 },
-  { periodId: '1-to-2', label: 'Over 1 to 2 years', openPlotRate: 0.125, constructedRate: 0.10, flatRate: 0.075 },
-  { periodId: '2-to-3', label: 'Over 2 to 3 years', openPlotRate: 0.10, constructedRate: 0.075, flatRate: 0 },
-  { periodId: '3-to-4', label: 'Over 3 to 4 years', openPlotRate: 0.075, constructedRate: 0.05, flatRate: 0 },
-  { periodId: '4-to-5', label: 'Over 4 to 5 years', openPlotRate: 0.05, constructedRate: 0, flatRate: 0 },
-  { periodId: '5-to-6', label: 'Over 5 to 6 years', openPlotRate: 0.025, constructedRate: 0, flatRate: 0 },
-  { periodId: 'over-6', label: 'Over 6 years', openPlotRate: 0, constructedRate: 0, flatRate: 0 },
+  { periodId: 'up-to-1', label: 'Up to 1 year', openPlotRate: 0.15, constructedRate: 0.15, flatRate: 0.15, lateFilerRate: 0.20 },
+  { periodId: '1-to-2', label: 'Over 1 to 2 years', openPlotRate: 0.125, constructedRate: 0.10, flatRate: 0.075, lateFilerRate: 0.175 },
+  { periodId: '2-to-3', label: 'Over 2 to 3 years', openPlotRate: 0.10, constructedRate: 0.075, flatRate: 0, lateFilerRate: 0.15 },
+  { periodId: '3-to-4', label: 'Over 3 to 4 years', openPlotRate: 0.075, constructedRate: 0.05, flatRate: 0, lateFilerRate: 0.125 },
+  { periodId: '4-to-5', label: 'Over 4 to 5 years', openPlotRate: 0.05, constructedRate: 0, flatRate: 0, lateFilerRate: 0.10 },
+  { periodId: '5-to-6', label: 'Over 5 to 6 years', openPlotRate: 0.025, constructedRate: 0, flatRate: 0, lateFilerRate: 0.05 },
+  { periodId: 'over-6', label: 'Over 6 years', openPlotRate: 0, constructedRate: 0, flatRate: 0, lateFilerRate: 0 },
 ];
 
 // 4. Provincial Stamp Duty & Capital Value Tax (CVT)
