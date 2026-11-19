@@ -6,6 +6,7 @@ import { connectDB, isDbConnected } from './config/db.js';
 import taxSlabRoutes from './routes/taxSlabRoutes.js';
 import companyCostRoutes from './routes/companyCostRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import eventsRoutes from './routes/eventsRoutes.js';
 import { ensureAdminSeeded } from './controllers/authController.js';
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tax-slabs', taxSlabRoutes);
 app.use('/api/cost-estimation', companyCostRoutes);
+app.use('/api/events', eventsRoutes);
 
 // 404 handler
 app.use((req, res) => {

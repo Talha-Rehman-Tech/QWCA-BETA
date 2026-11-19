@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { SALARY_TAX_DATA } from '@/data/tax-calculator-data';
 import { getTaxYearsApi } from '@/lib/api';
+import { subscribeToRealtime } from '@/lib/realtime';
 import {
   Calculator,
   User,
@@ -62,7 +63,16 @@ export default function SalariedTaxCalculator() {
       }
     }
     syncWithBackend();
-  }, []);
+
+    // Instant Realtime Sync: Auto-update DOM when Admin updates slabs
+    const unsubscribe = subscribeToRealtime((event) => {
+      if (event.type === 'tax_slabs_updated') {
+        syncWithBackend();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [salYear]);
 
   const formatPKR = (num: number) => {
     return 'Rs. ' + Math.round(num).toLocaleString('en-PK');

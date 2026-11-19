@@ -10,6 +10,7 @@ import {
   CGTHoldingBracket
 } from '@/data/tax-calculator-data';
 import { getTaxYearsApi } from '@/lib/api';
+import { subscribeToRealtime } from '@/lib/realtime';
 import {
   Home,
   Building,
@@ -83,7 +84,16 @@ export default function PropertyTaxCalculator() {
       }
     }
     syncPropertyWithBackend();
-  }, []);
+
+    // Instant Realtime Sync: Auto-update DOM when Admin updates slabs
+    const unsubscribe = subscribeToRealtime((event) => {
+      if (event.type === 'tax_slabs_updated') {
+        syncPropertyWithBackend();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [propertyYear]);
 
   const handleYearChange = (year: string) => {
     setPropertyYear(year);

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { CompanyCost } from '../models/CompanyCost.js';
 import { INITIAL_COMPANY_COST_CONFIG } from '../data/seedData.js';
 import { isDbConnected } from '../config/db.js';
+import { broadcastRealtimeEvent } from '../services/realtimeService.js';
 
 let inMemoryCostConfig: any = JSON.parse(JSON.stringify(INITIAL_COMPANY_COST_CONFIG));
 
@@ -50,11 +51,25 @@ export async function saveCompanyCostConfig(req: Request, res: Response): Promis
         { upsert: true, new: true, setDefaultsOnInsert: true }
       ).lean();
       inMemoryCostConfig = updated;
+
+      broadcastRealtimeEvent('company_cost_updated', {
+        action: 'save',
+        data: updated,
+        timestamp: new Date().toISOString(),
+      });
+
       res.json({ success: true, message: 'Company cost configuration saved to MongoDB', data: updated });
       return;
     }
 
     inMemoryCostConfig = { ...inMemoryCostConfig, ...payload };
+
+    broadcastRealtimeEvent('company_cost_updated', {
+      action: 'save',
+      data: inMemoryCostConfig,
+      timestamp: new Date().toISOString(),
+    });
+
     res.json({
       success: true,
       message: 'Company cost configuration saved (in-memory mode, MongoDB offline)',
@@ -75,6 +90,12 @@ export async function resetCompanyCostConfig(req: Request, res: Response): Promi
         { upsert: true }
       );
     }
+
+    broadcastRealtimeEvent('company_cost_updated', {
+      action: 'reset',
+      timestamp: new Date().toISOString(),
+    });
+
     res.json({
       success: true,
       message: 'Company cost configuration reset to official baseline defaults',

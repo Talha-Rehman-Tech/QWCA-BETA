@@ -64,6 +64,7 @@ import {
   PROPERTY_SALE_RATES,
   CGT_HOLDING_SCHEDULE
 } from '@/data/tax-calculator-data';
+import { broadcastLocalUpdate } from '@/lib/realtime';
 
 export default function AdminCustomizationDashboard() {
   // ==================== 0. SINGLE ADMIN AUTHENTICATION STATE ====================
@@ -340,6 +341,10 @@ export default function AdminCustomizationDashboard() {
       const nextYear = remaining[0];
       setSelectedYear(nextYear);
       handleYearChange(nextYear);
+
+      // Instant live cross-tab broadcast
+      broadcastLocalUpdate('tax_slabs_updated', { action: 'delete', year: selectedYear });
+
       setSaveNotification({
         type: 'success',
         message: `Tax Year ${selectedYear} successfully removed from database.`,
@@ -366,9 +371,12 @@ export default function AdminCustomizationDashboard() {
     setIsSaving(false);
 
     if (result.success) {
+      // Instant live cross-tab broadcast (0ms latency to other open tabs)
+      broadcastLocalUpdate('tax_slabs_updated', { action: 'save', year: selectedYear, data: payload });
+
       setSaveNotification({
         type: 'success',
-        message: `Tax Slabs for ${selectedYear} successfully saved to ${serverOnline ? 'Express & MongoDB' : 'Local State'}!`,
+        message: `Tax Slabs for ${selectedYear} successfully saved to ${serverOnline ? 'Express & MongoDB' : 'Local State'}! Live DOM synchronized.`,
       });
     } else {
       if (result.message?.includes('Unauthorized') || result.message?.includes('token')) {
@@ -396,9 +404,12 @@ export default function AdminCustomizationDashboard() {
     setIsSaving(false);
 
     if (result.success) {
+      // Instant live cross-tab broadcast (0ms latency to other open tabs)
+      broadcastLocalUpdate('company_cost_updated', { action: 'save', data: payload });
+
       setSaveNotification({
         type: 'success',
-        message: `Company registration fees successfully saved to ${serverOnline ? 'Express & MongoDB' : 'Local State'}!`,
+        message: `Company registration fees successfully saved to ${serverOnline ? 'Express & MongoDB' : 'Local State'}! Live DOM synchronized.`,
       });
     } else {
       if (result.message?.includes('Unauthorized') || result.message?.includes('token')) {
@@ -420,6 +431,7 @@ export default function AdminCustomizationDashboard() {
     const res = await resetTaxSlabsApi();
     setIsSaving(false);
     if (res.success) {
+      broadcastLocalUpdate('tax_slabs_updated', { action: 'reset' });
       window.location.reload();
     } else {
       alert(res.message || 'Reset failed.');
@@ -432,6 +444,7 @@ export default function AdminCustomizationDashboard() {
     const res = await resetCompanyCostConfigApi();
     setIsSaving(false);
     if (res.success) {
+      broadcastLocalUpdate('company_cost_updated', { action: 'reset' });
       window.location.reload();
     } else {
       alert(res.message || 'Reset failed.');

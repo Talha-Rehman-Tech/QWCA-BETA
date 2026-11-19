@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { TaxSlab } from '../models/TaxSlab.js';
 import { INITIAL_TAX_YEARS } from '../data/seedData.js';
 import { isDbConnected } from '../config/db.js';
+import { broadcastRealtimeEvent } from '../services/realtimeService.js';
 
 // In-memory fallback store initialized with baseline data
 let inMemoryTaxYears: any[] = JSON.parse(JSON.stringify(INITIAL_TAX_YEARS));
@@ -85,6 +86,14 @@ export async function saveTaxSlabYear(req: Request, res: Response): Promise<void
       if (idx >= 0) inMemoryTaxYears[idx] = updated;
       else inMemoryTaxYears.unshift(updated);
 
+      // Broadcast realtime event to all connected frontends
+      broadcastRealtimeEvent('tax_slabs_updated', {
+        action: 'save',
+        year,
+        data: updated,
+        timestamp: new Date().toISOString(),
+      });
+
       res.json({ success: true, message: `Tax Year ${year} saved to MongoDB`, data: updated });
       return;
     }
@@ -96,6 +105,14 @@ export async function saveTaxSlabYear(req: Request, res: Response): Promise<void
     } else {
       inMemoryTaxYears.unshift(payload);
     }
+
+    // Broadcast realtime event to all connected frontends
+    broadcastRealtimeEvent('tax_slabs_updated', {
+      action: 'save',
+      year,
+      data: payload,
+      timestamp: new Date().toISOString(),
+    });
 
     res.json({
       success: true,
@@ -116,6 +133,12 @@ export async function deleteTaxSlabYear(req: Request, res: Response): Promise<vo
     }
     inMemoryTaxYears = inMemoryTaxYears.filter((item) => item.year !== year);
 
+    broadcastRealtimeEvent('tax_slabs_updated', {
+      action: 'delete',
+      year,
+      timestamp: new Date().toISOString(),
+    });
+
     res.json({ success: true, message: `Tax Year ${year} deleted` });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -129,6 +152,12 @@ export async function resetTaxSlabs(req: Request, res: Response): Promise<void> 
       await TaxSlab.deleteMany({});
       await TaxSlab.insertMany(INITIAL_TAX_YEARS);
     }
+
+    broadcastRealtimeEvent('tax_slabs_updated', {
+      action: 'reset',
+      timestamp: new Date().toISOString(),
+    });
+
     res.json({ success: true, message: 'Tax slabs reset to official FBR baseline defaults', data: inMemoryTaxYears });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });

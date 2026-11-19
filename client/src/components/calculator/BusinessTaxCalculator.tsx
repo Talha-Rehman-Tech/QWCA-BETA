@@ -7,6 +7,7 @@ import {
   SUPER_TAX_BRACKETS
 } from '@/data/tax-calculator-data';
 import { getTaxYearsApi } from '@/lib/api';
+import { subscribeToRealtime } from '@/lib/realtime';
 import {
   Building2,
   User,
@@ -60,7 +61,16 @@ export default function BusinessTaxCalculator() {
       }
     }
     syncBizWithBackend();
-  }, []);
+
+    // Instant Realtime Sync: Auto-update DOM when Admin updates slabs
+    const unsubscribe = subscribeToRealtime((event) => {
+      if (event.type === 'tax_slabs_updated') {
+        syncBizWithBackend();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [bizYear]);
 
   const formatPKR = (num: number) => {
     return 'Rs. ' + Math.round(num).toLocaleString('en-PK');

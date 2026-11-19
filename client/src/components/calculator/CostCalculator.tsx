@@ -11,6 +11,7 @@ import {
   SetupAddon
 } from '@/data/calculator-data';
 import { getCompanyCostConfigApi } from '@/lib/api';
+import { subscribeToRealtime } from '@/lib/realtime';
 import {
   Calculator,
   Check,
@@ -143,6 +144,15 @@ export default function CostCalculator() {
       }
     }
     syncCostWithBackend();
+
+    // Instant Realtime Sync: Auto-update DOM when Admin updates company cost
+    const unsubscribe = subscribeToRealtime((event) => {
+      if (event.type === 'company_cost_updated') {
+        syncCostWithBackend();
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const selectedEntity = useMemo(
