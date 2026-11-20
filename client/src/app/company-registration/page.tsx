@@ -211,7 +211,7 @@ export default function CompanyRegistrationPage() {
                   <span>Estimate Foreign Setup Cost</span>
                   <ArrowRight size={15} />
                 </Link>
-                <Link href="/#contact" className="button button-outline">
+                <Link href="/contact" className="button button-outline">
                   <span>Consult Cross-Border CA Partner</span>
                 </Link>
               </div>
@@ -276,7 +276,7 @@ export default function CompanyRegistrationPage() {
                   <span>Calculate Startup Incorporation Cost</span>
                   <ArrowRight size={15} />
                 </Link>
-                <Link href="/#contact" className="button button-outline">
+                <Link href="/contact" className="button button-outline">
                   <span>Request Name Availability Check</span>
                 </Link>
               </div>
@@ -339,7 +339,7 @@ export default function CompanyRegistrationPage() {
                 </div>
               </div>
 
-              <Link href="/#contact" className="button">
+              <Link href="/contact" className="button">
                 <span>Request Manufacturing Setup Advisory</span>
                 <ArrowRight size={15} />
               </Link>

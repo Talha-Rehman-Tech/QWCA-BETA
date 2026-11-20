@@ -396,7 +396,7 @@ export default function WorkspaceSlider() {
           </p>
 
           <div className="workspace-minimal-actions ws-minimal-anim">
-            <Link href="#contact" className="button button-sm workspace-action-primary">
+            <Link href="/contact" className="button button-sm workspace-action-primary">
               <span>{ui.scheduleConsultation}</span>
               <ArrowRight size={14} />
             </Link>

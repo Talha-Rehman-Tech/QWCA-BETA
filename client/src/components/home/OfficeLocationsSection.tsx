@@ -302,7 +302,7 @@ export default function OfficeLocationsSection() {
                   <ExternalLink size={13} />
                 </a>
 
-                <Link href="/#contact" className="button button-outline office-inquiry-btn">
+                <Link href="/contact" className="button button-outline office-inquiry-btn">
                   <span>Schedule Consultation</span>
                 </Link>
               </div>

@@ -325,7 +325,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     </div>
                   </div>
 
-                  <Link href="/#contact" className="button consult-button">
+                  <Link href="/contact" className="button consult-button">
                     <span>Schedule Consultation</span>
                     <ArrowRight size={15} />
                   </Link>

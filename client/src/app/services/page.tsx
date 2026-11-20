@@ -154,7 +154,7 @@ export default function ServicesPage() {
             <Link href="/cost-estimator" className="button button-outline bottom-cta-btn">
               <span>Try Cost Estimator</span>
             </Link>
-            <Link href="/#contact" className="button bottom-cta-btn">
+            <Link href="/contact" className="button bottom-cta-btn">
               <span>Book Partner Discussion</span>
               <ArrowRight size={15} />
             </Link>

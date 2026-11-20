@@ -317,7 +317,7 @@ export default function SalariedTaxCalculator() {
             </div>
 
             <div className="calc-action-row">
-              <Link href="/#contact" className="calc-consult-link">
+              <Link href="/contact" className="calc-consult-link">
                 Need employee payroll structuring or tax refund support? Consult QWCA &rarr;
               </Link>
             </div>

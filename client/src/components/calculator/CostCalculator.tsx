@@ -505,7 +505,7 @@ export default function CostCalculator() {
 
             <div className="summary-actions">
               <Link
-                href={`/#contact?entity=${selectedEntity.id}&total=${calculation.grandTotal}`}
+                href={`/contact?service=SECP%20Company%20Registration&entity=${selectedEntity.id}&total=${calculation.grandTotal}`}
                 className="button"
                 style={{ width: '100%', justifyContent: 'center' }}
               >

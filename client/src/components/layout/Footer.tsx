@@ -153,7 +153,7 @@ export default function Footer() {
                 Actual tax liability, admissible deductions, withholding tax adjustments, Minimum Turnover Tax (Sec 113), Alternate Corporate Tax (Sec 113C), and Super Tax (Sec 4C) require scrutiny of audited books, statutory records, and entity classifications. <strong>Always consult a qualified Chartered Accountant at QWCA before making financial decisions or filing statutory returns.</strong>
               </p>
               <div className="footer-disclaimer-actions">
-                <Link href="/#contact" className="disclaimer-action-btn primary">
+                <Link href="/contact" className="disclaimer-action-btn primary">
                   <span>Book Accountant Consultation</span>
                   <ArrowRight size={14} strokeWidth={2.5} aria-hidden="true" />
                 </Link>
@@ -205,7 +205,7 @@ export default function Footer() {
               <span className="footer-sep">&bull;</span>
               <Link href="/cost-estimator" className="footer-bottom-link">Cost Calculator</Link>
               <span className="footer-sep">&bull;</span>
-              <Link href="/#contact" className="footer-bottom-link">Contact</Link>
+              <Link href="/contact" className="footer-bottom-link">Contact</Link>
               <span className="footer-sep">&bull;</span>
               <Link href="/admin" className="footer-bottom-link font-medium hover:text-[#A31D24]">Admin Portal</Link>
             </div>

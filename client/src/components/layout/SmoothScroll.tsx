@@ -55,12 +55,21 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       if (!target) return;
 
       const href = target.getAttribute('href');
-      if (href && href.startsWith('#') && href.length > 1) {
-        const targetElement = document.querySelector(href);
+      if (!href) return;
+
+      let hash = '';
+      if (href.startsWith('#') && href.length > 1) {
+        hash = href;
+      } else if (href.startsWith('/#') && (window.location.pathname === '/' || window.location.pathname === '')) {
+        hash = href.slice(1);
+      }
+
+      if (hash) {
+        const targetElement = document.querySelector(hash);
         if (targetElement) {
           e.preventDefault();
           lenis.scrollTo(targetElement as HTMLElement, {
-            offset: -84,
+            offset: -100,
             duration: 1.2,
           });
         }

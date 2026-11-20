@@ -342,7 +342,7 @@ export default function TaxCalculatorCTA() {
             </p>
           </div>
           <div>
-            <Link href="/#contact" className="button" style={{ whiteSpace: 'nowrap' }}>
+            <Link href="/contact" className="button" style={{ whiteSpace: 'nowrap' }}>
               <span>Book Tax Consultation</span>
               <ArrowRight size={15} />
             </Link>

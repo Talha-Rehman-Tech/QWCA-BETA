@@ -493,7 +493,7 @@ export default function PropertyTaxCalculator() {
               </div>
 
               <div className="summary-actions" style={{ marginTop: '16px' }}>
-                <Link href="/#contact" className="button" style={{ width: '100%', justifyContent: 'center' }}>
+                <Link href="/contact" className="button" style={{ width: '100%', justifyContent: 'center' }}>
                   <span>Consult Real Estate Tax Advisor</span>
                   <ArrowRight size={15} />
                 </Link>
@@ -903,7 +903,7 @@ export default function PropertyTaxCalculator() {
               </div>
 
               <div className="summary-actions" style={{ marginTop: '16px' }}>
-                <Link href="/#contact" className="button" style={{ width: '100%', justifyContent: 'center' }}>
+                <Link href="/contact" className="button" style={{ width: '100%', justifyContent: 'center' }}>
                   <span>Book Property Tax Advisory</span>
                   <ArrowRight size={15} />
                 </Link>

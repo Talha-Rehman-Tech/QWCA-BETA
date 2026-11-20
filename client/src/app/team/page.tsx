@@ -174,7 +174,7 @@ export default function TeamPage() {
             <p style={{ fontSize: '14.5px', color: 'var(--text-body)', marginBottom: '20px' }}>
               Schedule a preliminary consultation to evaluate your business audit, corporate structuring, or tax advisory requirements.
             </p>
-            <Link href="/#contact" className="button">
+            <Link href="/contact" className="button">
               <span>Contact Our Practice</span>
               <ArrowRight size={15} />
             </Link>

@@ -109,6 +109,7 @@ export default function Navbar() {
   const isTaxCalculatorActive = pathname.startsWith('/tax-calculator');
   const isTeamActive = pathname === '/team';
   const isPublicationsActive = pathname === '/publications';
+  const isContactActive = pathname === '/contact';
 
   return (
     <div className={`fixed-header-wrapper ${isScrolled ? 'is-scrolled' : ''}`}>
@@ -448,9 +449,9 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/#contact"
+              href="/contact"
               onClick={closeAll}
-              className="nav-link-item"
+              className={`nav-link-item ${isContactActive ? 'active' : ''}`}
             >
               Contact
             </Link>
@@ -459,7 +460,7 @@ export default function Navbar() {
           {/* Desktop CTA Action Button & Language Switcher */}
           <div className="nav-desktop-action" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <LanguageSelector variant="navbar" />
-            <Link href="/#contact" className="nav-consultation-btn">
+            <Link href="/contact" className="nav-consultation-btn">
               <CalendarCheck size={14} />
               <span>Book Consultation</span>
               <ArrowRight size={13} className="btn-arrow" />
@@ -753,9 +754,9 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/#contact"
+                href="/contact"
                 onClick={closeAll}
-                className="drawer-link"
+                className={`drawer-link ${isContactActive ? 'active' : ''}`}
               >
                 <span>Contact Office</span>
               </Link>
@@ -766,7 +767,7 @@ export default function Navbar() {
               {/* Mobile Drawer Footer with Contact Actions */}
               <div className="drawer-footer-actions">
                 <Link
-                  href="/#contact"
+                  href="/contact"
                   className="button drawer-cta-button"
                   onClick={closeAll}
                 >

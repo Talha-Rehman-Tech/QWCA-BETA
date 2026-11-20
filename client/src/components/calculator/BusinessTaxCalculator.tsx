@@ -461,7 +461,7 @@ export default function BusinessTaxCalculator() {
             </div>
 
             <div className="calc-action-row">
-              <Link href="/#contact" className="calc-consult-link">
+              <Link href="/contact" className="calc-consult-link">
                 Need corporate tax planning, audit or SECP annual filing? Consult QWCA &rarr;
               </Link>
             </div>

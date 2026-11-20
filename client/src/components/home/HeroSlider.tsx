@@ -36,7 +36,7 @@ const slides: Slide[] = [
     description:
       'Reliable accounting, audit, taxation, and corporate advisory services for businesses and individuals across Faisalabad and nationwide.',
     primaryCtaText: 'Schedule a Consultation',
-    primaryCtaLink: '#contact',
+    primaryCtaLink: '/contact',
     secondaryCtaText: 'Explore Services',
     secondaryCtaLink: '/services',
     photoUrl: '/assets/Qummar Waheed.webp',

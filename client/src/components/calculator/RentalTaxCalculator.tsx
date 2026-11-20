@@ -295,7 +295,7 @@ export default function RentalTaxCalculator() {
             </div>
 
             <div className="calc-action-row">
-              <Link href="/#contact" className="calc-consult-link">
+              <Link href="/contact" className="calc-consult-link">
                 Need property tax planning, withholding certificates or appeals? Consult QWCA &rarr;
               </Link>
             </div>
