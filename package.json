@@ -12,6 +12,7 @@
     "build": "npm run build --prefix client",
     "start:client": "npm run start --prefix client",
     "start:server": "npm run start --prefix server",
+    "migrate:atlas": "npm run migrate:atlas --prefix server",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",

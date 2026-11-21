@@ -1107,7 +1107,7 @@ export default function AdminCustomizationDashboard() {
             >
               <span>
                 {serverOnline
-                  ? `Backend: Port 5000 (${serverInfo?.database?.includes('MongoDB') ? 'MongoDB Docker Online' : 'In-Memory'})`
+                  ? `Backend: Online (${serverInfo?.database?.includes('Atlas') ? 'MongoDB Atlas Cloud' : serverInfo?.database?.includes('MongoDB') ? 'MongoDB Online' : 'In-Memory Resilient'})`
                   : 'Express Backend Offline'}
               </span>
             </div>
@@ -2653,27 +2653,27 @@ export default function AdminCustomizationDashboard() {
                 QWCA Full-Stack Architecture Status
               </h3>
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 20px' }}>
-                High-performance decoupled architecture: Next.js Client on port 3000 and Express REST API on port 5000 with Dockerized MongoDB.
+                Production-ready decoupled architecture: Next.js Client and Express REST API with MongoDB (Atlas Cloud / Local Docker).
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '24px' }}>
                 <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <div style={{ fontSize: '12px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Express REST Server</div>
                   <div style={{ fontSize: '18px', fontWeight: 900, color: serverOnline ? '#10b981' : '#f59e0b', marginTop: '4px' }}>
-                    {serverOnline ? 'Connected (Port 5000)' : 'Offline / Standalone'}
+                    {serverOnline ? 'Connected (Online)' : 'Offline / Standalone'}
                   </div>
                   <p style={{ fontSize: '12.5px', color: '#64748b', margin: '6px 0 0' }}>
-                    API Endpoint: <code>http://localhost:5000/api</code>
+                    API Endpoint: <code>{process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}</code>
                   </p>
                 </div>
 
                 <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <div style={{ fontSize: '12px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Database Engine</div>
                   <div style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', marginTop: '4px' }}>
-                    {serverInfo?.database || (serverOnline ? 'MongoDB Docker Online' : 'In-Memory Fallback')}
+                    {serverInfo?.database || (serverOnline ? 'MongoDB Online' : 'In-Memory Fallback')}
                   </div>
                   <p style={{ fontSize: '12.5px', color: '#64748b', margin: '6px 0 0' }}>
-                    MongoDB URI: <code>mongodb://127.0.0.1:27017/qwca_database</code>
+                    Connection: <code>{serverInfo?.connectionEndpoint || 'Protected Database'}</code>
                   </p>
                 </div>
 

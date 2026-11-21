@@ -13,6 +13,9 @@ export interface ApiHealthResponse {
   status: string;
   server: string;
   database: string;
+  databaseType?: string;
+  connectionEndpoint?: string;
+  environment?: string;
   timestamp: string;
 }
 
